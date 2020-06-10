@@ -12,7 +12,7 @@ class DefaultParserTests: XCTestCase {
 
   func testParseBuyTransactionSuccess() throws {
     let sut = DefaultParser()
-    let data = "BUY 15/08/2020 Foo 12.345 1.2345 10 2.5"
+    let data = "BUY 15/08/2020 Foo 12.345 1.2345 12.5"
     let transaction = try sut.transaction(fromData: data)
     XCTAssertNotNil(transaction)
     XCTAssertEqual(transaction!.kind, .Buy)
@@ -25,7 +25,7 @@ class DefaultParserTests: XCTestCase {
 
   func testParseSellTransactionSuccess() throws {
     let sut = DefaultParser()
-    let data = "SELL 15/08/2020 Foo 12.345 1.2345 10 2.5"
+    let data = "SELL 15/08/2020 Foo 12.345 1.2345 12.5"
     let transaction = try sut.transaction(fromData: data)
     XCTAssertNotNil(transaction)
     XCTAssertEqual(transaction!.kind, .Sell)
@@ -58,13 +58,13 @@ class DefaultParserTests: XCTestCase {
 
   func testParseIncorrectKindFails() throws {
     let sut = DefaultParser()
-    let data = "FOOBAR 08/15/2020 Foo 12.345 1.2345 10 2.5"
+    let data = "FOOBAR 08/15/2020 Foo 12.345 1.2345 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: data))
   }
 
   func testParseIncorrectDateFormatFails() throws {
     let sut = DefaultParser()
-    let data = "BUY 08/15/2020 Foo 12.345 1.2345 10 2.5"
+    let data = "BUY 08/15/2020 Foo 12.345 1.2345 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: data))
   }
 
@@ -76,7 +76,7 @@ class DefaultParserTests: XCTestCase {
 
   func testParseIncorrectNumberFormatFails() throws {
     let sut = DefaultParser()
-    let data = "BUY 15/08/2020 Foo abc def 10 2.5"
+    let data = "BUY 15/08/2020 Foo abc def 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: data))
   }
 

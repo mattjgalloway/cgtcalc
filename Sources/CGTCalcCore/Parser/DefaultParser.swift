@@ -8,8 +8,12 @@
 import Foundation
 
 enum ParserError: Error {
-  case MissingFields
-  case InvalidData(String)
+  case IncorrectNumberOfFields(String)
+  case InvalidKind(String)
+  case InvalidDate(String)
+  case InvalidAmount(String)
+  case InvalidPrice(String)
+  case InvalidExpenses(String)
 }
 
 public class DefaultParser {
@@ -35,8 +39,8 @@ public class DefaultParser {
     }
 
     let splitData = data.components(separatedBy: .whitespaces)
-    guard splitData.count >= 6 else {
-      throw ParserError.MissingFields
+    guard splitData.count == 6 else {
+      throw ParserError.IncorrectNumberOfFields(data)
     }
 
     let kind: Transaction.Kind
@@ -48,35 +52,30 @@ public class DefaultParser {
     case "ADJ":
       kind = .Section104Adjust
     default:
-      throw ParserError.InvalidData(data)
+      throw ParserError.InvalidKind(data)
     }
 
     guard let date = dateFormatter.date(from: splitData[1]) else {
-      throw ParserError.InvalidData(data)
+      throw ParserError.InvalidDate(data)
     }
 
     let asset = splitData[2]
 
-    guard
-      let amount = Decimal(string: splitData[3]),
-      let price = Decimal(string: splitData[4]),
-      let expenses = Decimal(string: splitData[5]) else {
-        throw ParserError.InvalidData(data)
+    guard let amount = Decimal(string: splitData[3]) else {
+      throw ParserError.InvalidAmount(data)
     }
 
-    let stampDuty: Decimal
-    if splitData.count >= 7 {
-      guard let parsedStampDuty = Decimal(string: splitData[6]) else {
-        throw ParserError.InvalidData(data)
-      }
-      stampDuty = parsedStampDuty
-    } else {
-      stampDuty = Decimal.zero
+    guard let price = Decimal(string: splitData[4]) else {
+      throw ParserError.InvalidPrice(data)
+    }
+
+    guard let expenses = Decimal(string: splitData[5]) else {
+      throw ParserError.InvalidExpenses(data)
     }
 
     let id = self.nextId
     self.nextId += 1
 
-    return Transaction(id: id, kind: kind, date: date, asset: asset, amount: amount, price: price, expenses: expenses + stampDuty)
+    return Transaction(id: id, kind: kind, date: date, asset: asset, amount: amount, price: price, expenses: expenses)
   }
 }
