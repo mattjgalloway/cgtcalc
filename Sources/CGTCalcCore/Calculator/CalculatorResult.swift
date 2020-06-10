@@ -45,9 +45,11 @@ public struct CalculatorResult {
           gainByDisposal[disposal.id, default: Decimal.zero] += disposalMatch.gain
         }
 
-        let disposalResults = disposalMatchesByDisposal.map {
-          DisposalResult(disposal: transactionsById[$0]!, gain: gainByDisposal[$0]!, disposalMatches: $1)
-        }
+        let disposalResults =
+          disposalMatchesByDisposal.map {
+            DisposalResult(disposal: transactionsById[$0]!, gain: gainByDisposal[$0]!, disposalMatches: $1)
+          }
+          .sorted { $0.disposal.date < $1.disposal.date }
 
         return TaxYearSummary(taxYear: taxYear, gain: taxYearGain, disposalResults: disposalResults)
       }
