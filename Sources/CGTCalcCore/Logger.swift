@@ -5,6 +5,9 @@
 //  Created by Matt Galloway on 08/06/2020.
 //
 
+import Darwin
+import Foundation
+
 public protocol Logger {
   func debug(_ str: String)
   func info(_ str: String)
@@ -23,27 +26,34 @@ public class BasicLogger: Logger {
 
   public init() {}
 
+  private class StandardErrorOutputStream: TextOutputStream {
+    func write(_ string: String) {
+      FileHandle.standardError.write(Data(string.utf8))
+    }
+  }
+  private var outputStream = StandardErrorOutputStream()
+
   public func debug(_ str: String) {
     if self.level <= .Debug {
-      print("[DEBUG] \(str)")
+      print("[DEBUG] \(str)", to: &outputStream)
     }
   }
 
   public func info(_ str: String) {
     if self.level <= .Info {
-      print("[INFO] \(str)")
+      print("[INFO] \(str)", to: &outputStream)
     }
   }
 
   public func warn(_ str: String) {
     if self.level <= .Warn {
-      print("[WARN] \(str)")
+      print("[WARN] \(str)", to: &outputStream)
     }
   }
 
   public func error(_ str: String) {
     if self.level <= .Error {
-      print("[ERROR] \(str)")
+      print("[ERROR] \(str)", to: &outputStream)
     }
   }
 }
