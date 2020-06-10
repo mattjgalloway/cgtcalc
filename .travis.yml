@@ -1,0 +1,8 @@
+language: swift
+osx_image: xcode11.5
+os: osx
+install:
+  - swift package update
+script:
+  - swift build
+  - swift test
