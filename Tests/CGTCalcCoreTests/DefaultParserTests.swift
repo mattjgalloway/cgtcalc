@@ -56,6 +56,12 @@ class DefaultParserTests: XCTestCase {
     XCTAssertNil(transaction)
   }
 
+  func testParseIncorrectKindFails() throws {
+    let sut = DefaultParser()
+    let data = "FOOBAR 08/15/2020 Foo 12.345 1.2345 10 2.5"
+    XCTAssertThrowsError(try sut.transaction(fromData: data))
+  }
+
   func testParseIncorrectDateFormatFails() throws {
     let sut = DefaultParser()
     let data = "BUY 08/15/2020 Foo 12.345 1.2345 10 2.5"
