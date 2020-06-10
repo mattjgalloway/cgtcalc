@@ -7,6 +7,7 @@
 
 import ArgumentParser
 import CGTCalcCore
+import Foundation
 
 struct CGTCalc: ParsableCommand {
   @Argument(help: "The input data filename")
@@ -14,6 +15,9 @@ struct CGTCalc: ParsableCommand {
 
   @Flag(name: .shortAndLong, help: "Enable verbose logging")
   var verbose: Bool
+
+  @Option(name: .shortAndLong, help: "Output file")
+  var outputFile: String?
 
   func run() throws {
     do {
@@ -31,8 +35,13 @@ struct CGTCalc: ParsableCommand {
 
       let presenter = TextPresenter(result: result)
       let output = try presenter.process()
-      print("\n")
-      print(output)
+
+      if let outputFile = self.outputFile, outputFile != "-" {
+        let outputFileUrl = URL(fileURLWithPath: outputFile)
+        try output.write(to: outputFileUrl, atomically: true, encoding: .utf8)
+      } else {
+        print(output)
+      }
     } catch {
       print("Failed: \(error)")
     }
