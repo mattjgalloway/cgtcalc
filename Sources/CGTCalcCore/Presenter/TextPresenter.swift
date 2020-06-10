@@ -38,9 +38,9 @@ public class TextPresenter {
         taxYearSummary.disposalResults
           .forEach { disposalResult in
             detailsOutput += "\(count)) SOLD \(disposalResult.disposal.amount) of \(disposalResult.disposal.asset) on \(dateFormatter.string(from: disposalResult.disposal.date)) for gain of \(self.formattedCurrency(disposalResult.gain))\n"
-            detailsOutput += "Matches with:"
+            detailsOutput += "Matches with:\n"
             disposalResult.disposalMatches.forEach { disposalMatch in
-              detailsOutput += "\(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: dateFormatter))\n"
+              detailsOutput += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: dateFormatter))\n"
             }
             detailsOutput += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
             count += 1
