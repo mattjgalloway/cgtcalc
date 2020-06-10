@@ -27,9 +27,10 @@ class Section104Processor {
 
     while disposalsIndex < self.state.pendingDisposals.endIndex {
       let disposal = self.state.pendingDisposals[disposalsIndex]
-      if let acquisition = allAcquisitions.popLast() {
+      if let acquisition = allAcquisitions.last {
         if acquisition.date <= disposal.date {
           section104Holding.process(acquisition: acquisition)
+          _ = allAcquisitions.removeLast()
           continue
         }
       }
