@@ -48,7 +48,7 @@ public class Calculator {
         disposalMatches.append(contentsOf: assetResult.disposalMatches)
       }
 
-    let calculatorResult = CalculatorResult(disposalMatches: allDisposalMatches)
+    let calculatorResult = CalculatorResult(transactions: self.transactions, disposalMatches: allDisposalMatches)
 
     self.logger.info("Finished processing")
 

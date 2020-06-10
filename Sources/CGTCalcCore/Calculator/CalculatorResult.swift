@@ -8,6 +8,7 @@
 import Foundation
 
 public struct CalculatorResult {
+  let transactions: [Transaction]
   let taxYearSummaries: [TaxYearSummary]
 
   struct DisposalResult {
@@ -22,7 +23,8 @@ public struct CalculatorResult {
     let disposalResults: [DisposalResult]
   }
 
-  init(disposalMatches: [DisposalMatch]) {
+  init(transactions: [Transaction], disposalMatches: [DisposalMatch]) {
+    self.transactions = transactions
     self.taxYearSummaries = disposalMatches
       .reduce(into: [TaxYear:[DisposalMatch]]()) { (result, disposalMatch) in
         var disposalMatches = result[disposalMatch.taxYear, default: []]

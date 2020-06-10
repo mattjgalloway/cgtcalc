@@ -18,7 +18,7 @@ enum ParserError: Error {
 
 public class DefaultParser {
   private let dateFormatter: DateFormatter
-  private var nextId: Int = 0
+  private var nextId: Int = 1
 
   public init() {
     self.dateFormatter = DateFormatter()

@@ -54,8 +54,15 @@ public class TextPresenter {
 
     output += "\n\n"
 
-    output += "# DETAILS\n"
+    output += "# TAX YEAR DETAILS\n"
     output += detailsOutput
+
+    output += "\n\n"
+
+    output += "# TRANSACTIONS\n\n"
+    output += self.result.transactions.reduce(into: "") { (result, transaction) in
+      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) \(transaction.asset) \(transaction.amount) £\(transaction.price) £\(transaction.expenses)\n"
+    }
 
     return output
   }

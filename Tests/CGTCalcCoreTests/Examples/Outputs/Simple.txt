@@ -3,7 +3,7 @@
 Year 2018/2019: Gain = £-19, Exemption = £11700
 
 
-# DETAILS
+# TAX YEAR DETAILS
 
 ## TAX YEAR 2018/2019
 
@@ -13,3 +13,9 @@ Matches with:
 Calculation: (10 * £4.6702 - £12.5) - ( (10 * £4.1565 + £12.5) ) = £-19
 
 
+
+
+# TRANSACTIONS
+
+11: 28/08/2018 GB00B41YBW71 10 £4.6702 £12.5
+12: 28/08/2018 GB00B41YBW71 10 £4.1565 £12.5

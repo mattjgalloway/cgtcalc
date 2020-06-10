@@ -16,7 +16,7 @@ class TextPresenterTests: XCTestCase {
     let disposal = ModelCreation.transaction(5, .Sell, "01/01/2000", "Foo", "1000", "1", "0")
     let disposalSub = SubTransaction(transaction: disposal)
     let disposalMatch = DisposalMatch(kind: .SameDay(acquisitionSub), disposal: disposalSub)
-    let result = CalculatorResult(disposalMatches: [disposalMatch])
+    let result = CalculatorResult(transactions: [acquisition, disposal], disposalMatches: [disposalMatch])
     let sut = TextPresenter(result: result)
     XCTAssertThrowsError(try sut.process())
   }
