@@ -7,15 +7,15 @@ Year 2018/2019: Gain = £629, Exemption = £11700
 
 ## TAX YEAR 2018/2019
 
-1) SOLD 700 of Lobster on 01/05/2018 for gain of £329
+1) SOLD 700 of Lobster on 01/05/2018 for GAIN of £329
 Matches with:
   - SECTION 104: 1500 at cost basis of £4.18667
-Calculation: (700 * £4.8 - £100) - ( (700 * £4.18667) ) = £329
+Calculation: (700 * 4.8 - 100) - ( (700 * 4.18667) ) = 329
 
-2) SOLD 400 of Lobster on 01/02/2019 for gain of £300
+2) SOLD 400 of Lobster on 01/02/2019 for GAIN of £300
 Matches with:
   - SECTION 104: 800 at cost basis of £4.18667
-Calculation: (400 * £5.2 - £105) - ( (400 * £4.18667) ) = £300
+Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 
 
 

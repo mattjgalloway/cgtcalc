@@ -37,7 +37,12 @@ public class TextPresenter {
         var count = 1
         taxYearSummary.disposalResults
           .forEach { disposalResult in
-            detailsOutput += "\(count)) SOLD \(disposalResult.disposal.amount) of \(disposalResult.disposal.asset) on \(dateFormatter.string(from: disposalResult.disposal.date)) for gain of \(self.formattedCurrency(disposalResult.gain))\n"
+            detailsOutput += "\(count)) SOLD \(disposalResult.disposal.amount)"
+            detailsOutput += " of \(disposalResult.disposal.asset)"
+            detailsOutput += " on \(dateFormatter.string(from: disposalResult.disposal.date))"
+            detailsOutput += " for "
+            detailsOutput += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
+            detailsOutput += " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
             detailsOutput += "Matches with:\n"
             disposalResult.disposalMatches.forEach { disposalMatch in
               detailsOutput += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: dateFormatter))\n"
@@ -73,29 +78,29 @@ extension TextPresenter {
   private static func disposalMatchDetails(_ disposalMatch: DisposalMatch, dateFormatter: DateFormatter) -> String {
     switch disposalMatch.kind {
     case .SameDay(let acquisition):
-      return "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at \(acquisition.price)"
+      return "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
     case .BedAndBreakfast(let acquisition):
-      return "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at \(acquisition.price)"
+      return "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
     case .Section104(let amountAtDisposal, let costBasis):
       return "SECTION 104: \(amountAtDisposal) at cost basis of £\(costBasis.rounded(to: 5).string)"
     }
   }
 
   private static func disposalResultCalculationString(_ disposalResult: CalculatorResult.DisposalResult) -> String {
-    var output = "(\(disposalResult.disposal.amount) * £\(disposalResult.disposal.price) - £\(disposalResult.disposal.expenses)) - ( "
+    var output = "(\(disposalResult.disposal.amount) * \(disposalResult.disposal.price) - \(disposalResult.disposal.expenses)) - ( "
     var gain = Decimal.zero
     var disposalMatchesStrings: [String] = []
     for disposalMatch in disposalResult.disposalMatches {
       gain += disposalMatch.gain
       switch disposalMatch.kind {
       case .SameDay(let acquisition), .BedAndBreakfast(let acquisition):
-        disposalMatchesStrings.append("(\(acquisition.amount) * £\(acquisition.price) + £\(acquisition.expenses))")
+        disposalMatchesStrings.append("(\(acquisition.amount) * \(acquisition.price) + \(acquisition.expenses))")
       case .Section104(_, let costBasis):
-        disposalMatchesStrings.append("(\(disposalMatch.disposal.amount) * £\(costBasis.rounded(to: 5).string))")
+        disposalMatchesStrings.append("(\(disposalMatch.disposal.amount) * \(costBasis.rounded(to: 5).string))")
       }
     }
     output += disposalMatchesStrings.joined(separator: " + ")
-    output += " ) = £\(gain.rounded(to: 2).string)"
+    output += " ) = \(gain.rounded(to: 2).string)"
     return output
   }
 

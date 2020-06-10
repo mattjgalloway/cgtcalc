@@ -9,28 +9,28 @@ Year 2020/2021: Gain = £-20, Exemption = £12300
 
 ## TAX YEAR 2018/2019
 
-1) SOLD 10 of GB00B41YBW71 on 28/08/2018 for gain of £-20
+1) SOLD 10 of GB00B41YBW71 on 28/08/2018 for LOSS of £20
 Matches with:
-  - SAME DAY: 10 bought on 28/08/2018 at 4.1565
-Calculation: (10 * £4.6702 - £12.5) - ( (10 * £4.1565 + £12.5) ) = £-20
+  - SAME DAY: 10 bought on 28/08/2018 at £4.1565
+Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 
 
 
 ## TAX YEAR 2019/2020
 
-1) SOLD 10 of GB00B41YBW71 on 28/08/2019 for gain of £-20
+1) SOLD 10 of GB00B41YBW71 on 28/08/2019 for LOSS of £20
 Matches with:
-  - BED & BREAKFAST: 10 bought on 20/09/2019 at 4.1565
-Calculation: (10 * £4.6702 - £12.5) - ( (10 * £4.1565 + £12.5) ) = £-20
+  - BED & BREAKFAST: 10 bought on 20/09/2019 at £4.1565
+Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 
 
 
 ## TAX YEAR 2020/2021
 
-1) SOLD 10 of GB00B41YBW71 on 28/10/2020 for gain of £-20
+1) SOLD 10 of GB00B41YBW71 on 28/10/2020 for LOSS of £20
 Matches with:
   - SECTION 104: 10 at cost basis of £5.4065
-Calculation: (10 * £4.6702 - £12.5) - ( (10 * £5.4065) ) = £-20
+Calculation: (10 * 4.6702 - 12.5) - ( (10 * 5.4065) ) = -20
 
 
 
