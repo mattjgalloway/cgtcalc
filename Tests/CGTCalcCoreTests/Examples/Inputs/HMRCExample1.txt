@@ -1,0 +1,5 @@
+# Taken from https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/877369/HS284_Example_3_2020.pdf
+BUY 01/04/2014 Lobster 1000 4.00 150
+BUY 01/09/2017 Lobster 500 4.10 80
+SELL 01/05/2018 Lobster 700 4.80 100
+SELL 01/02/2019 Lobster 400 5.20 105
