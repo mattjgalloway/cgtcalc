@@ -7,4 +7,5 @@ script:
   - swift build
   - swift test --enable-code-coverage
 after_success:
+  - xcrun llvm-cov export -format="lcov" .build/debug/cgtcalcPackageTests.xctest/Contents/MacOS/cgtcalcPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
   - bash <(curl -s https://codecov.io/bash)
