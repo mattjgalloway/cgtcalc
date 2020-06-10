@@ -26,10 +26,14 @@ public class DefaultParser {
   public func transactions(fromData data: String) throws -> [Transaction] {
     return try data
       .split { $0.isNewline }
-      .map { try self.transaction(fromData: String($0)) }
+      .compactMap { try self.transaction(fromData: String($0)) }
   }
 
-  public func transaction(fromData data: String) throws -> Transaction {
+  public func transaction(fromData data: String) throws -> Transaction? {
+    guard data.count > 0 && data[data.startIndex] != "#" else {
+      return nil
+    }
+
     let splitData = data.components(separatedBy: .whitespaces)
     guard splitData.count >= 6 else {
       throw ParserError.MissingFields
