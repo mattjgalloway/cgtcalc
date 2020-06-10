@@ -1,0 +1,14 @@
+# SUMMARY
+
+Year 2018/2019: Gain = £-19, Exemption = £11700
+
+
+# DETAILS
+
+## TAX YEAR 2018/2019
+
+1) SOLD 10 of GB00B41YBW71 on 28/08/2018 for gain of £-19
+Matches with:SAME DAY: 10 bought on 28/08/2018 at 4.1565
+Calculation: (10 * £4.6702 - £12.5) - ( (10 * £4.1565 + £12.5) ) = £-19
+
+
