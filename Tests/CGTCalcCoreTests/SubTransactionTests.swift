@@ -22,8 +22,8 @@ class SubTransactionTests: XCTestCase {
     let acquisition = SubTransaction(transaction: transaction)
     let splitAmount = Decimal(string: "2.123")!
     let remainder = try acquisition.split(withAmount: splitAmount)
-    XCTAssertEqual(acquisition.amount, Decimal(string: "10.222"))
-    XCTAssertEqual(remainder.amount, splitAmount)
+    XCTAssertEqual(acquisition.amount, splitAmount)
+    XCTAssertEqual(remainder.amount, Decimal(string: "10.222"))
   }
 
   func testSplitTooMuchFails() throws {

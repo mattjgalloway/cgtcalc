@@ -34,10 +34,11 @@ class SubTransaction {
     }
 
     let remainder = SubTransaction(transaction: self.transaction)
-    remainder.amount = amount
-    remainder.expenses = self.expenses * amount / self.amount
+    let remainderAmount = self.amount - amount
+    remainder.amount = remainderAmount
+    remainder.expenses = self.expenses * remainderAmount / self.amount
 
-    self.amount -= amount
+    self.amount = amount
     self.expenses = self.expenses - remainder.expenses
 
     return remainder
