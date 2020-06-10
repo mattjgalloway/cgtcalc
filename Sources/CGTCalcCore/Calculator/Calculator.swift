@@ -72,7 +72,7 @@ public class Calculator {
     let bedAndBreakfastProcessor = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
       if acquisition.date < disposal.date {
         return .SkipAcquisition
-      } else if disposal.date < acquisition.date.addingTimeInterval(60*60*24*30) {
+      } else if disposal.date.addingTimeInterval(60*60*24*30) < acquisition.date {
         return .SkipDisposal
       } else {
         return .Match(DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal))
