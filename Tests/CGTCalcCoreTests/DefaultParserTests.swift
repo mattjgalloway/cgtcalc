@@ -74,9 +74,21 @@ class DefaultParserTests: XCTestCase {
     XCTAssertThrowsError(try sut.transaction(fromData: data))
   }
 
-  func testParseIncorrectNumberFormatFails() throws {
+  func testParseIncorrectAmountFormatFails() throws {
     let sut = DefaultParser()
-    let data = "BUY 15/08/2020 Foo abc def 12.5"
+    let data = "BUY 15/08/2020 Foo abc 1.2345 12.5"
+    XCTAssertThrowsError(try sut.transaction(fromData: data))
+  }
+
+  func testParseIncorrectPriceFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "BUY 15/08/2020 Foo 12.345 def 12.5"
+    XCTAssertThrowsError(try sut.transaction(fromData: data))
+  }
+
+  func testParseIncorrectExpensesFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "BUY 15/08/2020 Foo 12.345 1.2345 abc"
     XCTAssertThrowsError(try sut.transaction(fromData: data))
   }
 
