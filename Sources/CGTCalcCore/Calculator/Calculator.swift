@@ -58,26 +58,26 @@ public class Calculator {
   private func processAsset(withState state: AssetProcessorState) throws -> AssetResult {
     self.logger.info("Begin processing transactions for \(state.asset).")
 
-    let sameDayProcessor = MatchingProcessor(state: state, logger: self.logger, matcher: { (acquisitionDate, disposalDate) in
-      if acquisitionDate < disposalDate {
+    let sameDayProcessor = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
+      if acquisition.date < disposal.date {
         return .SkipAcquisition
-      } else if disposalDate < acquisitionDate {
+      } else if disposal.date < acquisition.date {
         return .SkipDisposal
       } else {
-        return .Match
+        return .Match(DisposalMatch(kind: .SameDay(acquisition), disposal: disposal))
       }
-    }, disposalMatchCreator: { DisposalMatch(kind: .SameDay($0), disposal: $1) })
+    }
     try sameDayProcessor.process()
 
-    let bedAndBreakfastProcessor = MatchingProcessor(state: state, logger: self.logger, matcher: { (acquisitionDate, disposalDate) in
-      if acquisitionDate < disposalDate {
+    let bedAndBreakfastProcessor = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
+      if acquisition.date < disposal.date {
         return .SkipAcquisition
-      } else if disposalDate < acquisitionDate.addingTimeInterval(60*60*24*30) {
+      } else if disposal.date < acquisition.date.addingTimeInterval(60*60*24*30) {
         return .SkipDisposal
       } else {
-        return .Match
+        return .Match(DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal))
       }
-    }, disposalMatchCreator: { DisposalMatch(kind: .BedAndBreakfast($0), disposal: $1) })
+    }
     try bedAndBreakfastProcessor.process()
 
     let section104Processor = Section104Processor(state: state, logger: self.logger)

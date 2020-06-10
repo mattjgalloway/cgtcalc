@@ -11,22 +11,19 @@ class MatchingProcessor {
   enum MatchResult {
     case SkipAcquisition
     case SkipDisposal
-    case Match
+    case Match(DisposalMatch)
   }
-  typealias Matcher = (Date, Date) -> MatchResult
-  typealias DisposalMatchCreator = (SubTransaction, SubTransaction) -> DisposalMatch
+  typealias Matcher = (SubTransaction, SubTransaction) -> MatchResult
 
   private let state: AssetProcessorState
   private let logger: Logger
   private let matcher: Matcher
-  private let disposalMatchCreator: DisposalMatchCreator
   private var matchCount: Int = 0
 
-  required init(state: AssetProcessorState, logger: Logger, matcher: @escaping Matcher, disposalMatchCreator: @escaping DisposalMatchCreator) {
+  required init(state: AssetProcessorState, logger: Logger, matcher: @escaping Matcher) {
     self.state = state
     self.logger = logger
     self.matcher = matcher
-    self.disposalMatchCreator = disposalMatchCreator
   }
 
   func process() throws {
@@ -38,14 +35,15 @@ class MatchingProcessor {
       let acquisition = self.state.pendingAcquisitions[acquisitionIndex]
       let disposal = self.state.pendingDisposals[disposalIndex]
 
-      switch self.matcher(acquisition.date, disposal.date) {
+      switch self.matcher(acquisition, disposal) {
       case .SkipAcquisition:
         acquisitionIndex += 1
         continue
       case .SkipDisposal:
         disposalIndex += 1
         continue
-      case .Match:
+      case .Match(let disposalMatch):
+        self.state.disposalMatches.append(disposalMatch)
         break
       }
 
@@ -71,10 +69,7 @@ class MatchingProcessor {
 
       // No need to increment the indices because we've removed those elements
 
-      self.matchCount = 0
-
-      let disposalMatch = self.disposalMatchCreator(acquisition, disposal)
-      self.state.disposalMatches.append(disposalMatch)
+      self.matchCount += 1
     }
 
     self.logger.debug("Finished matching processor. Matched \(self.matchCount) and there are \(self.state.pendingDisposals.count) disposals left.")
