@@ -19,6 +19,8 @@ struct CGTCalc: ParsableCommand {
   @Option(name: .shortAndLong, help: "Output file")
   var outputFile: String?
 
+  static var configuration = CommandConfiguration(commandName: "cgtcalc")
+
   func run() throws {
     do {
       let logger = BasicLogger()
