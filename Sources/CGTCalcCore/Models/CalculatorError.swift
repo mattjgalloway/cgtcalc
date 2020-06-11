@@ -7,6 +7,7 @@
 
 enum CalculatorError: Error {
   case InvalidData(String)
+  case TransactionDateNotSupported
   case InternalError(String)
   case Incomplete
 }

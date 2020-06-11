@@ -1,8 +1,10 @@
 # SUMMARY
 
-Year 2018/2019: Gain = £-20, Exemption = £11700
-Year 2019/2020: Gain = £-20, Exemption = £12000
-Year 2020/2021: Gain = £-20, Exemption = £12300
+Tax year    Gain   Exemption   Taxable gain   Basic rate tax   Higher rate tax
+==============================================================================
+2018/2019   £-20   £11700      £0             £0               £0             
+2019/2020   £-20   £12000      £0             £0               £0             
+2020/2021   £-20   £12300      £0             £0               £0             
 
 
 # TAX YEAR DETAILS

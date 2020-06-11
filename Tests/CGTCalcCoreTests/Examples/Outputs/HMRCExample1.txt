@@ -1,6 +1,8 @@
 # SUMMARY
 
-Year 2018/2019: Gain = £629, Exemption = £11700
+Tax year    Gain   Exemption   Taxable gain   Basic rate tax   Higher rate tax
+==============================================================================
+2018/2019   £629   £11700      £0             £0               £0             
 
 
 # TAX YEAR DETAILS

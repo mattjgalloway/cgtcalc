@@ -20,19 +20,22 @@ public struct CalculatorResult {
   struct TaxYearSummary {
     let taxYear: TaxYear
     let gain: Decimal
+    let taxableGain: Decimal
+    let basicRateTax: Decimal
+    let higherRateTax: Decimal
     let disposalResults: [DisposalResult]
   }
 
-  init(transactions: [Transaction], disposalMatches: [DisposalMatch]) {
+  init(transactions: [Transaction], disposalMatches: [DisposalMatch]) throws {
     self.transactions = transactions
-    self.taxYearSummaries = disposalMatches
+    self.taxYearSummaries = try disposalMatches
       .reduce(into: [TaxYear:[DisposalMatch]]()) { (result, disposalMatch) in
         var disposalMatches = result[disposalMatch.taxYear, default: []]
         disposalMatches.append(disposalMatch)
         result[disposalMatch.taxYear] = disposalMatches
       }
       .map { (taxYear, disposalMatches) in
-        var taxYearGain = Decimal.zero
+        var gain = Decimal.zero
         var transactionsById: [Transaction.Id:Transaction] = [:]
         var disposalMatchesByDisposal: [Transaction.Id:[DisposalMatch]] = [:]
         var gainByDisposal: [Transaction.Id:Decimal] = [:]
@@ -40,7 +43,7 @@ public struct CalculatorResult {
         disposalMatches.forEach { disposalMatch in
           let disposal = disposalMatch.disposal.transaction
           transactionsById[disposal.id] = disposal
-          taxYearGain += disposalMatch.gain
+          gain += disposalMatch.gain
           var matches = disposalMatchesByDisposal[disposal.id, default: []]
           matches.append(disposalMatch)
           disposalMatchesByDisposal[disposal.id] = matches
@@ -53,7 +56,14 @@ public struct CalculatorResult {
           }
           .sorted { $0.disposal.date < $1.disposal.date }
 
-        return TaxYearSummary(taxYear: taxYear, gain: taxYearGain, disposalResults: disposalResults)
+        guard let taxYearRates = taxYear.rates else {
+          throw CalculatorError.InternalError("Missing tax year rates for \(taxYear)")
+        }
+        let taxableGain = max(Decimal.zero, gain - taxYearRates.exemption)
+        let basicRateTax = taxableGain * taxYearRates.basicRate * 0.01
+        let higherRateTax = taxableGain * taxYearRates.higherRate * 0.01
+
+        return TaxYearSummary(taxYear: taxYear, gain: gain, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
       }
       .sorted { $0.taxYear < $1.taxYear }
   }

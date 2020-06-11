@@ -31,4 +31,10 @@ class CalculatorTests: XCTestCase {
     }
   }
 
+  func testDateBefore20080406Throws() throws {
+    let transaction = ModelCreation.transaction(1, .Buy, "05/04/2008", "Foo", "1", "1", "0")
+    let calculator = try Calculator(transactions: [transaction], logger: self.logger)
+    XCTAssertThrowsError(try calculator.process())
+  }
+
 }

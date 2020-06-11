@@ -9,67 +9,102 @@ import Foundation
 
 public class TextPresenter {
   private let result: CalculatorResult
+  private let dateFormatter: DateFormatter
 
   public init(result: CalculatorResult) {
     self.result = result
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    dateFormatter.dateFormat = "dd/MM/yyyy"
+    self.dateFormatter = dateFormatter
+  }
+
+  public func process() throws -> String {
+    var output = ""
+    output += "# SUMMARY\n\n"
+    output += try self.summaryTable()
+
+    output += "\n\n"
+
+    output += "# TAX YEAR DETAILS\n"
+    output += self.detailsOutput()
+
+    output += "\n\n"
+
+    output += "# TRANSACTIONS\n\n"
+    output += self.transactionsTable()
+
+    return output
   }
 
   private func formattedCurrency(_ amount: Decimal) -> String {
     return "£\(amount.rounded(to: 2).string)"
   }
 
-  public func process() throws -> String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-    dateFormatter.dateFormat = "dd/MM/yyyy"
-
-    var summaryOutput = ""
-    var detailsOutput = ""
-    try self.result.taxYearSummaries
-      .forEach { taxYearSummary in
-        guard let taxYearRates = taxYearSummary.taxYear.rates else {
-          throw CalculatorError.InternalError("Missing tax year rates for \(taxYearSummary.taxYear)")
+  private func summaryTable() throws -> String {
+    let rows = try self.result.taxYearSummaries
+      .reduce(into: [[String]]()) { (output, summary) in
+        guard let taxYearRates = summary.taxYear.rates else {
+          throw CalculatorError.InternalError("Missing tax year rates for \(summary.taxYear)")
         }
-        summaryOutput += "Year \(taxYearSummary.taxYear): Gain = \(self.formattedCurrency(taxYearSummary.gain)), Exemption = \(self.formattedCurrency(taxYearRates.exemption))\n"
-
-        detailsOutput += "\n## TAX YEAR \(taxYearSummary.taxYear)\n\n"
-        var count = 1
-        taxYearSummary.disposalResults
-          .forEach { disposalResult in
-            detailsOutput += "\(count)) SOLD \(disposalResult.disposal.amount)"
-            detailsOutput += " of \(disposalResult.disposal.asset)"
-            detailsOutput += " on \(dateFormatter.string(from: disposalResult.disposal.date))"
-            detailsOutput += " for "
-            detailsOutput += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
-            detailsOutput += " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
-            detailsOutput += "Matches with:\n"
-            disposalResult.disposalMatches.forEach { disposalMatch in
-              detailsOutput += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: dateFormatter))\n"
-            }
-            detailsOutput += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
-            count += 1
-          }
-        detailsOutput += "\n"
+        let row = [summary.taxYear.string, self.formattedCurrency(summary.gain), self.formattedCurrency(taxYearRates.exemption), self.formattedCurrency(summary.taxableGain), self.formattedCurrency(summary.basicRateTax), self.formattedCurrency(summary.higherRateTax)]
+        output.append(row)
       }
 
-    var output = ""
-    output += "# SUMMARY\n\n"
-    output += summaryOutput
-
-    output += "\n\n"
-
-    output += "# TAX YEAR DETAILS\n"
-    output += detailsOutput
-
-    output += "\n\n"
-
-    output += "# TRANSACTIONS\n\n"
-    output += self.result.transactions.reduce(into: "") { (result, transaction) in
-      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) \(transaction.asset) \(transaction.amount) £\(transaction.price) £\(transaction.expenses)\n"
+    let headerRow = ["Tax year", "Gain", "Exemption", "Taxable gain", "Basic rate tax", "Higher rate tax"]
+    let initialMaxWidths = headerRow.map { $0.count }
+    let maxWidths = rows.reduce(into: initialMaxWidths) { (result, row) in
+      for i in 0..<result.count {
+        result[i] = max(result[i], row[i].count)
+      }
     }
 
+    let builder = { (input: [String]) -> String in
+      var out: [String] = []
+      for (i, column) in input.enumerated() {
+        out.append(column.padding(toLength: maxWidths[i], withPad: " ", startingAt: 0))
+      }
+      return out.joined(separator: "   ")
+    }
+
+    let header = builder(headerRow)
+    var output = header + "\n"
+    output += String(repeating: "=", count: header.count) + "\n"
+    for row in rows {
+      output += builder(row) + "\n"
+    }
     return output
+  }
+
+  private func detailsOutput() -> String {
+    return self.result.taxYearSummaries
+      .reduce(into: "") { (output, summary) in
+        output += "\n## TAX YEAR \(summary.taxYear)\n\n"
+        var count = 1
+        summary.disposalResults
+          .forEach { disposalResult in
+            output += "\(count)) SOLD \(disposalResult.disposal.amount)"
+            output += " of \(disposalResult.disposal.asset)"
+            output += " on \(self.dateFormatter.string(from: disposalResult.disposal.date))"
+            output += " for "
+            output += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
+            output += " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
+            output += "Matches with:\n"
+            disposalResult.disposalMatches.forEach { disposalMatch in
+              output += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: self.dateFormatter))\n"
+            }
+            output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
+            count += 1
+          }
+        output += "\n"
+    }
+  }
+
+  private func transactionsTable() -> String {
+    return self.result.transactions.reduce(into: "") { (result, transaction) in
+      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) \(transaction.asset) \(transaction.amount) £\(transaction.price) £\(transaction.expenses)\n"
+    }
   }
 }
 
