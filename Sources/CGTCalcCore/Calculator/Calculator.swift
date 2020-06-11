@@ -18,7 +18,22 @@ public class Calculator {
 
   public func process() throws -> CalculatorResult {
     self.logger.info("Begin processing")
+    try self.preprocessTransactions()
+    let calculatorResult = try self.processTransactions()
+    self.logger.info("Finished processing")
+    return calculatorResult
+  }
 
+  private func preprocessTransactions() throws {
+    for transaction in transactions {
+      // 6th April 2008 is when new CGT rules came in. We only support those new rules.
+      if transaction.date < Date(timeIntervalSince1970: 1207440000) {
+        throw CalculatorError.TransactionDateNotSupported
+      }
+    }
+  }
+
+  private func processTransactions() throws -> CalculatorResult {
     let allDisposalMatches = try self.transactions
       .reduce(into: [String:[Transaction]]()) { (result, transaction) in
         var transactions = result[transaction.asset, default: []]
@@ -48,11 +63,7 @@ public class Calculator {
         disposalMatches.append(contentsOf: assetResult.disposalMatches)
       }
 
-    let calculatorResult = CalculatorResult(transactions: self.transactions, disposalMatches: allDisposalMatches)
-
-    self.logger.info("Finished processing")
-
-    return calculatorResult
+    return try CalculatorResult(transactions: self.transactions, disposalMatches: allDisposalMatches)
   }
 
   private func processAsset(withState state: AssetProcessorState) throws -> AssetResult {
