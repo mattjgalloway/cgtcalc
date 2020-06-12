@@ -15,8 +15,6 @@ Matches with:
 Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 0 + 12.5) ) = -20
 
 
-
-
 # TRANSACTIONS
 
 1: 28/08/2018 SOLD 10 of GB00B41YBW71 at £4.6702 with £12.5 expenses

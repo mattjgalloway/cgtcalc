@@ -20,8 +20,6 @@ Matches with:
 Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 
 
-
-
 # TRANSACTIONS
 
 1: 01/04/2014 BOUGHT 1000 of Lobster at £4 with £150 expenses

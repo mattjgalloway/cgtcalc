@@ -27,10 +27,10 @@ public class TextPresenter {
 
     output += "\n\n"
 
-    output += "# TAX YEAR DETAILS\n"
+    output += "# TAX YEAR DETAILS\n\n"
     output += self.detailsOutput()
 
-    output += "\n\n"
+    output += "\n"
 
     output += "# TRANSACTIONS\n\n"
     output += self.transactionsTable()
@@ -85,7 +85,7 @@ public class TextPresenter {
   private func detailsOutput() -> String {
     return self.result.taxYearSummaries
       .reduce(into: "") { (output, summary) in
-        output += "\n## TAX YEAR \(summary.taxYear)\n\n"
+        output += "## TAX YEAR \(summary.taxYear)\n\n"
         var count = 1
         summary.disposalResults
           .forEach { disposalResult in
@@ -102,7 +102,6 @@ public class TextPresenter {
             output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
             count += 1
           }
-        output += "\n"
     }
   }
 

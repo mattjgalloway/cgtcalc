@@ -15,8 +15,6 @@ Matches with:
 Calculation: (40 * 194.22 - 12.5) - ( (40 * 183.47975) ) = 417
 
 
-
-
 # TRANSACTIONS
 
 1: 05/12/2019 SOLD 40 of GB00B3TYHH97 at £194.22 with £12.5 expenses

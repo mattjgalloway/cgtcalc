@@ -16,8 +16,6 @@ Matches with:
   - SAME DAY: 1 bought on 01/01/2018 at £1000 with offset of £0
 Calculation: (1 * 0 - 0) - ( (1 * 1000 + 0 + 0) ) = -1000
 
-
-
 ## TAX YEAR 2018/2019
 
 1) SOLD 1 of GB00B41YBW71 on 01/01/2019 for GAIN of £1000
@@ -25,16 +23,12 @@ Matches with:
   - SAME DAY: 1 bought on 01/01/2019 at £1000 with offset of £0
 Calculation: (1 * 2000 - 0) - ( (1 * 1000 + 0 + 0) ) = 1000
 
-
-
 ## TAX YEAR 2019/2020
 
 1) SOLD 1 of GB00B41YBW71 on 01/01/2020 for GAIN of £19000
 Matches with:
   - SAME DAY: 1 bought on 01/01/2020 at £1000 with offset of £0
 Calculation: (1 * 20000 - 0) - ( (1 * 1000 + 0 + 0) ) = 19000
-
-
 
 
 # TRANSACTIONS
