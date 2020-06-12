@@ -35,6 +35,8 @@ public class TextPresenter {
     output += "# TRANSACTIONS\n\n"
     output += self.transactionsTable()
 
+    output += "\n\n"
+
     output += "# ASSET EVENTS\n\n"
     output += self.assetEventsTable()
 
