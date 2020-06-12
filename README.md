@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/mattjgalloway/cgtcalc.svg?branch=master)](https://travis-ci.org/mattjgalloway/cgtcalc)
 [![codecov](https://codecov.io/gh/mattjgalloway/cgtcalc/branch/master/graph/badge.svg)](https://codecov.io/gh/mattjgalloway/cgtcalc)
 
-**DISCLAIMER: I am not a financial professional and cannot give tax advice. This calculator is intended for sample purposes only. Always do your own calculations for your self assessment.**
+**DISCLAIMER: I am not a financial professional and cannot give tax advice. This calculator is intended for sample purposes only. Always do your own calculations for your self assessment. I accept no responsibility for any errors this calculator produces.**
 
 `cgtcalc` is a command line application written in Swift which calculates UK capital gains tax based on a set of transactions. You feed it an input list of transactions and it outputs a summary of each tax year's gain (or loss) and the details for the disposal events that make up the gain (or loss).
 
@@ -134,3 +134,7 @@ let result = try calculator.process()
 let presenter = TextPresenter(result: result)
 let output = try presenter.process()
 ```
+
+## Tests
+
+`cgtcalc` includes a comprehensive test suite. The most interesting ones are in [Tests/CGTCalcCoreTests/Examples](Tests/CGTCalcCoreTests/Examples). These are full end-to-end tests which have [input data files](Tests/CGTCalcCoreTests/Examples/Inputs) and check against equivalent [output files](Tests/CGTCalcCoreTests/Examples/Outputs). Those are worth looking at to see how the calculator responds to given inputs.
