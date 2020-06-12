@@ -63,41 +63,72 @@ class DefaultParserTests: XCTestCase {
     XCTAssertNil(transaction)
   }
 
-  func testParseIncorrectKindFails() throws {
+  func testParseTransactionIncorrectKindFails() throws {
     let sut = DefaultParser()
     let data = "FOOBAR 08/15/2020 Foo 12.345 1.2345 12.5"
     let transaction = try sut.transaction(fromData: Substring(data))
     XCTAssertNil(transaction)
   }
 
-  func testParseIncorrectDateFormatFails() throws {
+  func testParseAssetEventIncorrectKindFails() throws {
     let sut = DefaultParser()
-    let data = "BUY 08/15/2020 Foo 12.345 1.2345 12.5"
+    let data = "FOOBAR 08/15/2020 Foo 12.345 1.2345 12.5"
+    let transaction = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNil(transaction)
+  }
+
+  func testParseTransactionIncorrectDateFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "BUY abc Foo 12.345 1.2345 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
   }
 
-  func testParseIncorrectNumberOfFieldsFails() throws {
+  func testParseTransactionIncorrectNumberOfFieldsFails() throws {
     let sut = DefaultParser()
     let data = "BUY 15/08/2020 Foo 12.345 1.2345"
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
   }
 
-  func testParseIncorrectAmountFormatFails() throws {
+  func testParseTransactionIncorrectAmountFormatFails() throws {
     let sut = DefaultParser()
     let data = "BUY 15/08/2020 Foo abc 1.2345 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
   }
 
-  func testParseIncorrectPriceFormatFails() throws {
+  func testParseTransactionIncorrectPriceFormatFails() throws {
     let sut = DefaultParser()
     let data = "BUY 15/08/2020 Foo 12.345 def 12.5"
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
   }
 
-  func testParseIncorrectExpensesFormatFails() throws {
+  func testParseTransactionIncorrectExpensesFormatFails() throws {
     let sut = DefaultParser()
     let data = "BUY 15/08/2020 Foo 12.345 1.2345 abc"
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
+  }
+
+  func testParseAssetEventIncorrectDateFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "DIVIDEND abc Foo 1.234 100"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseAssetEventIncorrectNumberOfFieldsFails() throws {
+    let sut = DefaultParser()
+    let data = "DIVIDEND 15/08/2020 Foo 1.234 100 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseAssetEventIncorrectAmountFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "DIVIDEND 15/08/2020 Foo abc 100"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseAssetEventIncorrectValueFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "DIVIDEND 15/08/2020 Foo 1.234 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
 
 }
