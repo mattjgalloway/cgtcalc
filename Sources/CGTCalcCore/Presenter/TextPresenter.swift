@@ -108,7 +108,14 @@ public class TextPresenter {
 
   private func transactionsTable() -> String {
     return self.result.input.transactions.reduce(into: "") { (result, transaction) in
-      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) \(transaction.asset) \(transaction.amount) £\(transaction.price) £\(transaction.expenses)\n"
+      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) "
+      switch transaction.kind {
+      case .Buy:
+        result += "BOUGHT "
+      case .Sell:
+        result += "SOLD "
+      }
+      result += "\(transaction.amount) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses\n"
     }
   }
 
