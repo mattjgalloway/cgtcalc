@@ -15,9 +15,17 @@ class CalculatorTests: XCTestCase {
   func testSamples() throws {
     SampleData.samples.forEach { sample in
       do {
-        let input = CalculatorInput(transactions: sample.transactions, assetEvents: [])
+        let input = CalculatorInput(transactions: sample.transactions, assetEvents: sample.assetEvents)
         let calculator = try Calculator(input: input, logger: self.logger)
-        let result = try calculator.process()
+
+        let result: CalculatorResult
+        if sample.shouldThrow {
+          XCTAssertThrowsError(try calculator.process())
+          return
+        } else {
+          result = try calculator.process()
+        }
+
         XCTAssertEqual(result.taxYearSummaries.count, sample.gains.count)
         result.taxYearSummaries.forEach { taxYearSummary in
           guard let gain = sample.gains[taxYearSummary.taxYear] else {
