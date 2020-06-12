@@ -9,9 +9,14 @@ import Foundation
 
 class SubTransaction {
   let transaction: Transaction
+  private let underlyingPrice: Decimal
   private(set) var amount: Decimal
-  private(set) var price: Decimal
   private(set) var expenses: Decimal
+  private(set) var offset = Decimal.zero
+
+  var price: Decimal {
+    return self.underlyingPrice + (self.offset / self.amount)
+  }
 
   var asset: String {
     return self.transaction.asset
@@ -24,7 +29,7 @@ class SubTransaction {
   init(transaction: Transaction) {
     self.transaction = transaction
     self.amount = transaction.amount
-    self.price = transaction.price
+    self.underlyingPrice = transaction.price
     self.expenses = transaction.expenses
   }
 
@@ -42,6 +47,14 @@ class SubTransaction {
     self.expenses = self.expenses - remainder.expenses
 
     return remainder
+  }
+
+  func addOffset(amount: Decimal) {
+    self.offset += amount
+  }
+
+  func subtractOffset(amount: Decimal) {
+    self.offset -= amount
   }
 }
 

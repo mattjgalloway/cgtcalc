@@ -63,6 +63,7 @@ public class Calculator {
         }
         let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
         let state = AssetProcessorState(asset: asset, acquisitions: acquisitions, disposals: disposals, assetEvents: assetEvents)
+        try self.preprocessAsset(withState: state)
         return try processAsset(withState: state)
       }
       .reduce(into: [DisposalMatch]()) { (disposalMatches, assetResult) in
@@ -70,6 +71,97 @@ public class Calculator {
       }
 
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
+  }
+
+  private func preprocessAsset(withState state: AssetProcessorState) throws {
+    guard state.assetEvents.count > 0 else {
+      self.logger.info("No pre-processing of transactions required for \(state.asset).")
+      return
+    }
+
+    guard state.pendingAcquisitions.count > 0 else {
+      throw CalculatorError.InvalidData("Had events but no acquisitions for \(state.asset).")
+    }
+
+    self.logger.info("Begin pre-processing transactions for \(state.asset).")
+
+    // First go over all the capital returns and decrease the price paid for acquisitions.
+    var acquisitionsIndex = state.pendingAcquisitions.startIndex
+    var assetEventsIndex = state.assetEvents.startIndex
+    while assetEventsIndex < state.assetEvents.endIndex && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+      let assetEvent = state.assetEvents[assetEventsIndex]
+
+      let amount: Decimal
+      let value: Decimal
+      switch assetEvent.kind {
+      case .CapitalReturn(let a, let v):
+        amount = a
+        value = v
+      default:
+        assetEventsIndex += 1
+        continue
+      }
+
+      self.logger.debug(" - Processing capital return event: \(assetEvent).")
+
+      var amountLeft = amount
+      while amountLeft > Decimal.zero && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
+        let apportionedValue = value * (acquisition.amount / amount)
+        self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
+        acquisition.subtractOffset(amount: apportionedValue)
+        amountLeft -= acquisition.amount
+        acquisitionsIndex += 1
+      }
+
+      if amountLeft != Decimal.zero {
+        throw CalculatorError.InvalidData("Error pre-processing \(state.asset). Capital return amount doesn't match acquisitions.")
+      }
+
+      assetEventsIndex += 1
+    }
+
+    // Second go over all the dividends and increase the price paid for acquisitions.
+    assetEventsIndex = state.assetEvents.startIndex
+    while assetEventsIndex < state.assetEvents.endIndex {
+      let assetEvent = state.assetEvents[assetEventsIndex]
+
+      let amount: Decimal
+      let value: Decimal
+      switch assetEvent.kind {
+      case .Dividend(let a, let v):
+        amount = a
+        value = v
+      default:
+        assetEventsIndex += 1
+        continue
+      }
+
+      self.logger.debug(" - Processing dividend event: \(assetEvent).")
+
+      var amountLeft = amount
+      var acquisitionsIndex = state.pendingAcquisitions.startIndex
+      while amountLeft > Decimal.zero && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
+        guard acquisition.date <= assetEvent.date else {
+          throw CalculatorError.InvalidData("Error pre-processing \(state.asset) while processing dividend events. Went past asset event date while matching acquisitions.")
+        }
+
+        let apportionedValue = value * (acquisition.amount / amount)
+        self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
+        acquisition.addOffset(amount: apportionedValue)
+        amountLeft -= acquisition.amount
+        acquisitionsIndex += 1
+      }
+
+      if amountLeft != Decimal.zero {
+        throw CalculatorError.InvalidData("Error pre-processing \(state.asset) while processing dividend events. Amount doesn't match acquisitions.")
+      }
+
+      assetEventsIndex += 1
+    }
+
+    self.logger.info("Finished pre-processing transactions for \(state.asset).")
   }
 
   private func processAsset(withState state: AssetProcessorState) throws -> AssetResult {

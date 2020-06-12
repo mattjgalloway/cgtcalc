@@ -22,8 +22,6 @@ class Section104Processor {
     let section104Holding = Section104Holding(logger: self.logger)
 
     var acquisitions = self.state.pendingAcquisitions.sorted { $0.date > $1.date }
-    var assetEvents = self.state.assetEvents.sorted { $0.date > $1.date }
-
     while let disposal = self.state.pendingDisposals.first {
       let acquisitionDate: Date
       if let acquisition = acquisitions.last {
@@ -32,20 +30,7 @@ class Section104Processor {
         acquisitionDate = Date.distantFuture
       }
 
-      let assetEventDate: Date
-      if let assetEvent = assetEvents.last {
-        assetEventDate = assetEvent.date
-      } else {
-        assetEventDate = Date.distantFuture
-      }
-
-      if assetEventDate <= acquisitionDate && assetEventDate <= disposal.date {
-        if let assetEvent = assetEvents.last {
-          try section104Holding.process(assetEvent: assetEvent)
-          _ = assetEvents.removeLast()
-        }
-        continue
-      } else if acquisitionDate <= disposal.date {
+      if acquisitionDate <= disposal.date {
         if let acquisition = acquisitions.last {
           section104Holding.process(acquisition: acquisition)
           _ = acquisitions.removeLast()
