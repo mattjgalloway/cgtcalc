@@ -90,8 +90,6 @@ Matches with:
 Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015) ) = 1139
 
 
-
-
 # TRANSACTIONS
 
 1: 05/12/2019 BOUGHT 500 of GB00B41YBW71 at £4.7012 with £2 expenses
