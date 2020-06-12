@@ -24,12 +24,12 @@ struct CGTCalc: ParsableCommand {
   static var configuration = CommandConfiguration(commandName: "cgtcalc", version: VERSION)
 
   func run() throws {
-    do {
-      let logger = BasicLogger()
-      if self.verbose {
-        logger.level = .Debug
-      }
+    let logger = BasicLogger()
+    if self.verbose {
+      logger.level = .Debug
+    }
 
+    do {
       let data = try String(contentsOfFile: filename)
       let parser = DefaultParser()
       let input = try parser.calculatorInput(fromData: data)
@@ -47,7 +47,7 @@ struct CGTCalc: ParsableCommand {
         print(output)
       }
     } catch {
-      print("Failed: \(error)")
+      logger.error("Failed: \(error)")
     }
   }
 }
