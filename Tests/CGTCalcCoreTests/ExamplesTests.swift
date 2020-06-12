@@ -13,7 +13,6 @@ class ExamplesTests: XCTestCase {
 
   let record = false
   let logger = StubLogger()
-  let parser = DefaultParser()
 
   func testExamples() throws {
     let thisFile = URL(fileURLWithPath: #file)
@@ -39,7 +38,8 @@ class ExamplesTests: XCTestCase {
       }
 
       do {
-        let transactions = try self.parser.transactions(fromData: inputData)
+        let parser = DefaultParser()
+        let transactions = try parser.transactions(fromData: inputData)
         let calculator = try Calculator(transactions: transactions, logger: self.logger)
         let result = try calculator.process()
         let presenter = TextPresenter(result: result)
