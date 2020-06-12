@@ -103,10 +103,34 @@ Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015
 NONE
 ```
 
-## Usage
-
-TODO
-
 ## Extending
 
-TODO
+`cgtcalc` is broken into two parts:
+  1. A library called `CGTCalcCore` which contains all of the calculation logic.
+  2. A simple console app called `cgtcalc` which uses `CGTCalcCore`.
+
+You can extend `CGTCalcCore` in two interesting ways:
+  1. Create a custom parser to parse from your own format into what `CGTCalcCore` requires. The default parser that comes with the library is called `DefaultParser`.
+  2. Create a custom presenter to process the output from `CGTCalcCore` and display it how you wish. The presenter that outputs in text format is called `TextPresenter`.
+
+It's best to look at `main.swift` to see how to use `CGTCalcCore`. It's essentially as follows:
+
+```
+import CGTCalcCore
+import Foundation
+
+...
+
+// Custom parser could be used here
+let parser = DefaultParser()
+let data = "... read from file ..."
+let input = try parser.calculatorInput(fromData: data)
+
+// Create calculator, feeding it the input created above, and then process it
+let calculator = try Calculator(input: input, logger: logger)
+let result = try calculator.process()
+
+// Custom presenter could be used here
+let presenter = TextPresenter(result: result)
+let output = try presenter.process()
+```
