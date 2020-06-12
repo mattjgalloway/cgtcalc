@@ -73,6 +73,109 @@ class CalculatorTests: XCTestCase {
     self.runTest(withData: testData)
   }
 
+  func testAssetEventDividendTooLarge() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .Dividend(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
+  func testAssetEventCapitalReturnTooLarge() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .CapitalReturn(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
+  func testAssetEventDividendTooSmall() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .Dividend(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
+  func testAssetEventCapitalReturnTooSmall() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .CapitalReturn(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
+  func testAssetEventDividendNotMatchingAmount() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(3, .Buy, "03/01/2020", "Foo", "10", "1", "12.5"),
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .Dividend(Decimal(20), Decimal(1)), "02/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
+  func testBedAndBreakfastEdges() throws {
+    // Exactly 30 days
+    let testData1 = TestData(
+      transactions: [
+        ModelCreation.transaction(1, .Buy, "01/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(3, .Buy, "01/02/2018", "Foo", "1", "1", "0"),
+      ],
+      assetEvents: [],
+      gains: [
+        TaxYear(year: 2018): Decimal(string: "9")!,
+      ],
+      shouldThrow: false
+    )
+    self.runTest(withData: testData1)
+
+    // Exactly 31 days
+    let testData2 = TestData(
+      transactions: [
+        ModelCreation.transaction(1, .Buy, "01/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(3, .Buy, "02/02/2018", "Foo", "1", "1", "0"),
+      ],
+      assetEvents: [],
+      gains: [
+        TaxYear(year: 2018): Decimal(string: "0")!,
+      ],
+      shouldThrow: false
+    )
+    self.runTest(withData: testData2)
+  }
+
   func testDateBefore20080406Throws() throws {
     let transaction = ModelCreation.transaction(1, .Buy, "05/04/2008", "Foo", "1", "1", "0")
     let input = CalculatorInput(transactions: [transaction], assetEvents: [])
