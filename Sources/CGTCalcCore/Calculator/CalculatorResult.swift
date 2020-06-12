@@ -39,7 +39,6 @@ public struct CalculatorResult {
       }
       .sorted { $0.key < $1.key }
       .map { (taxYear, disposalMatches) in
-        var gain = Decimal.zero
         var transactionsById: [Transaction.Id:Transaction] = [:]
         var disposalMatchesByDisposal: [Transaction.Id:[DisposalMatch]] = [:]
         var gainByDisposal: [Transaction.Id:Decimal] = [:]
@@ -47,16 +46,18 @@ public struct CalculatorResult {
         disposalMatches.forEach { disposalMatch in
           let disposal = disposalMatch.disposal.transaction
           transactionsById[disposal.id] = disposal
-          gain += disposalMatch.gain
           var matches = disposalMatchesByDisposal[disposal.id, default: []]
           matches.append(disposalMatch)
           disposalMatchesByDisposal[disposal.id] = matches
           gainByDisposal[disposal.id, default: Decimal.zero] += disposalMatch.gain
         }
 
+        var totalGain = Decimal.zero
         let disposalResults =
-          disposalMatchesByDisposal.map {
-            DisposalResult(disposal: transactionsById[$0]!, gain: gainByDisposal[$0]!, disposalMatches: $1)
+          disposalMatchesByDisposal.map { (disposal, disposalMatches) -> DisposalResult in
+            let roundedGain = TaxMethods.roundedGain(gainByDisposal[disposal]!)
+            totalGain += roundedGain
+            return DisposalResult(disposal: transactionsById[disposal]!, gain: roundedGain, disposalMatches: disposalMatches)
           }
           .sorted { $0.disposal.date < $1.disposal.date }
 
@@ -65,21 +66,21 @@ public struct CalculatorResult {
         }
 
         let taxableGain: Decimal
-        let gainAboveExemption = max(gain - taxYearRates.exemption, Decimal.zero)
+        let gainAboveExemption = max(totalGain - taxYearRates.exemption, Decimal.zero)
         if !gainAboveExemption.isZero {
           let lossUsed = min(gainAboveExemption, carryForwardLoss)
           taxableGain = gainAboveExemption - lossUsed
           carryForwardLoss -= lossUsed
         } else {
           taxableGain = Decimal.zero
-          if gain.isSignMinus {
-            carryForwardLoss -= gain
+          if totalGain.isSignMinus {
+            carryForwardLoss -= totalGain
           }
         }
         let basicRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.basicRate * 0.01)
         let higherRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.higherRate * 0.01)
 
-        return TaxYearSummary(taxYear: taxYear, gain: gain, carryForwardLoss: carryForwardLoss, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
+        return TaxYearSummary(taxYear: taxYear, gain: totalGain, carryForwardLoss: carryForwardLoss, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
       }
   }
 }
