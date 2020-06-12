@@ -49,6 +49,7 @@ BUY 01/01/2020 LON:FOOBAR 200 1.5 20
 The full list of kinds of data are as follows:
 
 | **Kind**    | **Description** | **Fields** |
+|-------------|-----------------|------------|
 | `BUY`       | Buy transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
 | `SELL`      | Sell transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
 | `CAPRETURN` | Capital return event (usually for a fund on first dividend distribution after purchase) | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
