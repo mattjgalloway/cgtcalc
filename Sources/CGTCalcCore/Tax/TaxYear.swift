@@ -21,16 +21,11 @@ struct TaxYear {
   init(containingDate: Date) {
     let calendar = Calendar(identifier: .gregorian)
     let components = calendar.dateComponents([.year, .month, .day], from: containingDate)
-    guard
-      var year = components.year,
-      let month = components.month,
-      let day = components.day else {
-        fatalError("Failed to extract date components when calculating tax year")
-    }
-    if month > 4 {
+    var year = components.year!
+    if components.month! > 4 {
       year += 1
     }
-    if month == 4 && day > 5 {
+    if components.month! == 4 && components.day! > 5 {
       year += 1
     }
     self.init(year: year)
