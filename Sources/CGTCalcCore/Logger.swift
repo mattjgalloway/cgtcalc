@@ -5,7 +5,11 @@
 //  Created by Matt Galloway on 08/06/2020.
 //
 
+#if os(Linux)
+import Glibc
+#else
 import Darwin
+#endif
 import Foundation
 
 public protocol Logger {
