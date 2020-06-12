@@ -54,4 +54,18 @@ class SubTransactionTests: XCTestCase {
     XCTAssertEqual(acquisition.offset, Decimal.zero)
   }
 
+  func testOffsetAndSplitWorks() throws {
+    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
+    let acquisition = SubTransaction(transaction: transaction)
+    acquisition.addOffset(amount: Decimal(string: "10.0")!)
+    let remainder = try acquisition.split(withAmount: Decimal(4))
+
+    XCTAssertEqual(acquisition.amount, Decimal(4))
+    XCTAssertEqual(remainder.amount, Decimal(6))
+    XCTAssertEqual(acquisition.value, Decimal(404))
+    XCTAssertEqual(remainder.value, Decimal(606))
+    XCTAssertEqual(acquisition.price, Decimal(101))
+    XCTAssertEqual(remainder.price, Decimal(101))
+  }
+
 }

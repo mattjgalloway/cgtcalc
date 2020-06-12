@@ -46,9 +46,11 @@ class SubTransaction {
     let remainderAmount = self.amount - amount
     remainder.amount = remainderAmount
     remainder.expenses = self.expenses * remainderAmount / self.amount
+    remainder.offset = self.offset * remainderAmount / self.amount
 
     self.amount = amount
     self.expenses = self.expenses - remainder.expenses
+    self.offset = self.offset - remainder.offset
 
     return remainder
   }
