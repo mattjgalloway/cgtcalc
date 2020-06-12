@@ -7,6 +7,53 @@
 
 `cgtcalc` is a command line application written in Swift which calculates UK capital gains tax based on a set of transactions. You feed it an input list of transactions and it outputs a summary of each tax year's gain (or loss) and the details for the disposal events that make up the gain (or loss).
 
+## Why?
+
+I developed this because I needed something that would take my transactions and calculate capitals gains tax. I wanted something which would check my manual working. I developed it in Swift because I wanted to see how building a console app in Swift was.
+
+There are other excellent calculators out there, such as [CGTCalculator](http://www.cgtcalculator.com/), however I couldn't find one which did everything that I need. The missing piece seemed to be handling of fund equalisation payments and dividends that need to be accounted for in accumulation funds.
+
+## Usage
+
+Using `cgtcalc` is simple. All you need to do is the following:
+
+  1. Clone the repository.
+  2. Put your transactions into a file, such as `data.txt`.
+  3. Run `swift run cgtcalc data.txt`.
+
+That's pretty much it. You'll then see output on your console showing the calculations and a summary for all tax years that have tax events in them. You can see more details about how it's being calculated if you pass the `-v` flag.
+
+Full usage can be found by running with `-h`:
+```
+USAGE: cgtcalc <filename> [--verbose] [--output-file <output-file>]
+
+ARGUMENTS:
+  <filename>              The input data filename
+
+OPTIONS:
+  -v, --verbose           Enable verbose logging
+  -o, --output-file <output-file>
+                          Output file
+  --version               Show the version.
+  -h, --help              Show help information.
+```
+
+### Input data
+
+Each row of the input file starts with the kind of data followed by details. For example a buy transaction, for 200 shares of LON:FOOBAR on 01/01/2020 at £1.50 with £20 expenses would be as follows:
+
+```
+BUY 01/01/2020 LON:FOOBAR 200 1.5 20
+```
+
+The full list of kinds of data are as follows:
+
+| **Kind**    | **Description** | **Fields** |
+| `BUY`       | Buy transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
+| `SELL`      | Sell transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
+| `CAPRETURN` | Capital return event (usually for a fund on first dividend distribution after purchase) | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
+| `DIVIDEND`  | Dividend for which income tax has been taken but shares also retain (usually for fund accumulation share class) | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
+
 ## Example
 
 Given the following input in a file called `data.txt`:
