@@ -11,14 +11,7 @@ import XCTest
 class SubTransactionTests: XCTestCase {
 
   func testSplitSuccess() throws {
-    let transaction = Transaction(
-      id: 1,
-      kind: .Buy,
-      date: DateCreation.date(fromString: "15/08/2020"),
-      asset: "Foo",
-      amount: Decimal(string: "12.345")!,
-      price: Decimal(string: "1.2345")!,
-      expenses: Decimal(string: "12.5")!)
+    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = SubTransaction(transaction: transaction)
     let splitAmount = Decimal(string: "2.123")!
     let remainder = try acquisition.split(withAmount: splitAmount)
@@ -27,17 +20,38 @@ class SubTransactionTests: XCTestCase {
   }
 
   func testSplitTooMuchFails() throws {
-    let transaction = Transaction(
-      id: 1,
-      kind: .Buy,
-      date: DateCreation.date(fromString: "15/08/2020"),
-      asset: "Foo",
-      amount: Decimal(string: "12.345")!,
-      price: Decimal(string: "1.2345")!,
-      expenses: Decimal(string: "12.5")!)
+    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = SubTransaction(transaction: transaction)
     let splitAmount = Decimal(string: "100")!
     XCTAssertThrowsError(try acquisition.split(withAmount: splitAmount))
+  }
+
+  func testOffsetWorks() throws {
+    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
+    let acquisition = SubTransaction(transaction: transaction)
+    XCTAssertEqual(acquisition.price, Decimal(string: "100.0")!)
+    XCTAssertEqual(acquisition.value, Decimal(string: "1000.0")!)
+    XCTAssertEqual(acquisition.offset, Decimal.zero)
+
+    acquisition.addOffset(amount: Decimal(string: "10.0")!)
+    XCTAssertEqual(acquisition.price, Decimal(string: "101.0")!)
+    XCTAssertEqual(acquisition.value, Decimal(string: "1010.0")!)
+    XCTAssertEqual(acquisition.offset, Decimal(string: "10.0")!)
+
+    acquisition.addOffset(amount: Decimal(string: "93.982")!)
+    XCTAssertEqual(acquisition.price, Decimal(string: "110.3982")!)
+    XCTAssertEqual(acquisition.value, Decimal(string: "1103.982")!)
+    XCTAssertEqual(acquisition.offset, Decimal(string: "103.982")!)
+
+    acquisition.subtractOffset(amount: Decimal(string: "10.0")!)
+    XCTAssertEqual(acquisition.price, Decimal(string: "109.3982")!)
+    XCTAssertEqual(acquisition.value, Decimal(string: "1093.982")!)
+    XCTAssertEqual(acquisition.offset, Decimal(string: "93.982.0")!)
+
+    acquisition.subtractOffset(amount: Decimal(string: "93.982")!)
+    XCTAssertEqual(acquisition.price, Decimal(string: "100.0")!)
+    XCTAssertEqual(acquisition.value, Decimal(string: "1000.0")!)
+    XCTAssertEqual(acquisition.offset, Decimal.zero)
   }
 
 }
