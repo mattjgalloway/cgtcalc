@@ -176,6 +176,20 @@ class CalculatorTests: XCTestCase {
     self.runTest(withData: testData2)
   }
 
+  func testSection104DisposeTooMuch() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(1, .Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(3, .Sell, "03/01/2018", "Foo", "1", "10", "0"),
+      ],
+      assetEvents: [],
+      gains: [:],
+      shouldThrow: true
+    )
+    self.runTest(withData: testData)
+  }
+
   func testDateBefore20080406Throws() throws {
     let transaction = ModelCreation.transaction(1, .Buy, "05/04/2008", "Foo", "1", "1", "0")
     let input = CalculatorInput(transactions: [transaction], assetEvents: [])
