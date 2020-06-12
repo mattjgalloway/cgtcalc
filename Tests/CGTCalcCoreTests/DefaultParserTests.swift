@@ -36,12 +36,22 @@ class DefaultParserTests: XCTestCase {
     XCTAssertEqual(transaction!.expenses, Decimal(12.5))
   }
 
-  func testParseSection104AdjustTransactionSuccess() throws {
+  func testParseCapitalReturnEventSuccess() throws {
     let sut = DefaultParser()
-    let data = "ADJ 15/08/2020 Foo 100"
+    let data = "CAPRETURN 15/08/2020 Foo 1.234 100"
     let transaction = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Section104Adjust(Decimal(100)))
+    XCTAssertEqual(transaction!.kind, .CapitalReturn(Decimal(1.234), Decimal(100)))
+    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction!.asset, "Foo")
+  }
+
+  func testParseDividendEventSuccess() throws {
+    let sut = DefaultParser()
+    let data = "DIVIDEND 15/08/2020 Foo 1.234 100"
+    let transaction = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNotNil(transaction)
+    XCTAssertEqual(transaction!.kind, .Dividend(Decimal(1.234), Decimal(100)))
     XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
     XCTAssertEqual(transaction!.asset, "Foo")
   }

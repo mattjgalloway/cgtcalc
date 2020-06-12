@@ -46,10 +46,20 @@ class Section104Holding {
     self.logger.debug("  New state: \(self.state)")
   }
 
-  func process(assetEvent: AssetEvent) {
+  func process(assetEvent: AssetEvent) throws {
     self.logger.debug("Section 104 ===: \(assetEvent)")
     switch assetEvent.kind {
-    case .Section104Adjust(let value):
+    case .CapitalReturn(let amount, let value):
+      // A capital return should effectively decrease the price paid for the asset.
+      if self.state.amount != amount {
+        throw CalculatorError.InvalidData("Processing dividend where its amount does not match current holding")
+      }
+      self.state.add(amount: 0, cost: -value)
+    case .Dividend(let amount, let value):
+      // A dividend has been taxed already as income tax, so it increases the cost basis.
+      if self.state.amount != amount {
+        throw CalculatorError.InvalidData("Processing dividend where its amount does not match current holding")
+      }
       self.state.add(amount: 0, cost: value)
     }
     self.logger.debug("  New state: \(self.state)")

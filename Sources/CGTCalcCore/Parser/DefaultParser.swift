@@ -104,14 +104,14 @@ public class DefaultParser {
     let splitData = data.components(separatedBy: .whitespaces)
 
     switch splitData[0] {
-    case "ADJ":
+    case "DIVIDEND", "CAPRETURN":
       // We can't actually set kind here because we need the associated value
       break
     default:
       return nil
     }
 
-    guard splitData.count == 4 else {
+    guard splitData.count == 5 else {
       throw ParserError.IncorrectNumberOfFields(String(data))
     }
 
@@ -121,14 +121,20 @@ public class DefaultParser {
 
     let asset = splitData[2]
 
-    guard let value = Decimal(string: splitData[3]) else {
+    guard let amount = Decimal(string: splitData[3]) else {
+      throw ParserError.InvalidValue(String(data))
+    }
+
+    guard let value = Decimal(string: splitData[4]) else {
       throw ParserError.InvalidValue(String(data))
     }
 
     let kind: AssetEvent.Kind
     switch splitData[0] {
-    case "ADJ":
-      kind = .Section104Adjust(value)
+    case "DIVIDEND":
+      kind = .Dividend(amount, value)
+    case "CAPRETURN":
+      kind = .CapitalReturn(amount, value)
     default:
       return nil
     }

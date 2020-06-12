@@ -11,7 +11,8 @@ public class AssetEvent {
   typealias Id = Int
 
   enum Kind: Equatable {
-    case Section104Adjust(Decimal)
+    case CapitalReturn(Decimal, Decimal)
+    case Dividend(Decimal, Decimal)
   }
 
   let id: Id

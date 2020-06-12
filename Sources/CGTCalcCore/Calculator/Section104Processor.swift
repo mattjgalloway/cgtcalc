@@ -41,7 +41,7 @@ class Section104Processor {
 
       if assetEventDate <= acquisitionDate && assetEventDate <= disposal.date {
         if let assetEvent = assetEvents.last {
-          section104Holding.process(assetEvent: assetEvent)
+          try section104Holding.process(assetEvent: assetEvent)
           _ = assetEvents.removeLast()
         }
         continue

@@ -118,8 +118,10 @@ public class TextPresenter {
     return self.result.input.assetEvents.reduce(into: "") { (result, assetEvent) in
       result += "\(assetEvent.id): \(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
       switch assetEvent.kind {
-      case .Section104Adjust(let value):
-        result += "SECTION 104 ADJUST by \(self.formattedCurrency(value))"
+      case .CapitalReturn(let amount, let value):
+        result += "CAPITAL RETURN on \(amount) for £\(self.formattedCurrency(value))"
+      case .Dividend(let amount, let value):
+        result += "DIVIDEND on \(amount) for £\(self.formattedCurrency(value))"
       }
       result += "\n"
     }
