@@ -76,18 +76,18 @@ And will output the following:
 
 Tax year    Gain    Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
 ======================================================================================
-2019/2020   £1139   £12000      £0           £0             £0            £0
+2019/2020   £1140   £12000      £0           £0             £0            £0
 
 
 # TAX YEAR DETAILS
 
 ## TAX YEAR 2019/2020
 
-1) SOLD 2000 of GB00B41YBW71 on 28/11/2019 for GAIN of £1139
+1) SOLD 2000 of GB00B41YBW71 on 28/11/2019 for GAIN of £1140
 Matches with:
   - BED & BREAKFAST: 500 bought on 05/12/2019 at £4.7012 with offset of £0
   - SECTION 104: 2000 at cost basis of £3.89015
-Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015) ) = 1139
+Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015) ) = 1140
 
 
 # TRANSACTIONS
