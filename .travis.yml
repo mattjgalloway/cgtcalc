@@ -1,11 +1,29 @@
-language: swift
-osx_image: xcode11.5
-os: osx
-install:
-  - swift package update
-script:
-  - swift build
-  - swift test --enable-code-coverage
-after_success:
-  - xcrun llvm-cov export -format="lcov" .build/debug/cgtcalcPackageTests.xctest/Contents/MacOS/cgtcalcPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
-  - bash <(curl -s https://codecov.io/bash)
+env:
+  global:
+    - SWIFT_BRANCH=swift-5.2.4-release
+    - SWIFT_VERSION=swift-5.2.4-RELEASE
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode11.5
+      language: swift
+      install:
+        - swift package update
+      script:
+        - swift build
+        - swift test --enable-code-coverage
+      after_success:
+        - xcrun llvm-cov export -format="lcov" .build/debug/cgtcalcPackageTests.xctest/Contents/MacOS/cgtcalcPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
+        - bash <(curl -s https://codecov.io/bash)
+    - os: linux
+      dist: bionic
+      language: generic
+      sudo: required
+      install:
+        - sudo apt-get install clang libicu-dev
+        - mkdir swift
+        - curl https://swift.org/builds/$SWIFT_BRANCH/ubuntu1804/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu18.04.tar.gz -s | tar xz -C swift &> /dev/null
+        - export PATH="$(pwd)/swift/$SWIFT_VERSION-ubuntu18.04/usr/bin:$PATH"
+        - swift package update
+      script:
+        - swift test
