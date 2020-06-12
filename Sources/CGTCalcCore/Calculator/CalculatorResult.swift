@@ -20,6 +20,7 @@ public struct CalculatorResult {
   struct TaxYearSummary {
     let taxYear: TaxYear
     let gain: Decimal
+    let carryForwardLoss: Decimal
     let taxableGain: Decimal
     let basicRateTax: Decimal
     let higherRateTax: Decimal
@@ -28,12 +29,15 @@ public struct CalculatorResult {
 
   init(transactions: [Transaction], disposalMatches: [DisposalMatch]) throws {
     self.transactions = transactions
+
+    var carryForwardLoss = Decimal.zero
     self.taxYearSummaries = try disposalMatches
       .reduce(into: [TaxYear:[DisposalMatch]]()) { (result, disposalMatch) in
         var disposalMatches = result[disposalMatch.taxYear, default: []]
         disposalMatches.append(disposalMatch)
         result[disposalMatch.taxYear] = disposalMatches
       }
+      .sorted { $0.key < $1.key }
       .map { (taxYear, disposalMatches) in
         var gain = Decimal.zero
         var transactionsById: [Transaction.Id:Transaction] = [:]
@@ -59,12 +63,23 @@ public struct CalculatorResult {
         guard let taxYearRates = taxYear.rates else {
           throw CalculatorError.InternalError("Missing tax year rates for \(taxYear)")
         }
-        let taxableGain = max(Decimal.zero, gain - taxYearRates.exemption)
-        let basicRateTax = taxableGain * taxYearRates.basicRate * 0.01
-        let higherRateTax = taxableGain * taxYearRates.higherRate * 0.01
 
-        return TaxYearSummary(taxYear: taxYear, gain: gain, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
+        let taxableGain: Decimal
+        let gainAboveExemption = max(gain - taxYearRates.exemption, Decimal.zero)
+        if !gainAboveExemption.isZero {
+          let lossUsed = min(gainAboveExemption, carryForwardLoss)
+          taxableGain = gainAboveExemption - lossUsed
+          carryForwardLoss -= lossUsed
+        } else {
+          taxableGain = Decimal.zero
+          if gain.isSignMinus {
+            carryForwardLoss -= gain
+          }
+        }
+        let basicRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.basicRate * 0.01)
+        let higherRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.higherRate * 0.01)
+
+        return TaxYearSummary(taxYear: taxYear, gain: gain, carryForwardLoss: carryForwardLoss, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
       }
-      .sorted { $0.taxYear < $1.taxYear }
   }
 }

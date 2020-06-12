@@ -48,11 +48,11 @@ public class TextPresenter {
         guard let taxYearRates = summary.taxYear.rates else {
           throw CalculatorError.InternalError("Missing tax year rates for \(summary.taxYear)")
         }
-        let row = [summary.taxYear.string, self.formattedCurrency(summary.gain), self.formattedCurrency(taxYearRates.exemption), self.formattedCurrency(summary.taxableGain), self.formattedCurrency(summary.basicRateTax), self.formattedCurrency(summary.higherRateTax)]
+        let row = [summary.taxYear.string, self.formattedCurrency(summary.gain), self.formattedCurrency(taxYearRates.exemption), self.formattedCurrency(summary.carryForwardLoss), self.formattedCurrency(summary.taxableGain), self.formattedCurrency(summary.basicRateTax), self.formattedCurrency(summary.higherRateTax)]
         output.append(row)
       }
 
-    let headerRow = ["Tax year", "Gain", "Exemption", "Taxable gain", "Basic rate tax", "Higher rate tax"]
+    let headerRow = ["Tax year", "Gain", "Exemption", "Loss carry", "Taxable gain", "Tax (basic)", "Tax (higher)"]
     let initialMaxWidths = headerRow.map { $0.count }
     let maxWidths = rows.reduce(into: initialMaxWidths) { (result, row) in
       for i in 0..<result.count {

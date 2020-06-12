@@ -1,0 +1,47 @@
+# SUMMARY
+
+Tax year    Gain     Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=======================================================================================
+2017/2018   £-1000   £11300      £1000        £0             £0            £0          
+2018/2019   £1000    £11700      £1000        £0             £0            £0          
+2019/2020   £19000   £12000      £0           £6000          £600          £1200       
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2017/2018
+
+1) SOLD 1 of GB00B41YBW71 on 01/01/2018 for LOSS of £1000
+Matches with:
+  - SAME DAY: 1 bought on 01/01/2018 at £1000
+Calculation: (1 * 0 - 0) - ( (1 * 1000 + 0) ) = -1000
+
+
+
+## TAX YEAR 2018/2019
+
+1) SOLD 1 of GB00B41YBW71 on 01/01/2019 for GAIN of £1000
+Matches with:
+  - SAME DAY: 1 bought on 01/01/2019 at £1000
+Calculation: (1 * 2000 - 0) - ( (1 * 1000 + 0) ) = 1000
+
+
+
+## TAX YEAR 2019/2020
+
+1) SOLD 1 of GB00B41YBW71 on 01/01/2020 for GAIN of £19000
+Matches with:
+  - SAME DAY: 1 bought on 01/01/2020 at £1000
+Calculation: (1 * 20000 - 0) - ( (1 * 1000 + 0) ) = 19000
+
+
+
+
+# TRANSACTIONS
+
+13: 01/01/2018 GB00B41YBW71 1 £1000 £0
+14: 01/01/2018 GB00B41YBW71 1 £0 £0
+15: 01/01/2019 GB00B41YBW71 1 £1000 £0
+16: 01/01/2019 GB00B41YBW71 1 £2000 £0
+17: 01/01/2020 GB00B41YBW71 1 £1000 £0
+18: 01/01/2020 GB00B41YBW71 1 £20000 £0
