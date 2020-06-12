@@ -135,9 +135,9 @@ extension TextPresenter {
   private static func disposalMatchDetails(_ disposalMatch: DisposalMatch, dateFormatter: DateFormatter) -> String {
     switch disposalMatch.kind {
     case .SameDay(let acquisition):
-      return "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
+      return "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price) with offset of £\(acquisition.offset)"
     case .BedAndBreakfast(let acquisition):
-      return "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
+      return "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price) with offset of £\(acquisition.offset)"
     case .Section104(let amountAtDisposal, let costBasis):
       return "SECTION 104: \(amountAtDisposal) at cost basis of £\(costBasis.rounded(to: 5).string)"
     }
@@ -151,7 +151,7 @@ extension TextPresenter {
       gain += disposalMatch.gain
       switch disposalMatch.kind {
       case .SameDay(let acquisition), .BedAndBreakfast(let acquisition):
-        disposalMatchesStrings.append("(\(acquisition.amount) * \(acquisition.price) + \(acquisition.expenses))")
+        disposalMatchesStrings.append("(\(acquisition.amount) * \(acquisition.price) + \(acquisition.offset) + \(acquisition.expenses))")
       case .Section104(_, let costBasis):
         disposalMatchesStrings.append("(\(disposalMatch.disposal.amount) * \(costBasis.rounded(to: 5).string))")
       }

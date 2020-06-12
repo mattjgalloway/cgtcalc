@@ -9,13 +9,17 @@ import Foundation
 
 class SubTransaction {
   let transaction: Transaction
-  private let underlyingPrice: Decimal
+  let underlyingPrice: Decimal
   private(set) var amount: Decimal
   private(set) var expenses: Decimal
   private(set) var offset = Decimal.zero
 
   var price: Decimal {
     return self.underlyingPrice + (self.offset / self.amount)
+  }
+
+  var value: Decimal {
+    return (self.underlyingPrice * self.amount) + self.offset
   }
 
   var asset: String {
@@ -60,6 +64,6 @@ class SubTransaction {
 
 extension SubTransaction: CustomStringConvertible {
   var description: String {
-    return "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses)>"
+    return "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), underlyingPrice=\(self.underlyingPrice), price=\(self.price), expenses=\(self.expenses), offset=\(self.offset)>"
   }
 }

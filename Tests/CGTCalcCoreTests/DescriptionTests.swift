@@ -35,7 +35,7 @@ class DescriptionTests: XCTestCase {
     let transaction = ModelCreation.transaction(1, .Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
     let sut = SubTransaction(transaction: transaction)
     let description = sut.description
-    let expected = "<SubTransaction: transaction=<Transaction: id=1, kind=Buy, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.23, expenses=12.5>, amount=1234, price=1.23, expenses=12.5>"
+    let expected = "<SubTransaction: transaction=<Transaction: id=1, kind=Buy, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.23, expenses=12.5>, amount=1234, underlyingPrice=1.23, price=1.23, expenses=12.5, offset=0>"
     XCTAssertEqual(description, expected)
   }
 
@@ -46,7 +46,7 @@ class DescriptionTests: XCTestCase {
     let disposalSub = SubTransaction(transaction: disposal)
     let sut = DisposalMatch(kind: .SameDay(acquisitionSub), disposal: disposalSub)
     let description = sut.description
-    let expected = "<DisposalMatch: kind=SameDay(<SubTransaction: transaction=<Transaction: id=1, kind=Buy, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.23, expenses=12.5>, amount=1234, price=1.23, expenses=12.5>), asset=Foo, date=2020-01-01 00:00:00 +0000, taxYear=2019/2020, disposal=<SubTransaction: transaction=<Transaction: id=2, kind=Sell, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.29, expenses=2>, amount=1234, price=1.29, expenses=2>, gain=59>"
+    let expected = "<DisposalMatch: kind=SameDay(<SubTransaction: transaction=<Transaction: id=1, kind=Buy, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.23, expenses=12.5>, amount=1234, underlyingPrice=1.23, price=1.23, expenses=12.5, offset=0>), asset=Foo, date=2020-01-01 00:00:00 +0000, taxYear=2019/2020, disposal=<SubTransaction: transaction=<Transaction: id=2, kind=Sell, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.29, expenses=2>, amount=1234, underlyingPrice=1.29, price=1.29, expenses=2, offset=0>, gain=59>"
     XCTAssertEqual(description, expected)
   }
 

@@ -37,11 +37,11 @@ class DisposalMatch {
   var gain: Decimal {
     switch self.kind {
     case .SameDay(let acquisition), .BedAndBreakfast(let acquisition):
-      let disposalProceeds = self.disposal.amount * self.disposal.price - self.disposal.expenses
-      let acquisitionProceeds = acquisition.amount * acquisition.price + acquisition.expenses
+      let disposalProceeds = self.disposal.value - self.disposal.expenses
+      let acquisitionProceeds = acquisition.value + acquisition.expenses
       return TaxMethods.roundedGain(disposalProceeds - acquisitionProceeds)
     case .Section104(_, let costBasis):
-      let disposalProceeds = self.disposal.amount * self.disposal.price - self.disposal.expenses
+      let disposalProceeds = self.disposal.value - self.disposal.expenses
       let acquisitionProceeds = self.disposal.amount * costBasis
       return TaxMethods.roundedGain(disposalProceeds - acquisitionProceeds)
     }

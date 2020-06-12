@@ -42,7 +42,7 @@ class Section104Holding {
 
   func process(acquisition: SubTransaction) {
     self.logger.debug("Section 104 +++: \(acquisition)")
-    self.state.add(amount: acquisition.amount, cost: acquisition.price * acquisition.amount + acquisition.expenses)
+    self.state.add(amount: acquisition.amount, cost: acquisition.value + acquisition.expenses)
     self.logger.debug("  New state: \(self.state)")
   }
 
