@@ -152,10 +152,8 @@ extension TextPresenter {
 
   private static func disposalResultCalculationString(_ disposalResult: CalculatorResult.DisposalResult) -> String {
     var output = "(\(disposalResult.disposal.amount) * \(disposalResult.disposal.price) - \(disposalResult.disposal.expenses)) - ( "
-    var gain = Decimal.zero
     var disposalMatchesStrings: [String] = []
     for disposalMatch in disposalResult.disposalMatches {
-      gain += disposalMatch.gain
       switch disposalMatch.kind {
       case .SameDay(let acquisition), .BedAndBreakfast(let acquisition):
         disposalMatchesStrings.append("(\(acquisition.amount) * \(acquisition.price) + \(acquisition.offset) + \(acquisition.expenses))")
@@ -164,7 +162,7 @@ extension TextPresenter {
       }
     }
     output += disposalMatchesStrings.joined(separator: " + ")
-    output += " ) = \(gain.rounded(to: 2).string)"
+    output += " ) = \(disposalResult.gain)"
     return output
   }
 
