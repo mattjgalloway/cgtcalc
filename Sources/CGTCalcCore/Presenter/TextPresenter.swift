@@ -121,9 +121,9 @@ public class TextPresenter {
       result += "\(assetEvent.id): \(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
       switch assetEvent.kind {
       case .CapitalReturn(let amount, let value):
-        result += "CAPITAL RETURN on \(amount) for £\(self.formattedCurrency(value))"
+        result += "CAPITAL RETURN on \(amount) for \(self.formattedCurrency(value))"
       case .Dividend(let amount, let value):
-        result += "DIVIDEND on \(amount) for £\(self.formattedCurrency(value))"
+        result += "DIVIDEND on \(amount) for \(self.formattedCurrency(value))"
       }
       result += "\n"
     }
