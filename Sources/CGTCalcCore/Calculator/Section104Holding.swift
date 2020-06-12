@@ -21,12 +21,12 @@ class Section104Holding {
       return cost / amount
     }
 
-    mutating func add(amount: Decimal, cost: Decimal) {
+    mutating fileprivate func add(amount: Decimal, cost: Decimal) {
       self.amount += amount
       self.cost += cost
     }
 
-    mutating func remove(amount: Decimal) {
+    mutating fileprivate func remove(amount: Decimal) {
       let costBasis = self.costBasis
       self.amount -= amount
       self.cost -= amount * costBasis
