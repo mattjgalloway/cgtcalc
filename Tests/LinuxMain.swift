@@ -1,6 +1,8 @@
 import XCTest
-@testable import CGTCalcCoreTests
 
-XCTMain([
-    testCase(ExamplesTests.allTests)
-])
+import CGTCalcCoreTests
+
+var tests = [XCTestCaseEntry]()
+tests += CGTCalcCoreTests.__allTests()
+
+XCTMain(tests)
