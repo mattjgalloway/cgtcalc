@@ -29,5 +29,14 @@ struct SampleData {
       ],
       shouldThrow: false
     ),
+    SampleData(
+      name: "AssetEventWithNoAcquisition",
+      transactions: [],
+      assetEvents: [
+        ModelCreation.assetEvent(1, .Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true
+    ),
   ]
 }

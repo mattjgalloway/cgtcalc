@@ -47,12 +47,14 @@ public class Calculator {
         result[assetEvent.asset] = assetEvents
       }
 
-    let allDisposalMatches = try transactionsByAsset
-      .map { (asset, transactions) -> AssetResult in
-        let sortedTransactions = transactions.sorted { $0.date < $1.date }
+    let allAssets = Set<String>(transactionsByAsset.keys).union(Set<String>(assetEventsByAsset.keys))
+
+    let allDisposalMatches = try allAssets
+      .map { asset -> AssetResult in
+        let transactions = transactionsByAsset[asset, default: []].sorted { $0.date < $1.date }
         var acquisitions: [SubTransaction] = []
         var disposals: [SubTransaction] = []
-        sortedTransactions.forEach { transaction in
+        transactions.forEach { transaction in
           let subTransaction = SubTransaction(transaction: transaction)
           switch transaction.kind {
           case .Buy:

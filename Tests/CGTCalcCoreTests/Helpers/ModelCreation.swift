@@ -14,4 +14,8 @@ struct ModelCreation {
     return Transaction(id: id, kind: kind, date: DateCreation.date(fromString: date), asset: asset, amount: Decimal(string: amount)!, price: Decimal(string: price)!, expenses: Decimal(string: expenses)!)
   }
 
+  static func assetEvent(_ id: Int, _ kind: AssetEvent.Kind, _ date: String, _ asset: String) -> AssetEvent {
+    return AssetEvent(id: id, kind: kind, date: DateCreation.date(fromString: date), asset: asset)
+  }
+
 }
