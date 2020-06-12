@@ -11,8 +11,10 @@
 
 Given the following input in a file called `data.txt`:
 ```
-SELL 28/08/2018 GB00B41YBW71 10 4.6702 12.5 0
-BUY 28/08/2018 GB00B41YBW71 10 4.1565 12.5 0
+BUY 05/12/2019 GB00B41YBW71 500 4.7012 2
+SELL 28/11/2019 GB00B41YBW71 2000 4.6702 12.5
+BUY 28/08/2018 GB00B41YBW71 1000 4.1565 12.5
+BUY 01/03/2018 GB00B41YBW71 1000 3.6093 2
 ```
 
 The tool can be invoked like so:
@@ -24,16 +26,35 @@ And will output the following:
 ```
 # SUMMARY
 
-Year 2018/2019: Gain = £-19, Exemption = £11700
+Tax year    Gain    Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+======================================================================================
+2019/2020   £1139   £12000      £0           £0             £0            £0
 
 
-# DETAILS
+# TAX YEAR DETAILS
 
-## TAX YEAR 2018/2019
+## TAX YEAR 2019/2020
 
-1) SOLD 10 of GB00B41YBW71 on 28/08/2018 for gain of £-19
-Matches with:SAME DAY: 10 bought on 28/08/2018 at 4.1565
-Calculation: (10 * £4.6702 - £12.5) - ( (10 * £4.1565 + £12.5) ) = £-19
+1) SOLD 2000 of GB00B41YBW71 on 28/11/2019 for GAIN of £1139
+Matches with:
+  - BED & BREAKFAST: 500 bought on 05/12/2019 at £4.7012 with offset of £0
+  - SECTION 104: 2000 at cost basis of £3.89015
+Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015) ) = 1139
+
+
+
+
+# TRANSACTIONS
+
+1: 05/12/2019 BOUGHT 500 of GB00B41YBW71 at £4.7012 with £2 expenses
+2: 28/11/2019 SOLD 2000 of GB00B41YBW71 at £4.6702 with £12.5 expenses
+3: 28/08/2018 BOUGHT 1000 of GB00B41YBW71 at £4.1565 with £12.5 expenses
+4: 01/03/2018 BOUGHT 1000 of GB00B41YBW71 at £3.6093 with £2 expenses
+
+
+# ASSET EVENTS
+
+NONE
 ```
 
 ## Usage
