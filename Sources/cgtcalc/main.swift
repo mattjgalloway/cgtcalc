@@ -9,6 +9,8 @@ import ArgumentParser
 import CGTCalcCore
 import Foundation
 
+let VERSION = "0.1.0"
+
 struct CGTCalc: ParsableCommand {
   @Argument(help: "The input data filename")
   var filename: String
@@ -19,7 +21,7 @@ struct CGTCalc: ParsableCommand {
   @Option(name: .shortAndLong, help: "Output file")
   var outputFile: String?
 
-  static var configuration = CommandConfiguration(commandName: "cgtcalc")
+  static var configuration = CommandConfiguration(commandName: "cgtcalc", version: VERSION)
 
   func run() throws {
     do {
