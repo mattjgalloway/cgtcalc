@@ -32,9 +32,9 @@ struct CGTCalc: ParsableCommand {
 
       let data = try String(contentsOfFile: filename)
       let parser = DefaultParser()
-      let transactions = try parser.transactions(fromData: data)
+      let input = try parser.calculatorInput(fromData: data)
 
-      let calculator = try Calculator(transactions: transactions, logger: logger)
+      let calculator = try Calculator(input: input, logger: logger)
       let result = try calculator.process()
 
       let presenter = TextPresenter(result: result)

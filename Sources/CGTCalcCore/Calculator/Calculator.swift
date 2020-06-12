@@ -8,11 +8,11 @@
 import Foundation
 
 public class Calculator {
-  private let transactions: [Transaction]
+  private let input: CalculatorInput
   private let logger: Logger
 
-  public init(transactions: [Transaction], logger: Logger) throws {
-    self.transactions = transactions
+  public init(input: CalculatorInput, logger: Logger) throws {
+    self.input = input
     self.logger = logger
   }
 
@@ -25,7 +25,7 @@ public class Calculator {
   }
 
   private func preprocessTransactions() throws {
-    for transaction in transactions {
+    for transaction in self.input.transactions {
       // 6th April 2008 is when new CGT rules came in. We only support those new rules.
       if transaction.date < Date(timeIntervalSince1970: 1207440000) {
         throw CalculatorError.TransactionDateNotSupported
@@ -34,17 +34,24 @@ public class Calculator {
   }
 
   private func processTransactions() throws -> CalculatorResult {
-    let allDisposalMatches = try self.transactions
+    let transactionsByAsset = self.input.transactions
       .reduce(into: [String:[Transaction]]()) { (result, transaction) in
         var transactions = result[transaction.asset, default: []]
         transactions.append(transaction)
         result[transaction.asset] = transactions
       }
+    let assetEventsByAsset = self.input.assetEvents
+      .reduce(into: [String:[AssetEvent]]()) { (result, assetEvent) in
+        var assetEvents = result[assetEvent.asset, default: []]
+        assetEvents.append(assetEvent)
+        result[assetEvent.asset] = assetEvents
+      }
+
+    let allDisposalMatches = try transactionsByAsset
       .map { (asset, transactions) -> AssetResult in
         let sortedTransactions = transactions.sorted { $0.date < $1.date }
         var acquisitions: [SubTransaction] = []
         var disposals: [SubTransaction] = []
-        var section104Adjusters: [SubTransaction] = []
         sortedTransactions.forEach { transaction in
           let subTransaction = SubTransaction(transaction: transaction)
           switch transaction.kind {
@@ -52,18 +59,17 @@ public class Calculator {
             acquisitions.append(subTransaction)
           case .Sell:
             disposals.append(subTransaction)
-          case .Section104Adjust:
-            section104Adjusters.append(subTransaction)
           }
         }
-        let state = AssetProcessorState(asset: asset, acquisitions: acquisitions, disposals: disposals, section104Adjusters: section104Adjusters)
+        let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
+        let state = AssetProcessorState(asset: asset, acquisitions: acquisitions, disposals: disposals, assetEvents: assetEvents)
         return try processAsset(withState: state)
       }
       .reduce(into: [DisposalMatch]()) { (disposalMatches, assetResult) in
         disposalMatches.append(contentsOf: assetResult.disposalMatches)
       }
 
-    return try CalculatorResult(transactions: self.transactions, disposalMatches: allDisposalMatches)
+    return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
   }
 
   private func processAsset(withState state: AssetProcessorState) throws -> AssetResult {

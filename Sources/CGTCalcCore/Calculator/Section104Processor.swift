@@ -21,23 +21,41 @@ class Section104Processor {
 
     let section104Holding = Section104Holding(logger: self.logger)
 
-    var allAcquisitions = (self.state.pendingAcquisitions + self.state.section104Adjusters)
-      .sorted { $0.date > $1.date }
-    let disposalsIndex = self.state.pendingDisposals.startIndex
+    var acquisitions = self.state.pendingAcquisitions.sorted { $0.date > $1.date }
+    var assetEvents = self.state.assetEvents.sorted { $0.date > $1.date }
 
-    while disposalsIndex < self.state.pendingDisposals.endIndex {
-      let disposal = self.state.pendingDisposals[disposalsIndex]
-      if let acquisition = allAcquisitions.last {
-        if acquisition.date <= disposal.date {
-          section104Holding.process(acquisition: acquisition)
-          _ = allAcquisitions.removeLast()
-          continue
+    while let disposal = self.state.pendingDisposals.first {
+      let acquisitionDate: Date
+      if let acquisition = acquisitions.last {
+        acquisitionDate = acquisition.date
+      } else {
+        acquisitionDate = Date.distantFuture
+      }
+
+      let assetEventDate: Date
+      if let assetEvent = assetEvents.last {
+        assetEventDate = assetEvent.date
+      } else {
+        assetEventDate = Date.distantFuture
+      }
+
+      if assetEventDate <= acquisitionDate && assetEventDate <= disposal.date {
+        if let assetEvent = assetEvents.last {
+          section104Holding.process(assetEvent: assetEvent)
+          _ = assetEvents.removeLast()
         }
+        continue
+      } else if acquisitionDate <= disposal.date {
+        if let acquisition = acquisitions.last {
+          section104Holding.process(acquisition: acquisition)
+          _ = acquisitions.removeLast()
+        }
+        continue
       }
 
       let disposalMatch = try section104Holding.process(disposal: disposal)
       self.state.processedDisposals.append(disposal)
-      self.state.pendingDisposals.remove(at: disposalsIndex)
+      self.state.pendingDisposals.remove(at: self.state.pendingDisposals.startIndex)
       self.state.disposalMatches.append(disposalMatch)
     }
 

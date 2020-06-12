@@ -13,7 +13,6 @@ public class Transaction {
   enum Kind {
     case Buy
     case Sell
-    case Section104Adjust
   }
 
   let id: Id

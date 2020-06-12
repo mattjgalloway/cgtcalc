@@ -14,6 +14,17 @@ enum ParserError: Error {
   case InvalidAmount(String)
   case InvalidPrice(String)
   case InvalidExpenses(String)
+  case InvalidValue(String)
+}
+
+public class CalculatorInput {
+  let transactions: [Transaction]
+  let assetEvents: [AssetEvent]
+
+  init(transactions: [Transaction], assetEvents: [AssetEvent]) {
+    self.transactions = transactions
+    self.assetEvents = assetEvents
+  }
 }
 
 public class DefaultParser {
@@ -27,21 +38,29 @@ public class DefaultParser {
     self.dateFormatter.dateFormat = "dd/MM/yyyy"
   }
 
-  public func transactions(fromData data: String) throws -> [Transaction] {
-    return try data
+  public func calculatorInput(fromData data: String) throws -> CalculatorInput {
+    var transactions: [Transaction] = []
+    var assetEvents: [AssetEvent] = []
+    try data
       .split { $0.isNewline }
-      .compactMap { try self.transaction(fromData: String($0)) }
+      .forEach { rowData in
+        guard rowData.count > 0 && rowData.first != "#" else {
+          return
+        }
+
+        if let transaction = try self.transaction(fromData: rowData) {
+          transactions.append(transaction)
+        } else if let assetEvent = try self.assetEvent(fromData: rowData) {
+          assetEvents.append(assetEvent)
+        } else {
+          throw ParserError.InvalidKind(String(rowData))
+        }
+      }
+    return CalculatorInput(transactions: transactions, assetEvents: assetEvents)
   }
 
-  public func transaction(fromData data: String) throws -> Transaction? {
-    guard data.count > 0 && data[data.startIndex] != "#" else {
-      return nil
-    }
-
+  public func transaction(fromData data: Substring) throws -> Transaction? {
     let splitData = data.components(separatedBy: .whitespaces)
-    guard splitData.count == 6 else {
-      throw ParserError.IncorrectNumberOfFields(data)
-    }
 
     let kind: Transaction.Kind
     switch splitData[0] {
@@ -49,33 +68,74 @@ public class DefaultParser {
       kind = .Buy
     case "SELL":
       kind = .Sell
-    case "ADJ":
-      kind = .Section104Adjust
     default:
-      throw ParserError.InvalidKind(data)
+      return nil
+    }
+
+    guard splitData.count == 6 else {
+      throw ParserError.IncorrectNumberOfFields(String(data))
     }
 
     guard let date = dateFormatter.date(from: splitData[1]) else {
-      throw ParserError.InvalidDate(data)
+      throw ParserError.InvalidDate(String(data))
     }
 
     let asset = splitData[2]
 
     guard let amount = Decimal(string: splitData[3]) else {
-      throw ParserError.InvalidAmount(data)
+      throw ParserError.InvalidAmount(String(data))
     }
 
     guard let price = Decimal(string: splitData[4]) else {
-      throw ParserError.InvalidPrice(data)
+      throw ParserError.InvalidPrice(String(data))
     }
 
     guard let expenses = Decimal(string: splitData[5]) else {
-      throw ParserError.InvalidExpenses(data)
+      throw ParserError.InvalidExpenses(String(data))
     }
 
     let id = self.nextId
     self.nextId += 1
 
     return Transaction(id: id, kind: kind, date: date, asset: asset, amount: amount, price: price, expenses: expenses)
+  }
+
+  public func assetEvent(fromData data: Substring) throws -> AssetEvent? {
+    let splitData = data.components(separatedBy: .whitespaces)
+
+    switch splitData[0] {
+    case "ADJ":
+      // We can't actually set kind here because we need the associated value
+      break
+    default:
+      return nil
+    }
+
+    guard splitData.count == 4 else {
+      throw ParserError.IncorrectNumberOfFields(String(data))
+    }
+
+    guard let date = dateFormatter.date(from: splitData[1]) else {
+      throw ParserError.InvalidDate(String(data))
+    }
+
+    let asset = splitData[2]
+
+    guard let value = Decimal(string: splitData[3]) else {
+      throw ParserError.InvalidValue(String(data))
+    }
+
+    let kind: AssetEvent.Kind
+    switch splitData[0] {
+    case "ADJ":
+      kind = .Section104Adjust(value)
+    default:
+      return nil
+    }
+
+    let id = self.nextId
+    self.nextId += 1
+
+    return AssetEvent(id: id, kind: kind, date: date, asset: asset)
   }
 }

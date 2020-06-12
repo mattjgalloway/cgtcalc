@@ -35,7 +35,7 @@ class MatchingProcessorTests: XCTestCase {
       asset: "Foo",
       acquisitions: [acquisition1Sub, acquisition2Sub, acquisition3Sub, acquisition4Sub],
       disposals: [disposal1Sub, disposal2Sub, disposal3Sub, disposal4Sub],
-      section104Adjusters: [])
+      assetEvents: [])
 
     let sut = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
       if acquisition === acquisition1Sub {

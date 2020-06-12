@@ -39,8 +39,8 @@ class ExamplesTests: XCTestCase {
 
       do {
         let parser = DefaultParser()
-        let transactions = try parser.transactions(fromData: inputData)
-        let calculator = try Calculator(transactions: transactions, logger: self.logger)
+        let input = try parser.calculatorInput(fromData: inputData)
+        let calculator = try Calculator(input: input, logger: self.logger)
         let result = try calculator.process()
         let presenter = TextPresenter(result: result)
         let outputData = try presenter.process()

@@ -12,7 +12,7 @@ class AssetProcessorState {
 
   var pendingAcquisitions: [SubTransaction]
   var pendingDisposals: [SubTransaction]
-  var section104Adjusters: [SubTransaction]
+  var assetEvents: [AssetEvent]
 
   var matchedAcquisitions: [SubTransaction] = []
   var processedDisposals: [SubTransaction] = []
@@ -22,10 +22,10 @@ class AssetProcessorState {
     get { self.pendingDisposals.isEmpty }
   }
 
-  init(asset: String, acquisitions: [SubTransaction], disposals: [SubTransaction], section104Adjusters: [SubTransaction]) {
+  init(asset: String, acquisitions: [SubTransaction], disposals: [SubTransaction], assetEvents: [AssetEvent]) {
     self.asset = asset
     self.pendingAcquisitions = acquisitions
     self.pendingDisposals = disposals
-    self.section104Adjusters = section104Adjusters
+    self.assetEvents = assetEvents
   }
 }

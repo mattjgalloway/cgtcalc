@@ -46,6 +46,15 @@ class Section104Holding {
     self.logger.debug("  New state: \(self.state)")
   }
 
+  func process(assetEvent: AssetEvent) {
+    self.logger.debug("Section 104 ===: \(assetEvent)")
+    switch assetEvent.kind {
+    case .Section104Adjust(let value):
+      self.state.add(amount: 0, cost: value)
+    }
+    self.logger.debug("  New state: \(self.state)")
+  }
+
   func process(disposal: SubTransaction) throws -> DisposalMatch {
     self.logger.debug("Section 104 ---: \(disposal)")
 

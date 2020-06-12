@@ -8,7 +8,7 @@
 import Foundation
 
 public struct CalculatorResult {
-  let transactions: [Transaction]
+  let input: CalculatorInput
   let taxYearSummaries: [TaxYearSummary]
 
   struct DisposalResult {
@@ -27,8 +27,8 @@ public struct CalculatorResult {
     let disposalResults: [DisposalResult]
   }
 
-  init(transactions: [Transaction], disposalMatches: [DisposalMatch]) throws {
-    self.transactions = transactions
+  init(input: CalculatorInput, disposalMatches: [DisposalMatch]) throws {
+    self.input = input
 
     var carryForwardLoss = Decimal.zero
     self.taxYearSummaries = try disposalMatches

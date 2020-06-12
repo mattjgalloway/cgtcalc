@@ -35,6 +35,9 @@ public class TextPresenter {
     output += "# TRANSACTIONS\n\n"
     output += self.transactionsTable()
 
+    output += "# ASSET EVENTS\n\n"
+    output += self.assetEventsTable()
+
     return output
   }
 
@@ -102,8 +105,23 @@ public class TextPresenter {
   }
 
   private func transactionsTable() -> String {
-    return self.result.transactions.reduce(into: "") { (result, transaction) in
+    return self.result.input.transactions.reduce(into: "") { (result, transaction) in
       result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) \(transaction.asset) \(transaction.amount) £\(transaction.price) £\(transaction.expenses)\n"
+    }
+  }
+
+  private func assetEventsTable() -> String {
+    guard self.result.input.assetEvents.count > 0 else {
+      return "NONE"
+    }
+
+    return self.result.input.assetEvents.reduce(into: "") { (result, assetEvent) in
+      result += "\(assetEvent.id): \(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
+      switch assetEvent.kind {
+      case .Section104Adjust(let value):
+        result += "SECTION 104 ADJUST by \(self.formattedCurrency(value))"
+      }
+      result += "\n"
     }
   }
 }

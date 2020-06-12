@@ -15,7 +15,8 @@ class CalculatorTests: XCTestCase {
   func testSamples() throws {
     SampleData.samples.forEach { sample in
       do {
-        let calculator = try Calculator(transactions: sample.transactions, logger: self.logger)
+        let input = CalculatorInput(transactions: sample.transactions, assetEvents: [])
+        let calculator = try Calculator(input: input, logger: self.logger)
         let result = try calculator.process()
         XCTAssertEqual(result.taxYearSummaries.count, sample.gains.count)
         result.taxYearSummaries.forEach { taxYearSummary in
@@ -33,7 +34,8 @@ class CalculatorTests: XCTestCase {
 
   func testDateBefore20080406Throws() throws {
     let transaction = ModelCreation.transaction(1, .Buy, "05/04/2008", "Foo", "1", "1", "0")
-    let calculator = try Calculator(transactions: [transaction], logger: self.logger)
+    let input = CalculatorInput(transactions: [transaction], assetEvents: [])
+    let calculator = try Calculator(input: input, logger: self.logger)
     XCTAssertThrowsError(try calculator.process())
   }
 
