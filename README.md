@@ -115,7 +115,7 @@ You can extend `CGTCalcCore` in two interesting ways:
 
 It's best to look at `main.swift` to see how to use `CGTCalcCore`. It's essentially as follows:
 
-```
+```swift
 import CGTCalcCore
 import Foundation
 
