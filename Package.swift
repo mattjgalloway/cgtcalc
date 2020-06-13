@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "cgtcalc",
     products: [
-        .executable(name: "cgtcalc", targets: ["cgtcalc"])
+        .library(name: "CGTCalcCore", targets: ["CGTCalcCore"]),
+        .executable(name: "cgtcalc", targets: ["cgtcalc"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "0.1.0")
