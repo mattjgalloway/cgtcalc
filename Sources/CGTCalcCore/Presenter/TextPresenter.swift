@@ -106,6 +106,10 @@ public class TextPresenter {
   }
 
   private func transactionsTable() -> String {
+    guard self.result.input.transactions.count > 0 else {
+      return "NONE"
+    }
+
     return self.result.input.transactions.reduce(into: "") { (result, transaction) in
       result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) "
       switch transaction.kind {
