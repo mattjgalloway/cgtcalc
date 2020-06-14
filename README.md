@@ -138,3 +138,7 @@ let output = try presenter.process()
 ## Tests
 
 `cgtcalc` includes a comprehensive test suite. The most interesting ones are in [Tests/CGTCalcCoreTests/Examples](Tests/CGTCalcCoreTests/Examples). These are full end-to-end tests which have [input data files](Tests/CGTCalcCoreTests/Examples/Inputs) and check against equivalent [output files](Tests/CGTCalcCoreTests/Examples/Outputs). Those are worth looking at to see how the calculator responds to given inputs.
+
+## Donate
+
+If you like this and you'd like to buy me a coffee or a beer then I would say thank you and ask you to [send to my PayPal](https://paypal.me/mattjgalloway?locale.x=en_GB).
