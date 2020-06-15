@@ -13,6 +13,26 @@ I developed this because I needed something that would take my transactions and 
 
 There are other excellent calculators out there, such as [CGTCalculator](http://www.cgtcalculator.com/), however I couldn't find one which did everything that I need. The missing piece seemed to be handling of fund equalisation payments and dividends that need to be accounted for in accumulation funds.
 
+## What does it support?
+
+Currently the calculator supports the full range of matches of acquisitions to disposals for the current capital gains tax system, namely supporting matching based on the following rules in this order:
+
+1) Same day trades.
+2) Bed & breakfast trades where you purchase an asset within 30 days of selling the same asset.
+3) Section 104 holding.
+
+The calculator specifically only deals with shares where the acquisition and disposals are all on or after 6th April 2008 when the latest rules came into effect.
+
+It also supports handling of equalisation payments (capital return) for funds where those amounts should be subtracted from the acquisition proceeds. And it also supports handling of dividends within accumulation share classes of funds where those amounts can be subtracted from the disposal proceeds.
+
+## What does it not support?
+
+Currently there is no support for:
+
+1) Stock splits.
+2) Transactions before 6th April 2008.
+3) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
+
 ## Usage
 
 Using `cgtcalc` is simple. All you need to do is the following:
