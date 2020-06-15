@@ -24,6 +24,8 @@ class ExamplesTests: XCTestCase {
     let inputs = try fileManager.contentsOfDirectory(at: inputsDirectory, includingPropertiesForKeys: nil, options: [])
 
     for inputFile in inputs {
+      guard inputFile.pathExtension == "txt" else { continue }
+
       let testName = inputFile.deletingPathExtension().lastPathComponent
       let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
 
