@@ -105,9 +105,9 @@ Tax year    Gain    Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (h
 
 1) SOLD 2000 of GB00B41YBW71 on 28/11/2019 for GAIN of £1140
 Matches with:
-  - BED & BREAKFAST: 500 bought on 05/12/2019 at £4.7012 with offset of £0
+  - BED & BREAKFAST: 500 bought on 05/12/2019 at £4.7012
   - SECTION 104: 2000 at cost basis of £3.89015
-Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 0 + 2) + (1500 * 3.89015) ) = 1140
+Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 2) + (1500 * 3.89015) ) = 1140
 
 
 # TRANSACTIONS

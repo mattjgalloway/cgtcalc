@@ -11,8 +11,8 @@ Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (hi
 
 1) SOLD 10 of GB00B41YBW71 on 28/08/2018 for LOSS of £20
 Matches with:
-  - SAME DAY: 10 bought on 28/08/2018 at £4.1565 with offset of £0
-Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 0 + 12.5) ) = -20
+  - SAME DAY: 10 bought on 28/08/2018 at £4.1565
+Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 
 
 # TRANSACTIONS
