@@ -34,6 +34,10 @@ Currently there is no support for:
 3) Transactions before 6th April 2008.
 4) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
 
+## Platforms
+
+The library and console app that makes up `cgtcalc` both work fully on both macOS and Linux. It's running on a Linux server at https://cgtcalc.galloway.me.uk/. However as of writing this, there's a very serious bug with `Decimal` in Swift on Linux that means you should not use it there as you can easily end up in a situation where the calculations are wildly incorrect. The Swift bug can be tracked here: https://bugs.swift.org/browse/SR-13015
+
 ## Usage
 
 Using `cgtcalc` is simple. All you need to do is the following:
