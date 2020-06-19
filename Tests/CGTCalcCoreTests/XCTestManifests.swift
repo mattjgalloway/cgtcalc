@@ -15,9 +15,16 @@ extension CalculatorTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__CalculatorTests = [
+        ("testAssetEventCapitalReturnTooLarge", testAssetEventCapitalReturnTooLarge),
+        ("testAssetEventCapitalReturnTooSmall", testAssetEventCapitalReturnTooSmall),
+        ("testAssetEventDividendNotMatchingAmount", testAssetEventDividendNotMatchingAmount),
+        ("testAssetEventDividendTooLarge", testAssetEventDividendTooLarge),
+        ("testAssetEventDividendTooSmall", testAssetEventDividendTooSmall),
         ("testAssetEventWithNoAcquisition", testAssetEventWithNoAcquisition),
         ("testBasicSingleAsset", testBasicSingleAsset),
+        ("testBedAndBreakfastEdges", testBedAndBreakfastEdges),
         ("testDateBefore20080406Throws", testDateBefore20080406Throws),
+        ("testSection104DisposeTooMuch", testSection104DisposeTooMuch),
     ]
 }
 
