@@ -19,9 +19,10 @@ public class Transaction {
   let kind: Kind
   let date: Date
   let asset: String
-  let amount: Decimal
-  let price: Decimal
-  let expenses: Decimal
+  private(set) var amount: Decimal
+  private(set) var price: Decimal
+  private(set) var expenses: Decimal
+  private(set) var groupedTransactions: [Transaction] = []
 
   init(id: Id, kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
     self.id = id
@@ -32,10 +33,26 @@ public class Transaction {
     self.price = price
     self.expenses = expenses
   }
+
+  func groupWith(transaction: Transaction) throws {
+    guard transaction.kind == self.kind, transaction.date == self.date, transaction.asset == self.asset else {
+      throw CalculatorError.InternalError("Cannot group transactions that don't have the same kind, date and asset.")
+    }
+    let selfCost = self.amount * self.price
+    let otherCost = transaction.amount * transaction.price
+    self.amount += transaction.amount
+    self.price = (selfCost + otherCost) / self.amount
+    self.expenses += transaction.expenses
+    self.groupedTransactions.append(transaction)
+  }
+
+  func groupWith(transactions: [Transaction]) throws {
+    try transactions.forEach(self.groupWith(transaction:))
+  }
 }
 
 extension Transaction: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): id=\(self.id), kind=\(self.kind), date=\(self.date), asset=\(asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses)>"
+    return "<\(String(describing: type(of: self))): id=\(self.id), kind=\(self.kind), date=\(self.date), asset=\(asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
   }
 }
