@@ -19,6 +19,21 @@ class TransactionToMatchTests: XCTestCase {
     XCTAssertEqual(remainder.amount, Decimal(string: "10.222"))
   }
 
+  func testSplitTwiceSuccess() throws {
+    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
+    let acquisition = TransactionToMatch(transaction: transaction)
+
+    let split1Amount = Decimal(string: "10.222")!
+    let remainder1 = try acquisition.split(withAmount: split1Amount)
+    XCTAssertEqual(acquisition.amount, split1Amount)
+    XCTAssertEqual(remainder1.amount, Decimal(string: "2.123"))
+
+    let split2Amount = Decimal(string: "5.431")!
+    let remainder2 = try acquisition.split(withAmount: split2Amount)
+    XCTAssertEqual(acquisition.amount, split2Amount)
+    XCTAssertEqual(remainder2.amount, Decimal(string: "4.791"))
+  }
+
   func testSplitTooMuchFails() throws {
     let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)

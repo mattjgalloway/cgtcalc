@@ -127,6 +127,7 @@ extension TransactionToMatchTests {
         ("testOffsetWorks", testOffsetWorks),
         ("testSplitSuccess", testSplitSuccess),
         ("testSplitTooMuchFails", testSplitTooMuchFails),
+        ("testSplitTwiceSuccess", testSplitTwiceSuccess),
     ]
 }
 
