@@ -13,7 +13,7 @@ class MatchingProcessor {
     case SkipDisposal
     case Match(DisposalMatch)
   }
-  typealias Matcher = (SubTransaction, SubTransaction) -> MatchResult
+  typealias Matcher = (TransactionToMatch, TransactionToMatch) -> MatchResult
 
   private let state: AssetProcessorState
   private let logger: Logger

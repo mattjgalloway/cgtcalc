@@ -10,19 +10,19 @@ import Foundation
 class AssetProcessorState {
   let asset: String
 
-  var pendingAcquisitions: [SubTransaction]
-  var pendingDisposals: [SubTransaction]
+  var pendingAcquisitions: [TransactionToMatch]
+  var pendingDisposals: [TransactionToMatch]
   var assetEvents: [AssetEvent]
 
-  var matchedAcquisitions: [SubTransaction] = []
-  var processedDisposals: [SubTransaction] = []
+  var matchedAcquisitions: [TransactionToMatch] = []
+  var processedDisposals: [TransactionToMatch] = []
   var disposalMatches: [DisposalMatch] = []
 
   var isComplete: Bool {
     get { self.pendingDisposals.isEmpty }
   }
 
-  init(asset: String, acquisitions: [SubTransaction], disposals: [SubTransaction], assetEvents: [AssetEvent]) {
+  init(asset: String, acquisitions: [TransactionToMatch], disposals: [TransactionToMatch], assetEvents: [AssetEvent]) {
     self.asset = asset
     self.pendingAcquisitions = acquisitions
     self.pendingDisposals = disposals

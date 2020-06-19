@@ -1,5 +1,5 @@
 //
-//  SubTransaction.swift
+//  TransactionToMatch.swift
 //  cgtcalc
 //
 //  Created by Matt Galloway on 07/06/2020.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class SubTransaction {
+class TransactionToMatch {
   let transaction: Transaction
   let underlyingPrice: Decimal
   private(set) var amount: Decimal
@@ -37,12 +37,12 @@ class SubTransaction {
     self.expenses = transaction.expenses
   }
 
-  func split(withAmount amount: Decimal) throws -> SubTransaction {
+  func split(withAmount amount: Decimal) throws -> TransactionToMatch {
     guard amount <= self.amount else {
       throw CalculatorError.InternalError("Tried to split calculator transaction by more than its amount")
     }
 
-    let remainder = SubTransaction(transaction: self.transaction)
+    let remainder = TransactionToMatch(transaction: self.transaction)
     let remainderAmount = self.amount - amount
     remainder.amount = remainderAmount
     remainder.expenses = self.expenses * remainderAmount / self.amount
@@ -64,7 +64,7 @@ class SubTransaction {
   }
 }
 
-extension SubTransaction: CustomStringConvertible {
+extension TransactionToMatch: CustomStringConvertible {
   var description: String {
     return "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), underlyingPrice=\(self.underlyingPrice), price=\(self.price), expenses=\(self.expenses), offset=\(self.offset)>"
   }

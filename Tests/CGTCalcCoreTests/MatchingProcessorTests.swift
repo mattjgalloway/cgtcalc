@@ -17,19 +17,19 @@ class MatchingProcessorTests: XCTestCase {
     let acquisition2 = ModelCreation.transaction(2, .Buy, "02/01/2020", "Foo", "1000", "1", "0")
     let acquisition3 = ModelCreation.transaction(3, .Buy, "03/01/2020", "Foo", "1000", "1", "0")
     let acquisition4 = ModelCreation.transaction(4, .Buy, "04/01/2020", "Foo", "500", "1", "0")
-    let acquisition1Sub = SubTransaction(transaction: acquisition1)
-    let acquisition2Sub = SubTransaction(transaction: acquisition2)
-    let acquisition3Sub = SubTransaction(transaction: acquisition3)
-    let acquisition4Sub = SubTransaction(transaction: acquisition4)
+    let acquisition1Sub = TransactionToMatch(transaction: acquisition1)
+    let acquisition2Sub = TransactionToMatch(transaction: acquisition2)
+    let acquisition3Sub = TransactionToMatch(transaction: acquisition3)
+    let acquisition4Sub = TransactionToMatch(transaction: acquisition4)
 
     let disposal1 = ModelCreation.transaction(5, .Sell, "01/01/2020", "Foo", "1000", "1", "0")
     let disposal2 = ModelCreation.transaction(6, .Sell, "02/01/2020", "Foo", "1000", "1", "0")
     let disposal3 = ModelCreation.transaction(7, .Sell, "03/01/2020", "Foo", "500", "1", "0")
     let disposal4 = ModelCreation.transaction(8, .Sell, "04/01/2020", "Foo", "1000", "1", "0")
-    let disposal1Sub = SubTransaction(transaction: disposal1)
-    let disposal2Sub = SubTransaction(transaction: disposal2)
-    let disposal3Sub = SubTransaction(transaction: disposal3)
-    let disposal4Sub = SubTransaction(transaction: disposal4)
+    let disposal1Sub = TransactionToMatch(transaction: disposal1)
+    let disposal2Sub = TransactionToMatch(transaction: disposal2)
+    let disposal3Sub = TransactionToMatch(transaction: disposal3)
+    let disposal4Sub = TransactionToMatch(transaction: disposal4)
 
     let state = AssetProcessorState(
       asset: "Foo",

@@ -52,15 +52,15 @@ public class Calculator {
     let allDisposalMatches = try allAssets
       .map { asset -> AssetResult in
         let transactions = transactionsByAsset[asset, default: []].sorted { $0.date < $1.date }
-        var acquisitions: [SubTransaction] = []
-        var disposals: [SubTransaction] = []
+        var acquisitions: [TransactionToMatch] = []
+        var disposals: [TransactionToMatch] = []
         transactions.forEach { transaction in
-          let subTransaction = SubTransaction(transaction: transaction)
+          let transactionToMatch = TransactionToMatch(transaction: transaction)
           switch transaction.kind {
           case .Buy:
-            acquisitions.append(subTransaction)
+            acquisitions.append(transactionToMatch)
           case .Sell:
-            disposals.append(subTransaction)
+            disposals.append(transactionToMatch)
           }
         }
         let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }

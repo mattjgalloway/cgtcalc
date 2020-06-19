@@ -9,7 +9,7 @@ import Foundation
 
 class DisposalMatch {
   let kind: Kind
-  let disposal: SubTransaction
+  let disposal: TransactionToMatch
 
   var asset: String {
     return self.disposal.asset
@@ -24,12 +24,12 @@ class DisposalMatch {
   }
 
   enum Kind {
-    case SameDay(SubTransaction)
-    case BedAndBreakfast(SubTransaction)
+    case SameDay(TransactionToMatch)
+    case BedAndBreakfast(TransactionToMatch)
     case Section104(Decimal, Decimal)
   }
 
-  init(kind: Kind, disposal: SubTransaction) {
+  init(kind: Kind, disposal: TransactionToMatch) {
     self.kind = kind
     self.disposal = disposal
   }

@@ -40,13 +40,13 @@ class Section104Holding {
     self.logger = logger
   }
 
-  func process(acquisition: SubTransaction) {
+  func process(acquisition: TransactionToMatch) {
     self.logger.debug("Section 104 +++: \(acquisition)")
     self.state.add(amount: acquisition.amount, cost: acquisition.value + acquisition.expenses)
     self.logger.debug("  New state: \(self.state)")
   }
 
-  func process(disposal: SubTransaction) throws -> DisposalMatch {
+  func process(disposal: TransactionToMatch) throws -> DisposalMatch {
     self.logger.debug("Section 104 ---: \(disposal)")
 
     guard self.state.amount >= disposal.amount else {
