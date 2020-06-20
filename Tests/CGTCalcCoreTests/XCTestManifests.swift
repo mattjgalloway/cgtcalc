@@ -123,6 +123,7 @@ extension Section104HoldingTests {
     static let __allTests__Section104HoldingTests = [
         ("testProcessesAcquisitionsCorrectly", testProcessesAcquisitionsCorrectly),
         ("testProcessesDisposalsCorrectly", testProcessesDisposalsCorrectly),
+        ("testProcessesDisposalsWithSplitsCorrectly", testProcessesDisposalsWithSplitsCorrectly),
         ("testProcessesManyDisposalsCorrectly", testProcessesManyDisposalsCorrectly),
         ("testProcessesTooBigDisposalCorrectly", testProcessesTooBigDisposalCorrectly),
     ]
