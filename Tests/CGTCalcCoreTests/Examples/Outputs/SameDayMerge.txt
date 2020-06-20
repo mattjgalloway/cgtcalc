@@ -1,0 +1,29 @@
+# SUMMARY
+
+Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=====================================================================================
+2018/2019   £-19   £11700      £19          £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2018/2019
+
+1) SOLD 20 of GB00B41YBW71 on 28/10/2018 for LOSS of £19
+Matches with:
+  - SECTION 104: 30 at cost basis of £8.21667
+Calculation: (20 * 8 - 14.5) - ( (20 * 8.21667) ) = -19
+
+
+# TRANSACTIONS
+
+28/10/2018 SOLD 20 of GB00B41YBW71 at £8 with £14.5 expenses
+28/10/2018 SOLD 10 of GB00B41YBW71 at £9 with £2 expenses
+28/08/2018 BOUGHT 30 of GB00B41YBW71 at £7.6666666666666666666666666666666666666 with £16.5 expenses
+28/08/2018 BOUGHT 10 of GB00B41YBW71 at £10 with £2 expenses
+28/08/2018 BOUGHT 10 of GB00B41YBW71 at £8 with £2 expenses
+
+
+# ASSET EVENTS
+
+NONE

@@ -51,7 +51,7 @@ public class Calculator {
 
     let allDisposalMatches = try allAssets
       .map { asset -> AssetResult in
-        let transactions = transactionsByAsset[asset, default: []].sorted { $0.date < $1.date }
+        let transactions = try self.groupSameDayTransactions(transactionsByAsset[asset, default: []])
         var acquisitions: [TransactionToMatch] = []
         var disposals: [TransactionToMatch] = []
         transactions.forEach { transaction in
@@ -73,6 +73,25 @@ public class Calculator {
       }
 
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
+  }
+
+  private func groupSameDayTransactions(_ transactions: [Transaction]) throws -> [Transaction] {
+    let initial: ([Transaction], Transaction?) = ([], nil)
+    return try transactions
+      .sorted { $0.date < $1.date }
+      .reduce(into: initial) { (returnValue, transaction) in
+        guard let groupTransaction = returnValue.1 else {
+          returnValue.0.append(transaction)
+          returnValue.1 = transaction
+          return
+        }
+        if groupTransaction.date == transaction.date && groupTransaction.kind == transaction.kind {
+          try groupTransaction.groupWith(transaction: transaction)
+        } else {
+          returnValue.0.append(transaction)
+          returnValue.1 = transaction
+        }
+    }.0
   }
 
   private func preprocessAsset(withState state: AssetProcessorState) throws {
