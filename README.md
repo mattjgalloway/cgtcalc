@@ -29,10 +29,9 @@ It also supports handling of equalisation payments (capital return) for funds wh
 
 Currently there is no support for:
 
-1) Grouping multiple same-day transactions. This is high-pri to add support for.
-2) Stock splits.
-3) Transactions before 6th April 2008.
-4) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
+1) Stock splits.
+2) Transactions before 6th April 2008.
+3) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
 
 ## Platforms
 
