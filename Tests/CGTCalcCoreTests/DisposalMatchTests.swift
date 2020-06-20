@@ -14,7 +14,7 @@ class DisposalMatchTests: XCTestCase {
     let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "2", "10")
     let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
-    let disposalMatch = DisposalMatch(kind: .SameDay(TransactionToMatch(transaction: acquisition)), disposal: TransactionToMatch(transaction: disposal))
+    let disposalMatch = DisposalMatch(kind: .SameDay(TransactionToMatch(transaction: acquisition)), disposal: TransactionToMatch(transaction: disposal), restructureMultiplier: Decimal(1))
 
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -30,7 +30,7 @@ class DisposalMatchTests: XCTestCase {
   func testSection104Disposal() throws {
     let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
-    let disposalMatch = DisposalMatch(kind: .Section104(Decimal(string: "100")!, Decimal(string: "2.5")!), disposal: TransactionToMatch(transaction: disposal))
+    let disposalMatch = DisposalMatch(kind: .Section104(Decimal(string: "100")!, Decimal(string: "2.5")!), disposal: TransactionToMatch(transaction: disposal), restructureMultiplier: Decimal(1))
 
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX")

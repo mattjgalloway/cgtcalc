@@ -34,6 +34,14 @@ class Section104Holding {
         self.cost = 0
       }
     }
+
+    mutating fileprivate func multiplyAmount(by: Decimal) {
+      self.amount *= by
+    }
+
+    mutating fileprivate func divideAmount(by: Decimal) {
+      self.amount /= by
+    }
   }
 
   init(logger: Logger) {
@@ -53,12 +61,30 @@ class Section104Holding {
       throw CalculatorError.InvalidData("Disposing of more than is currently held")
     }
 
-    let disposalMatch = DisposalMatch(kind: .Section104(self.state.amount, self.state.costBasis), disposal: disposal)
+    let disposalMatch = DisposalMatch(kind: .Section104(self.state.amount, self.state.costBasis), disposal: disposal, restructureMultiplier: Decimal(1))
 
     self.state.remove(amount: disposal.amount)
     self.logger.debug("  New state: \(self.state)")
 
     return disposalMatch
+  }
+
+  func process(assetEvent: AssetEvent) {
+    self.logger.debug("Section 104 ===: \(assetEvent)")
+
+    switch assetEvent.kind {
+    case .Split(let multiplier):
+      self.state.multiplyAmount(by: multiplier)
+      self.logger.debug("  Rebasing by mutliplying holding by \(multiplier)")
+      self.logger.debug("  New state: \(self.state)")
+    case .Unsplit(let multiplier):
+      self.state.divideAmount(by: multiplier)
+      self.logger.debug("  Rebasing by dividing holding by \(multiplier)")
+      self.logger.debug("  New state: \(self.state)")
+    case .CapitalReturn(_, _), .Dividend(_, _):
+      self.logger.debug("  Nothing to do for this asset event.")
+      break
+    }
   }
 }
 

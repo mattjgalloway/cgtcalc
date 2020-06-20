@@ -1,0 +1,29 @@
+# SUMMARY
+
+Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=====================================================================================
+2018/2019   £40    £11700      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2018/2019
+
+1) SOLD 20 of FOO on 01/02/2019 for GAIN of £40
+Matches with:
+  - BED & BREAKFAST: 10 bought on 10/02/2019 at £10
+  - BED & BREAKFAST: 5 bought on 20/02/2019 at £20 with restructure multiplier 0.5
+Calculation: (20 * 12 - 0) - ( (10 * 10 + 0) + (5 * 20 + 0) ) = 40
+
+
+# TRANSACTIONS
+
+20/02/2019 BOUGHT 5 of FOO at £20 with £0 expenses
+10/02/2019 BOUGHT 10 of FOO at £10 with £0 expenses
+01/02/2019 SOLD 20 of FOO at £12 with £0 expenses
+01/01/2019 BOUGHT 20 of FOO at £10 with £0 expenses
+
+
+# ASSET EVENTS
+
+15/02/2019 FOO UNSPLIT by 2

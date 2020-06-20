@@ -1,0 +1,26 @@
+# SUMMARY
+
+Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=====================================================================================
+2018/2019   £40    £11700      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2018/2019
+
+1) SOLD 40 of FOO on 01/04/2019 for GAIN of £40
+Matches with:
+  - SECTION 104: 40 at cost basis of £5
+Calculation: (40 * 6 - 0) - ( (40 * 5) ) = 40
+
+
+# TRANSACTIONS
+
+01/04/2019 SOLD 40 of FOO at £6 with £0 expenses
+01/01/2019 BOUGHT 20 of FOO at £10 with £0 expenses
+
+
+# ASSET EVENTS
+
+01/02/2019 FOO SPLIT by 2

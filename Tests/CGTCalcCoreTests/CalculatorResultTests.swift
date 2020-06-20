@@ -15,7 +15,7 @@ class CalculatorResultTests: XCTestCase {
     let acquisitionSub = TransactionToMatch(transaction: acquisition)
     let disposal = ModelCreation.transaction(.Sell, "01/01/2000", "Foo", "1000", "1", "0")
     let disposalSub = TransactionToMatch(transaction: disposal)
-    let disposalMatch = DisposalMatch(kind: .SameDay(acquisitionSub), disposal: disposalSub)
+    let disposalMatch = DisposalMatch(kind: .SameDay(acquisitionSub), disposal: disposalSub, restructureMultiplier: Decimal(1))
     let input = CalculatorInput(transactions: [acquisition, disposal], assetEvents: [])
     XCTAssertThrowsError(try CalculatorResult(input: input, disposalMatches: [disposalMatch]))
   }

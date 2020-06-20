@@ -38,6 +38,7 @@ class MatchingProcessor {
       let acquisition = self.state.pendingAcquisitions[acquisitionIndex]
       let disposal = self.state.pendingDisposals[disposalIndex]
 
+      let restructureMultiplier: Decimal
       switch kind {
       case .SameDay:
         if acquisition.date < disposal.date {
@@ -47,6 +48,7 @@ class MatchingProcessor {
           disposalIndex += 1
           continue
         }
+        restructureMultiplier = Decimal(1)
       case .BedAndBreakfast:
         if acquisition.date < disposal.date {
           acquisitionIndex += 1
@@ -55,26 +57,41 @@ class MatchingProcessor {
           disposalIndex += 1
           continue
         }
+
+        var currentMultiplier = Decimal(1)
+        self.state.assetEvents
+          .filter { $0.date > disposal.date && $0.date <= acquisition.date }
+          .forEach { assetEvent in
+            switch assetEvent.kind {
+            case .Split(let m):
+              currentMultiplier *= m
+            case .Unsplit(let m):
+              currentMultiplier /= m
+            case .CapitalReturn(_, _), .Dividend(_, _):
+              break
+            }
+        }
+        restructureMultiplier = currentMultiplier
       }
 
       // If disposal is too big we split it up
-      if disposal.amount > acquisition.amount {
-        let splitDisposal = try disposal.split(withAmount: acquisition.amount)
+      if disposal.amount * restructureMultiplier > acquisition.amount {
+        let splitDisposal = try disposal.split(withAmount: acquisition.amount / restructureMultiplier)
         self.state.pendingDisposals.insert(splitDisposal, at: disposalIndex + 1)
       }
 
       // If the acquisition is too big we split it up
-      if acquisition.amount > disposal.amount {
-        let splitAcquisition = try acquisition.split(withAmount: disposal.amount)
+      if acquisition.amount > disposal.amount * restructureMultiplier {
+        let splitAcquisition = try acquisition.split(withAmount: disposal.amount * restructureMultiplier)
         self.state.pendingAcquisitions.insert(splitAcquisition, at: acquisitionIndex + 1)
       }
 
       let disposalMatch: DisposalMatch
       switch kind {
       case .SameDay:
-        disposalMatch = DisposalMatch(kind: .SameDay(acquisition), disposal: disposal)
+        disposalMatch = DisposalMatch(kind: .SameDay(acquisition), disposal: disposal, restructureMultiplier: restructureMultiplier)
       case .BedAndBreakfast:
-        disposalMatch = DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal)
+        disposalMatch = DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal, restructureMultiplier: restructureMultiplier)
       }
 
       self.logger.info("Matched \(disposal) against \(acquisition).")

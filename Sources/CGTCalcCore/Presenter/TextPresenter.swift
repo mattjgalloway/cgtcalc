@@ -159,6 +159,9 @@ extension TextPresenter {
       if !acquisition.offset.isZero {
         output += " with offset of £\(acquisition.offset)"
       }
+      if disposalMatch.restructureMultiplier != Decimal(1) {
+        output += " with restructure multiplier \(disposalMatch.restructureMultiplier)"
+      }
       return output
     case .Section104(let amountAtDisposal, let costBasis):
       return "SECTION 104: \(amountAtDisposal) at cost basis of £\(costBasis.rounded(to: 5).string)"
