@@ -188,27 +188,8 @@ public class Calculator {
   private func processAsset(withState state: AssetProcessorState) throws -> AssetResult {
     self.logger.info("Begin processing transactions for \(state.asset).")
 
-    let sameDayProcessor = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
-      if acquisition.date < disposal.date {
-        return .SkipAcquisition
-      } else if disposal.date < acquisition.date {
-        return .SkipDisposal
-      } else {
-        return .Match(DisposalMatch(kind: .SameDay(acquisition), disposal: disposal))
-      }
-    }
-    try sameDayProcessor.process()
-
-    let bedAndBreakfastProcessor = MatchingProcessor(state: state, logger: self.logger) { (acquisition, disposal) in
-      if acquisition.date < disposal.date {
-        return .SkipAcquisition
-      } else if disposal.date.addingTimeInterval(60*60*24*30) < acquisition.date {
-        return .SkipDisposal
-      } else {
-        return .Match(DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal))
-      }
-    }
-    try bedAndBreakfastProcessor.process()
+    let matchingProcessor = MatchingProcessor(state: state, logger: self.logger)
+    try matchingProcessor.process()
 
     let section104Processor = Section104Processor(state: state, logger: self.logger)
     try section104Processor.process()
