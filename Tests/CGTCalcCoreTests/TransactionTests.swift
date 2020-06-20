@@ -47,4 +47,13 @@ class TransactionTests: XCTestCase {
     XCTAssertThrowsError(try transactionA.groupWith(transaction: transactionB))
   }
 
+  func testEquality() throws {
+    let a = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
+    let b = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
+    let c = a
+    XCTAssertNotEqual(a, b)
+    XCTAssertNotEqual(b, c)
+    XCTAssertEqual(a, c)
+  }
+
 }
