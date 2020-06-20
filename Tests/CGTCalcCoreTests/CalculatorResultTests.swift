@@ -11,9 +11,9 @@ import XCTest
 class CalculatorResultTests: XCTestCase {
 
   func testFailsWhenTaxYearHasNoRates() throws {
-    let acquisition = ModelCreation.transaction(1, .Buy, "01/01/2000", "Foo", "1000", "1", "0")
+    let acquisition = ModelCreation.transaction(.Buy, "01/01/2000", "Foo", "1000", "1", "0")
     let acquisitionSub = TransactionToMatch(transaction: acquisition)
-    let disposal = ModelCreation.transaction(5, .Sell, "01/01/2000", "Foo", "1000", "1", "0")
+    let disposal = ModelCreation.transaction(.Sell, "01/01/2000", "Foo", "1000", "1", "0")
     let disposalSub = TransactionToMatch(transaction: disposal)
     let disposalMatch = DisposalMatch(kind: .SameDay(acquisitionSub), disposal: disposalSub)
     let input = CalculatorInput(transactions: [acquisition, disposal], assetEvents: [])

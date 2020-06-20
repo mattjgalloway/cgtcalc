@@ -29,7 +29,6 @@ public class CalculatorInput {
 
 public class DefaultParser {
   private let dateFormatter: DateFormatter
-  private var nextId: Int = 1
 
   public init() {
     self.dateFormatter = DateFormatter()
@@ -94,10 +93,7 @@ public class DefaultParser {
       throw ParserError.InvalidExpenses(String(data))
     }
 
-    let id = self.nextId
-    self.nextId += 1
-
-    return Transaction(id: id, kind: kind, date: date, asset: asset, amount: amount, price: price, expenses: expenses)
+    return Transaction(kind: kind, date: date, asset: asset, amount: amount, price: price, expenses: expenses)
   }
 
   public func assetEvent(fromData data: Substring) throws -> AssetEvent? {
@@ -139,9 +135,6 @@ public class DefaultParser {
       return nil
     }
 
-    let id = self.nextId
-    self.nextId += 1
-
-    return AssetEvent(id: id, kind: kind, date: date, asset: asset)
+    return AssetEvent(kind: kind, date: date, asset: asset)
   }
 }

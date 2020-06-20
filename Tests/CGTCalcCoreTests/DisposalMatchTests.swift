@@ -11,8 +11,8 @@ import XCTest
 class DisposalMatchTests: XCTestCase {
 
   func testMatchingDisposal() throws {
-    let acquisition = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "100", "2", "10")
-    let disposal = ModelCreation.transaction(1, .Sell, "16/08/2020", "Foo", "100", "3", "20")
+    let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "2", "10")
+    let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
     let disposalMatch = DisposalMatch(kind: .SameDay(TransactionToMatch(transaction: acquisition)), disposal: TransactionToMatch(transaction: disposal))
 
@@ -28,7 +28,7 @@ class DisposalMatchTests: XCTestCase {
   }
 
   func testSection104Disposal() throws {
-    let disposal = ModelCreation.transaction(1, .Sell, "16/08/2020", "Foo", "100", "3", "20")
+    let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
     let disposalMatch = DisposalMatch(kind: .Section104(Decimal(string: "100")!, Decimal(string: "2.5")!), disposal: TransactionToMatch(transaction: disposal))
 

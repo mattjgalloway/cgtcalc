@@ -48,9 +48,9 @@ class CalculatorTests: XCTestCase {
   func testBasicSingleAsset() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(1, .Sell, "28/11/2019", "Foo", "2234.0432", "4.6702", "12.5"),
-        ModelCreation.transaction(2, .Buy, "28/08/2018", "Foo", "812.9", "4.1565", "12.5"),
-        ModelCreation.transaction(3, .Buy, "01/03/2018", "Foo", "1421.1432", "3.6093", "2"),
+        ModelCreation.transaction(.Sell, "28/11/2019", "Foo", "2234.0432", "4.6702", "12.5"),
+        ModelCreation.transaction(.Buy, "28/08/2018", "Foo", "812.9", "4.1565", "12.5"),
+        ModelCreation.transaction(.Buy, "01/03/2018", "Foo", "1421.1432", "3.6093", "2"),
       ],
       assetEvents: [],
       gains: [
@@ -65,7 +65,7 @@ class CalculatorTests: XCTestCase {
     let testData = TestData(
       transactions: [],
       assetEvents: [
-        ModelCreation.assetEvent(1, .Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
+        ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -76,10 +76,10 @@ class CalculatorTests: XCTestCase {
   func testAssetEventDividendTooLarge() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
       ],
       assetEvents: [
-        ModelCreation.assetEvent(1, .Dividend(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
+        ModelCreation.assetEvent(.Dividend(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -90,10 +90,10 @@ class CalculatorTests: XCTestCase {
   func testAssetEventCapitalReturnTooLarge() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
       ],
       assetEvents: [
-        ModelCreation.assetEvent(1, .CapitalReturn(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
+        ModelCreation.assetEvent(.CapitalReturn(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -104,10 +104,10 @@ class CalculatorTests: XCTestCase {
   func testAssetEventDividendTooSmall() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
       ],
       assetEvents: [
-        ModelCreation.assetEvent(1, .Dividend(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
+        ModelCreation.assetEvent(.Dividend(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -118,10 +118,10 @@ class CalculatorTests: XCTestCase {
   func testAssetEventCapitalReturnTooSmall() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
       ],
       assetEvents: [
-        ModelCreation.assetEvent(1, .CapitalReturn(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
+        ModelCreation.assetEvent(.CapitalReturn(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -132,11 +132,11 @@ class CalculatorTests: XCTestCase {
   func testAssetEventDividendNotMatchingAmount() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(2, .Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
-        ModelCreation.transaction(3, .Buy, "03/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "03/01/2020", "Foo", "10", "1", "12.5"),
       ],
       assetEvents: [
-        ModelCreation.assetEvent(1, .Dividend(Decimal(20), Decimal(1)), "02/01/2020", "Foo")
+        ModelCreation.assetEvent(.Dividend(Decimal(20), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
       shouldThrow: true
@@ -148,9 +148,9 @@ class CalculatorTests: XCTestCase {
     // Exactly 30 days
     let testData1 = TestData(
       transactions: [
-        ModelCreation.transaction(1, .Buy, "01/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(3, .Buy, "01/02/2018", "Foo", "1", "1", "0"),
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Buy, "01/02/2018", "Foo", "1", "1", "0"),
       ],
       assetEvents: [],
       gains: [
@@ -163,9 +163,9 @@ class CalculatorTests: XCTestCase {
     // Exactly 31 days
     let testData2 = TestData(
       transactions: [
-        ModelCreation.transaction(1, .Buy, "01/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(3, .Buy, "02/02/2018", "Foo", "1", "1", "0"),
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Buy, "02/02/2018", "Foo", "1", "1", "0"),
       ],
       assetEvents: [],
       gains: [
@@ -179,9 +179,9 @@ class CalculatorTests: XCTestCase {
   func testSection104DisposeTooMuch() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(1, .Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
-        ModelCreation.transaction(2, .Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(3, .Sell, "03/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Sell, "03/01/2018", "Foo", "1", "10", "0"),
       ],
       assetEvents: [],
       gains: [:],
@@ -191,7 +191,7 @@ class CalculatorTests: XCTestCase {
   }
 
   func testDateBefore20080406Throws() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "05/04/2008", "Foo", "1", "1", "0")
+    let transaction = ModelCreation.transaction(.Buy, "05/04/2008", "Foo", "1", "1", "0")
     let input = CalculatorInput(transactions: [transaction], assetEvents: [])
     let calculator = try Calculator(input: input, logger: self.logger)
     XCTAssertThrowsError(try calculator.process())

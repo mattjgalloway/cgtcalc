@@ -39,17 +39,15 @@ public struct CalculatorResult {
       }
       .sorted { $0.key < $1.key }
       .map { (taxYear, disposalMatches) in
-        var transactionsById: [Transaction.Id:Transaction] = [:]
-        var disposalMatchesByDisposal: [Transaction.Id:[DisposalMatch]] = [:]
-        var gainByDisposal: [Transaction.Id:Decimal] = [:]
+        var disposalMatchesByDisposal: [Transaction:[DisposalMatch]] = [:]
+        var gainByDisposal: [Transaction:Decimal] = [:]
 
         disposalMatches.forEach { disposalMatch in
           let disposal = disposalMatch.disposal.transaction
-          transactionsById[disposal.id] = disposal
-          var matches = disposalMatchesByDisposal[disposal.id, default: []]
+          var matches = disposalMatchesByDisposal[disposal, default: []]
           matches.append(disposalMatch)
-          disposalMatchesByDisposal[disposal.id] = matches
-          gainByDisposal[disposal.id, default: Decimal.zero] += disposalMatch.gain
+          disposalMatchesByDisposal[disposal] = matches
+          gainByDisposal[disposal, default: Decimal.zero] += disposalMatch.gain
         }
 
         var totalGain = Decimal.zero
@@ -57,7 +55,7 @@ public struct CalculatorResult {
           disposalMatchesByDisposal.map { (disposal, disposalMatches) -> DisposalResult in
             let roundedGain = TaxMethods.roundedGain(gainByDisposal[disposal]!)
             totalGain += roundedGain
-            return DisposalResult(disposal: transactionsById[disposal]!, gain: roundedGain, disposalMatches: disposalMatches)
+            return DisposalResult(disposal: disposal, gain: roundedGain, disposalMatches: disposalMatches)
           }
           .sorted { $0.disposal.date < $1.disposal.date }
 

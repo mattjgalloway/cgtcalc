@@ -22,10 +22,10 @@ Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 
 # TRANSACTIONS
 
-1: 01/04/2014 BOUGHT 1000 of Lobster at £4 with £150 expenses
-2: 01/09/2017 BOUGHT 500 of Lobster at £4.1 with £80 expenses
-3: 01/05/2018 SOLD 700 of Lobster at £4.8 with £100 expenses
-4: 01/02/2019 SOLD 400 of Lobster at £5.2 with £105 expenses
+01/04/2014 BOUGHT 1000 of Lobster at £4 with £150 expenses
+01/09/2017 BOUGHT 500 of Lobster at £4.1 with £80 expenses
+01/05/2018 SOLD 700 of Lobster at £4.8 with £100 expenses
+01/02/2019 SOLD 400 of Lobster at £5.2 with £105 expenses
 
 
 # ASSET EVENTS

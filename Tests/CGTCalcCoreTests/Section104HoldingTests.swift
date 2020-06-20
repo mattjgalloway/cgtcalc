@@ -14,7 +14,7 @@ class Section104HoldingTests: XCTestCase {
     let sut = Section104Holding(logger: StubLogger())
 
     do {
-      let acquisition = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "100", "1", "10")
+      let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "1", "10")
       sut.process(acquisition: TransactionToMatch(transaction: acquisition))
       XCTAssertEqual(sut.state.amount, Decimal(string: "100"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "110"))
@@ -22,7 +22,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let acquisition = ModelCreation.transaction(1, .Buy, "16/08/2020", "Foo", "100", "1.1", "20")
+      let acquisition = ModelCreation.transaction(.Buy, "16/08/2020", "Foo", "100", "1.1", "20")
       sut.process(acquisition: TransactionToMatch(transaction: acquisition))
       XCTAssertEqual(sut.state.amount, Decimal(string: "200"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "240"))
@@ -34,7 +34,7 @@ class Section104HoldingTests: XCTestCase {
     let sut = Section104Holding(logger: StubLogger())
 
     do {
-      let acquisition = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "100", "1", "10")
+      let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "1", "10")
       sut.process(acquisition: TransactionToMatch(transaction: acquisition))
       XCTAssertEqual(sut.state.amount, Decimal(string: "100"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "110"))
@@ -42,7 +42,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let disposal = ModelCreation.transaction(1, .Sell, "16/08/2020", "Foo", "35", "1.1", "20")
+      let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "35", "1.1", "20")
       _ = try sut.process(disposal: TransactionToMatch(transaction: disposal))
       XCTAssertEqual(sut.state.amount, Decimal(string: "65"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "71.5"))
@@ -54,7 +54,7 @@ class Section104HoldingTests: XCTestCase {
     let sut = Section104Holding(logger: StubLogger())
 
     do {
-      let acquisition = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "100", "1", "10")
+      let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "1", "10")
       sut.process(acquisition: TransactionToMatch(transaction: acquisition))
       XCTAssertEqual(sut.state.amount, Decimal(string: "100"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "110"))
@@ -62,7 +62,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let disposal = ModelCreation.transaction(1, .Sell, "16/08/2020", "Foo", "35", "1.1", "20")
+      let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "35", "1.1", "20")
       let disposalMatch = try sut.process(disposal: TransactionToMatch(transaction: disposal))
       XCTAssertEqual(sut.state.amount, Decimal(string: "65"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "71.5"))
@@ -71,7 +71,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let acquisition = ModelCreation.transaction(1, .Buy, "17/08/2020", "Foo", "100", "1.76", "0")
+      let acquisition = ModelCreation.transaction(.Buy, "17/08/2020", "Foo", "100", "1.76", "0")
       sut.process(acquisition: TransactionToMatch(transaction: acquisition))
       XCTAssertEqual(sut.state.amount, Decimal(string: "165"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "247.5"))
@@ -79,7 +79,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let disposal = ModelCreation.transaction(1, .Sell, "18/08/2020", "Foo", "35", "1.1", "0")
+      let disposal = ModelCreation.transaction(.Sell, "18/08/2020", "Foo", "35", "1.1", "0")
       let disposalMatch = try sut.process(disposal: TransactionToMatch(transaction: disposal))
       XCTAssertEqual(sut.state.amount, Decimal(string: "130"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "195"))
@@ -88,7 +88,7 @@ class Section104HoldingTests: XCTestCase {
     }
 
     do {
-      let disposal = ModelCreation.transaction(1, .Sell, "18/08/2020", "Foo", "130", "2.5", "0")
+      let disposal = ModelCreation.transaction(.Sell, "18/08/2020", "Foo", "130", "2.5", "0")
       let disposalMatch = try sut.process(disposal: TransactionToMatch(transaction: disposal))
       XCTAssertEqual(sut.state.amount, Decimal(string: "0"))
       XCTAssertEqual(sut.state.cost, Decimal(string: "0"))
@@ -100,13 +100,13 @@ class Section104HoldingTests: XCTestCase {
   func testProcessesTooBigDisposalCorrectly() throws {
     let sut = Section104Holding(logger: StubLogger())
 
-    let acquisition = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "100", "1", "10")
+    let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "1", "10")
     sut.process(acquisition: TransactionToMatch(transaction: acquisition))
     XCTAssertEqual(sut.state.amount, Decimal(string: "100"))
     XCTAssertEqual(sut.state.cost, Decimal(string: "110"))
     XCTAssertEqual(sut.state.costBasis, Decimal(string: "1.1"))
 
-    let disposal = ModelCreation.transaction(1, .Sell, "16/08/2020", "Foo", "200", "1", "10")
+    let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "200", "1", "10")
     XCTAssertThrowsError(try sut.process(disposal: TransactionToMatch(transaction: disposal)))
   }
 

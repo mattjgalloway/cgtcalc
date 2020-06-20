@@ -11,7 +11,7 @@ import XCTest
 class TransactionToMatchTests: XCTestCase {
 
   func testSplitSuccess() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
+    let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
     let splitAmount = Decimal(string: "2.123")!
     let remainder = try acquisition.split(withAmount: splitAmount)
@@ -20,7 +20,7 @@ class TransactionToMatchTests: XCTestCase {
   }
 
   func testSplitTwiceSuccess() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
+    let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
 
     let split1Amount = Decimal(string: "10.222")!
@@ -35,14 +35,14 @@ class TransactionToMatchTests: XCTestCase {
   }
 
   func testSplitTooMuchFails() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
+    let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
     let splitAmount = Decimal(string: "100")!
     XCTAssertThrowsError(try acquisition.split(withAmount: splitAmount))
   }
 
   func testOffsetWorks() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
+    let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
     XCTAssertEqual(acquisition.price, Decimal(string: "100.0")!)
     XCTAssertEqual(acquisition.value, Decimal(string: "1000.0")!)
@@ -70,7 +70,7 @@ class TransactionToMatchTests: XCTestCase {
   }
 
   func testOffsetAndSplitWorks() throws {
-    let transaction = ModelCreation.transaction(1, .Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
+    let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "10", "100.0", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
     acquisition.addOffset(amount: Decimal(string: "10.0")!)
     let remainder = try acquisition.split(withAmount: Decimal(4))

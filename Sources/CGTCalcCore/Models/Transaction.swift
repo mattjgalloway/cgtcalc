@@ -8,14 +8,11 @@
 import Foundation
 
 public class Transaction {
-  typealias Id = Int
-
   enum Kind {
     case Buy
     case Sell
   }
 
-  let id: Id
   let kind: Kind
   let date: Date
   let asset: String
@@ -24,8 +21,7 @@ public class Transaction {
   private(set) var expenses: Decimal
   private(set) var groupedTransactions: [Transaction] = []
 
-  init(id: Id, kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
-    self.id = id
+  init(kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
     self.kind = kind
     self.date = date
     self.asset = asset
@@ -53,6 +49,18 @@ public class Transaction {
 
 extension Transaction: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): id=\(self.id), kind=\(self.kind), date=\(self.date), asset=\(asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
+    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
+  }
+}
+
+extension Transaction: Equatable {
+  public static func == (lhs: Transaction, rhs: Transaction) -> Bool {
+    return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+  }
+}
+
+extension Transaction: Hashable {
+  public func hash(into hasher: inout Hasher) {
+    return hasher.combine(ObjectIdentifier(self))
   }
 }

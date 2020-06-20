@@ -111,7 +111,7 @@ public class TextPresenter {
     }
 
     return self.result.input.transactions.reduce(into: "") { (result, transaction) in
-      result += "\(transaction.id): \(dateFormatter.string(from: transaction.date)) "
+      result += "\(dateFormatter.string(from: transaction.date)) "
       switch transaction.kind {
       case .Buy:
         result += "BOUGHT "
@@ -128,7 +128,7 @@ public class TextPresenter {
     }
 
     return self.result.input.assetEvents.reduce(into: "") { (result, assetEvent) in
-      result += "\(assetEvent.id): \(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
+      result += "\(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
       switch assetEvent.kind {
       case .CapitalReturn(let amount, let value):
         result += "CAPITAL RETURN on \(amount) for \(self.formattedCurrency(value))"
