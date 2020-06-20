@@ -29,9 +29,8 @@ It also supports handling of equalisation payments (capital return) for funds wh
 
 Currently there is no support for:
 
-1) Stock splits.
-2) Transactions before 6th April 2008.
-3) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
+1) Transactions before 6th April 2008.
+2) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
 
 ## Platforms
 
@@ -78,6 +77,8 @@ The full list of kinds of data are as follows:
 | `SELL`      | Transaction  | Sell transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
 | `CAPRETURN` | Asset event  | Capital return event (usually for a fund on first dividend distribution after purchase) | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
 | `DIVIDEND`  | Asset event  | Dividend for which income tax has been taken but shares also retain (usually for fund accumulation share class) | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
+| `SPLIT`     | Asset event  | Stock split     | `<DATE> <ASSET> <MULTIPLIER>` |
+| `UNSPLIT`   | Asset event  | Stock un-split  | `<DATE> <ASSET> <MULTIPLIER>` |
 
 ## Example
 
@@ -116,10 +117,10 @@ Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 2) + (1500 * 3.89015) ) 
 
 # TRANSACTIONS
 
-1: 05/12/2019 BOUGHT 500 of GB00B41YBW71 at £4.7012 with £2 expenses
-2: 28/11/2019 SOLD 2000 of GB00B41YBW71 at £4.6702 with £12.5 expenses
-3: 28/08/2018 BOUGHT 1000 of GB00B41YBW71 at £4.1565 with £12.5 expenses
-4: 01/03/2018 BOUGHT 1000 of GB00B41YBW71 at £3.6093 with £2 expenses
+05/12/2019 BOUGHT 500 of GB00B41YBW71 at £4.7012 with £2 expenses
+28/11/2019 SOLD 2000 of GB00B41YBW71 at £4.6702 with £12.5 expenses
+28/08/2018 BOUGHT 1000 of GB00B41YBW71 at £4.1565 with £12.5 expenses
+01/03/2018 BOUGHT 1000 of GB00B41YBW71 at £3.6093 with £2 expenses
 
 
 # ASSET EVENTS
