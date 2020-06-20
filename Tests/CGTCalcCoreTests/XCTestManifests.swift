@@ -7,6 +7,7 @@ extension AssetEventTests {
     // to regenerate.
     static let __allTests__AssetEventTests = [
         ("testEquality", testEquality),
+        ("testHashable", testHashable),
     ]
 }
 
@@ -138,6 +139,7 @@ extension TransactionTests {
         ("testGroupedDifferentDate", testGroupedDifferentDate),
         ("testGroupedDifferentKind", testGroupedDifferentKind),
         ("testGroupedMultiple", testGroupedMultiple),
+        ("testHashable", testHashable),
     ]
 }
 

@@ -56,4 +56,14 @@ class TransactionTests: XCTestCase {
     XCTAssertEqual(a, c)
   }
 
+  func testHashable() throws {
+    let a = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
+    let b = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
+    let c = a
+    let set = Set<Transaction>([a, b, c])
+    XCTAssertEqual(set.count, 2)
+    XCTAssertTrue(set.contains(a))
+    XCTAssertTrue(set.contains(b))
+  }
+
 }

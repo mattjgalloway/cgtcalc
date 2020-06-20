@@ -19,4 +19,14 @@ class AssetEventTests: XCTestCase {
     XCTAssertEqual(a, c)
   }
 
+  func testHashable() throws {
+    let a = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
+    let b = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
+    let c = a
+    let set = Set<AssetEvent>([a, b, c])
+    XCTAssertEqual(set.count, 2)
+    XCTAssertTrue(set.contains(a))
+    XCTAssertTrue(set.contains(b))
+  }
+
 }
