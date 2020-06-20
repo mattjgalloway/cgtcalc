@@ -11,6 +11,8 @@ public class AssetEvent {
   enum Kind: Equatable {
     case CapitalReturn(Decimal, Decimal)
     case Dividend(Decimal, Decimal)
+    case Split(Decimal)
+    case Unsplit(Decimal)
   }
 
   let kind: Kind

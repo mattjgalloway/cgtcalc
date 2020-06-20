@@ -134,6 +134,10 @@ public class TextPresenter {
         result += "CAPITAL RETURN on \(amount) for \(self.formattedCurrency(value))"
       case .Dividend(let amount, let value):
         result += "DIVIDEND on \(amount) for \(self.formattedCurrency(value))"
+      case .Split(let multiplier):
+        result += "SPLIT by \(multiplier)"
+      case .Unsplit(let multiplier):
+        result += "UNSPLIT by \(multiplier)"
       }
       result += "\n"
     }

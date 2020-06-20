@@ -100,41 +100,100 @@ public class DefaultParser {
     let splitData = data.components(separatedBy: .whitespaces)
 
     switch splitData[0] {
-    case "DIVIDEND", "CAPRETURN":
-      // We can't actually set kind here because we need the associated value
-      break
-    default:
-      return nil
-    }
-
-    guard splitData.count == 5 else {
-      throw ParserError.IncorrectNumberOfFields(String(data))
-    }
-
-    guard let date = dateFormatter.date(from: splitData[1]) else {
-      throw ParserError.InvalidDate(String(data))
-    }
-
-    let asset = splitData[2]
-
-    guard let amount = Decimal(string: splitData[3]) else {
-      throw ParserError.InvalidValue(String(data))
-    }
-
-    guard let value = Decimal(string: splitData[4]) else {
-      throw ParserError.InvalidValue(String(data))
-    }
-
-    let kind: AssetEvent.Kind
-    switch splitData[0] {
     case "DIVIDEND":
-      kind = .Dividend(amount, value)
+      return try self.parseDividendAssetEvent(fromData: splitData)
     case "CAPRETURN":
-      kind = .CapitalReturn(amount, value)
+      return try self.parseCapitalReturnAssetEvent(fromData: splitData)
+    case "SPLIT":
+      return try self.parseSplitAssetEvent(fromData: splitData)
+    case "UNSPLIT":
+      return try self.parseUnsplitAssetEvent(fromData: splitData)
     default:
       return nil
     }
+  }
 
+  private func parseDividendAssetEvent(fromData data: [String]) throws -> AssetEvent {
+    guard data.count == 5 else {
+      throw ParserError.IncorrectNumberOfFields(data.joined(separator: " "))
+    }
+
+    guard let date = dateFormatter.date(from: data[1]) else {
+      throw ParserError.InvalidDate(data.joined(separator: " "))
+    }
+
+    let asset = data[2]
+
+    guard let amount = Decimal(string: data[3]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    guard let value = Decimal(string: data[4]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    let kind = AssetEvent.Kind.Dividend(amount, value)
+    return AssetEvent(kind: kind, date: date, asset: asset)
+  }
+
+  private func parseCapitalReturnAssetEvent(fromData data: [String]) throws -> AssetEvent {
+    guard data.count == 5 else {
+      throw ParserError.IncorrectNumberOfFields(data.joined(separator: " "))
+    }
+
+    guard let date = dateFormatter.date(from: data[1]) else {
+      throw ParserError.InvalidDate(data.joined(separator: " "))
+    }
+
+    let asset = data[2]
+
+    guard let amount = Decimal(string: data[3]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    guard let value = Decimal(string: data[4]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    let kind = AssetEvent.Kind.CapitalReturn(amount, value)
+    return AssetEvent(kind: kind, date: date, asset: asset)
+  }
+
+  private func parseSplitAssetEvent(fromData data: [String]) throws -> AssetEvent {
+    guard data.count == 4 else {
+      throw ParserError.IncorrectNumberOfFields(data.joined(separator: " "))
+    }
+
+    guard let date = dateFormatter.date(from: data[1]) else {
+      throw ParserError.InvalidDate(data.joined(separator: " "))
+    }
+
+    let asset = data[2]
+
+    guard let multiplier = Decimal(string: data[3]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    let kind = AssetEvent.Kind.Split(multiplier)
+    return AssetEvent(kind: kind, date: date, asset: asset)
+  }
+
+  private func parseUnsplitAssetEvent(fromData data: [String]) throws -> AssetEvent {
+    guard data.count == 4 else {
+      throw ParserError.IncorrectNumberOfFields(data.joined(separator: " "))
+    }
+
+    guard let date = dateFormatter.date(from: data[1]) else {
+      throw ParserError.InvalidDate(data.joined(separator: " "))
+    }
+
+    let asset = data[2]
+
+    guard let multiplier = Decimal(string: data[3]) else {
+      throw ParserError.InvalidValue(data.joined(separator: " "))
+    }
+
+    let kind = AssetEvent.Kind.Unsplit(multiplier)
     return AssetEvent(kind: kind, date: date, asset: asset)
   }
 }

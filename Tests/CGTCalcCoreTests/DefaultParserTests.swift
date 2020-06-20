@@ -56,6 +56,26 @@ class DefaultParserTests: XCTestCase {
     XCTAssertEqual(transaction!.asset, "Foo")
   }
 
+  func testParseSplitEventSuccess() throws {
+    let sut = DefaultParser()
+    let data = "SPLIT 15/08/2020 Foo 10"
+    let transaction = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNotNil(transaction)
+    XCTAssertEqual(transaction!.kind, .Split(Decimal(10)))
+    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction!.asset, "Foo")
+  }
+
+  func testParseUnsplitEventSuccess() throws {
+    let sut = DefaultParser()
+    let data = "UNSPLIT 15/08/2020 Foo 10"
+    let transaction = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNotNil(transaction)
+    XCTAssertEqual(transaction!.kind, .Unsplit(Decimal(10)))
+    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction!.asset, "Foo")
+  }
+
   func testParseCommentSuccess() throws {
     let sut = DefaultParser()
     let data = "# THIS IS A COMMENT"
@@ -107,27 +127,87 @@ class DefaultParserTests: XCTestCase {
     XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
   }
 
-  func testParseAssetEventIncorrectDateFormatFails() throws {
+  func testParseDividendAssetEventIncorrectDateFormatFails() throws {
     let sut = DefaultParser()
     let data = "DIVIDEND abc Foo 1.234 100"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
 
-  func testParseAssetEventIncorrectNumberOfFieldsFails() throws {
+  func testParseDividendAssetEventIncorrectNumberOfFieldsFails() throws {
     let sut = DefaultParser()
     let data = "DIVIDEND 15/08/2020 Foo 1.234 100 abc"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
 
-  func testParseAssetEventIncorrectAmountFormatFails() throws {
+  func testParseDividendAssetEventIncorrectAmountFormatFails() throws {
     let sut = DefaultParser()
     let data = "DIVIDEND 15/08/2020 Foo abc 100"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
 
-  func testParseAssetEventIncorrectValueFormatFails() throws {
+  func testParseDividendAssetEventIncorrectValueFormatFails() throws {
     let sut = DefaultParser()
     let data = "DIVIDEND 15/08/2020 Foo 1.234 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseCapitalReturnAssetEventIncorrectDateFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "CAPRETURN abc Foo 1.234 100"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseCapitalReturnEventIncorrectNumberOfFieldsFails() throws {
+    let sut = DefaultParser()
+    let data = "CAPRETURN 15/08/2020 Foo 1.234 100 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseCapitalReturnEventIncorrectAmountFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "CAPRETURN 15/08/2020 Foo abc 100"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseCapitalReturnEventIncorrectValueFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "CAPRETURN 15/08/2020 Foo 1.234 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseSplitAssetEventIncorrectDateFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "SPLIT abc Foo 10"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseSplitEventIncorrectNumberOfFieldsFails() throws {
+    let sut = DefaultParser()
+    let data = "SPLIT 15/08/2020 Foo 10 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseSplitEventIncorrectAmountFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "SPLIT 15/08/2020 Foo abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseUnsplitAssetEventIncorrectDateFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "UNSPLIT abc Foo 10"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseUnsplitEventIncorrectNumberOfFieldsFails() throws {
+    let sut = DefaultParser()
+    let data = "UNSPLIT 15/08/2020 Foo 10 abc"
+    XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
+  }
+
+  func testParseUnsplitEventIncorrectAmountFormatFails() throws {
+    let sut = DefaultParser()
+    let data = "UNSPLIT 15/08/2020 Foo abc"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
 

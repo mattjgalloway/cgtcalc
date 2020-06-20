@@ -43,22 +43,34 @@ extension DefaultParserTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__DefaultParserTests = [
-        ("testParseAssetEventIncorrectAmountFormatFails", testParseAssetEventIncorrectAmountFormatFails),
-        ("testParseAssetEventIncorrectDateFormatFails", testParseAssetEventIncorrectDateFormatFails),
         ("testParseAssetEventIncorrectKindFails", testParseAssetEventIncorrectKindFails),
-        ("testParseAssetEventIncorrectNumberOfFieldsFails", testParseAssetEventIncorrectNumberOfFieldsFails),
-        ("testParseAssetEventIncorrectValueFormatFails", testParseAssetEventIncorrectValueFormatFails),
         ("testParseBuyTransactionSuccess", testParseBuyTransactionSuccess),
+        ("testParseCapitalReturnAssetEventIncorrectDateFormatFails", testParseCapitalReturnAssetEventIncorrectDateFormatFails),
+        ("testParseCapitalReturnEventIncorrectAmountFormatFails", testParseCapitalReturnEventIncorrectAmountFormatFails),
+        ("testParseCapitalReturnEventIncorrectNumberOfFieldsFails", testParseCapitalReturnEventIncorrectNumberOfFieldsFails),
+        ("testParseCapitalReturnEventIncorrectValueFormatFails", testParseCapitalReturnEventIncorrectValueFormatFails),
         ("testParseCapitalReturnEventSuccess", testParseCapitalReturnEventSuccess),
         ("testParseCommentSuccess", testParseCommentSuccess),
+        ("testParseDividendAssetEventIncorrectAmountFormatFails", testParseDividendAssetEventIncorrectAmountFormatFails),
+        ("testParseDividendAssetEventIncorrectDateFormatFails", testParseDividendAssetEventIncorrectDateFormatFails),
+        ("testParseDividendAssetEventIncorrectNumberOfFieldsFails", testParseDividendAssetEventIncorrectNumberOfFieldsFails),
+        ("testParseDividendAssetEventIncorrectValueFormatFails", testParseDividendAssetEventIncorrectValueFormatFails),
         ("testParseDividendEventSuccess", testParseDividendEventSuccess),
         ("testParseSellTransactionSuccess", testParseSellTransactionSuccess),
+        ("testParseSplitAssetEventIncorrectDateFormatFails", testParseSplitAssetEventIncorrectDateFormatFails),
+        ("testParseSplitEventIncorrectAmountFormatFails", testParseSplitEventIncorrectAmountFormatFails),
+        ("testParseSplitEventIncorrectNumberOfFieldsFails", testParseSplitEventIncorrectNumberOfFieldsFails),
+        ("testParseSplitEventSuccess", testParseSplitEventSuccess),
         ("testParseTransactionIncorrectAmountFormatFails", testParseTransactionIncorrectAmountFormatFails),
         ("testParseTransactionIncorrectDateFormatFails", testParseTransactionIncorrectDateFormatFails),
         ("testParseTransactionIncorrectExpensesFormatFails", testParseTransactionIncorrectExpensesFormatFails),
         ("testParseTransactionIncorrectKindFails", testParseTransactionIncorrectKindFails),
         ("testParseTransactionIncorrectNumberOfFieldsFails", testParseTransactionIncorrectNumberOfFieldsFails),
         ("testParseTransactionIncorrectPriceFormatFails", testParseTransactionIncorrectPriceFormatFails),
+        ("testParseUnsplitAssetEventIncorrectDateFormatFails", testParseUnsplitAssetEventIncorrectDateFormatFails),
+        ("testParseUnsplitEventIncorrectAmountFormatFails", testParseUnsplitEventIncorrectAmountFormatFails),
+        ("testParseUnsplitEventIncorrectNumberOfFieldsFails", testParseUnsplitEventIncorrectNumberOfFieldsFails),
+        ("testParseUnsplitEventSuccess", testParseUnsplitEventSuccess),
     ]
 }
 
