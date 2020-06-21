@@ -1,0 +1,32 @@
+# SUMMARY
+
+Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=====================================================================================
+2019/2020   £239   £12000      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+1) SOLD 40 of GB00B3TYHH97 on 05/11/2019 for GAIN of £239
+Matches with:
+  - SAME DAY: 20 bought on 05/11/2019 at £189.464 with offset of £-95.12
+  - SECTION 104: 40 at cost basis of £186.253
+Calculation: (40 * 194.22 - 12.5) - ( (20 * 189.464 + 2 + -95.12) + (20 * 186.253) ) = 239
+
+
+# TRANSACTIONS
+
+05/11/2019 BOUGHT 20 of GB00B3TYHH97 at £194.22 with £2 expenses
+05/11/2019 SOLD 40 of GB00B3TYHH97 at £194.22 with £12.5 expenses
+15/03/2019 BOUGHT 20 of GB00B3TYHH97 at £181.56 with £2 expenses
+29/08/2018 BOUGHT 20 of GB00B3TYHH97 at £184.65 with £12.5 expenses
+
+
+# ASSET EVENTS
+
+30/11/2019 GB00B3TYHH97 DIVIDEND on 20 for £110.93
+30/11/2019 GB00B3TYHH97 CAPITAL RETURN on 20 for £95.12
+31/05/2019 GB00B3TYHH97 DIVIDEND on 40 for £150.24
+31/05/2019 GB00B3TYHH97 CAPITAL RETURN on 40 for £149.75
