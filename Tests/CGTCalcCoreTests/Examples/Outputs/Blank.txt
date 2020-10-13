@@ -1,7 +1,7 @@
 # SUMMARY
 
-Tax year   Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
-====================================================================================
+Tax year   Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+===============================================================================================
 
 
 # TAX YEAR DETAILS

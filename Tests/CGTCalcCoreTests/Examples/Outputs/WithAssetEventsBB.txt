@@ -1,8 +1,8 @@
 # SUMMARY
 
-Tax year    Gain   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
-=====================================================================================
-2019/2020   £320   £12000      £0           £0             £0            £0          
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+================================================================================================
+2019/2020   £320   £7768      £12000      £0           £0             £0            £0          
 
 
 # TAX YEAR DETAILS
