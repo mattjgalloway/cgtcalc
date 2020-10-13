@@ -1,0 +1,16 @@
+--swiftversion 5
+
+--binarygrouping none
+--closingparen same-line
+--commas inline
+--decimalgrouping none
+--hexgrouping none
+--hexliteralcase lowercase
+--indent 2
+--maxwidth 120
+--octalgrouping none
+--operatorfunc spaced
+--patternlet inline
+--self insert
+--stripunusedargs closure-only
+--wrapcollections before-first

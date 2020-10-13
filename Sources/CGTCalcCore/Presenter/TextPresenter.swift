@@ -49,18 +49,36 @@ public class TextPresenter {
 
   private func summaryTable() throws -> String {
     let rows = try self.result.taxYearSummaries
-      .reduce(into: [[String]]()) { (output, summary) in
+      .reduce(into: [[String]]()) { output, summary in
         guard let taxYearRates = summary.taxYear.rates else {
           throw CalculatorError.InternalError("Missing tax year rates for \(summary.taxYear)")
         }
-        let row = [summary.taxYear.string, self.formattedCurrency(summary.gain), self.formattedCurrency(summary.proceeds), self.formattedCurrency(taxYearRates.exemption), self.formattedCurrency(summary.carryForwardLoss), self.formattedCurrency(summary.taxableGain), self.formattedCurrency(summary.basicRateTax), self.formattedCurrency(summary.higherRateTax)]
+        let row = [
+          summary.taxYear.string,
+          self.formattedCurrency(summary.gain),
+          self.formattedCurrency(summary.proceeds),
+          self.formattedCurrency(taxYearRates.exemption),
+          self.formattedCurrency(summary.carryForwardLoss),
+          self.formattedCurrency(summary.taxableGain),
+          self.formattedCurrency(summary.basicRateTax),
+          self.formattedCurrency(summary.higherRateTax)
+        ]
         output.append(row)
       }
 
-    let headerRow = ["Tax year", "Gain", "Proceeds", "Exemption", "Loss carry", "Taxable gain", "Tax (basic)", "Tax (higher)"]
+    let headerRow = [
+      "Tax year",
+      "Gain",
+      "Proceeds",
+      "Exemption",
+      "Loss carry",
+      "Taxable gain",
+      "Tax (basic)",
+      "Tax (higher)"
+    ]
     let initialMaxWidths = headerRow.map { $0.count }
-    let maxWidths = rows.reduce(into: initialMaxWidths) { (result, row) in
-      for i in 0..<result.count {
+    let maxWidths = rows.reduce(into: initialMaxWidths) { result, row in
+      for i in 0 ..< result.count {
         result[i] = max(result[i], row[i].count)
       }
     }
@@ -84,7 +102,7 @@ public class TextPresenter {
 
   private func detailsOutput() -> String {
     return self.result.taxYearSummaries
-      .reduce(into: "") { (output, summary) in
+      .reduce(into: "") { output, summary in
         output += "## TAX YEAR \(summary.taxYear)\n\n"
         var count = 1
         summary.disposalResults
@@ -94,7 +112,8 @@ public class TextPresenter {
             output += " on \(self.dateFormatter.string(from: disposalResult.disposal.date))"
             output += " for "
             output += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
-            output += " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
+            output +=
+              " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
             output += "Matches with:\n"
             disposalResult.disposalMatches.forEach { disposalMatch in
               output += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: self.dateFormatter))\n"
@@ -102,7 +121,7 @@ public class TextPresenter {
             output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
             count += 1
           }
-    }
+      }
   }
 
   private func transactionsTable() -> String {
@@ -110,7 +129,7 @@ public class TextPresenter {
       return "NONE"
     }
 
-    return self.result.input.transactions.reduce(into: "") { (result, transaction) in
+    return self.result.input.transactions.reduce(into: "") { result, transaction in
       result += "\(dateFormatter.string(from: transaction.date)) "
       switch transaction.kind {
       case .Buy:
@@ -118,7 +137,8 @@ public class TextPresenter {
       case .Sell:
         result += "SOLD "
       }
-      result += "\(transaction.amount) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses\n"
+      result +=
+        "\(transaction.amount) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses\n"
     }
   }
 
@@ -127,7 +147,7 @@ public class TextPresenter {
       return "NONE"
     }
 
-    return self.result.input.assetEvents.reduce(into: "") { (result, assetEvent) in
+    return self.result.input.assetEvents.reduce(into: "") { result, assetEvent in
       result += "\(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
       switch assetEvent.kind {
       case .CapitalReturn(let amount, let value):
@@ -145,17 +165,18 @@ public class TextPresenter {
 }
 
 extension TextPresenter {
-
   private static func disposalMatchDetails(_ disposalMatch: DisposalMatch, dateFormatter: DateFormatter) -> String {
     switch disposalMatch.kind {
     case .SameDay(let acquisition):
-      var output = "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
+      var output =
+        "SAME DAY: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
       if !acquisition.offset.isZero {
         output += " with offset of £\(acquisition.offset)"
       }
       return output
     case .BedAndBreakfast(let acquisition):
-      var output = "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
+      var output =
+        "BED & BREAKFAST: \(acquisition.amount) bought on \(dateFormatter.string(from: acquisition.date)) at £\(acquisition.price)"
       if !acquisition.offset.isZero {
         output += " with offset of £\(acquisition.offset)"
       }
@@ -169,7 +190,8 @@ extension TextPresenter {
   }
 
   private static func disposalResultCalculationString(_ disposalResult: CalculatorResult.DisposalResult) -> String {
-    var output = "(\(disposalResult.disposal.amount) * \(disposalResult.disposal.price) - \(disposalResult.disposal.expenses)) - ( "
+    var output =
+      "(\(disposalResult.disposal.amount) * \(disposalResult.disposal.price) - \(disposalResult.disposal.expenses)) - ( "
     var disposalMatchesStrings: [String] = []
     for disposalMatch in disposalResult.disposalMatches {
       switch disposalMatch.kind {
@@ -188,5 +210,4 @@ extension TextPresenter {
     output += " ) = \(disposalResult.gain)"
     return output
   }
-
 }

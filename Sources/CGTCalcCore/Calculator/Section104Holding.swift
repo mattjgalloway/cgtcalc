@@ -15,18 +15,18 @@ class Section104Holding {
     private(set) var amount: Decimal
     private(set) var cost: Decimal
     var costBasis: Decimal {
-      if amount.isZero {
+      if self.amount.isZero {
         return 0
       }
-      return cost / amount
+      return self.cost / self.amount
     }
 
-    mutating fileprivate func add(amount: Decimal, cost: Decimal) {
+    fileprivate mutating func add(amount: Decimal, cost: Decimal) {
       self.amount += amount
       self.cost += cost
     }
 
-    mutating fileprivate func remove(amount: Decimal) {
+    fileprivate mutating func remove(amount: Decimal) {
       let costBasis = self.costBasis
       self.amount -= amount
       self.cost -= amount * costBasis
@@ -35,11 +35,11 @@ class Section104Holding {
       }
     }
 
-    mutating fileprivate func multiplyAmount(by: Decimal) {
+    fileprivate mutating func multiplyAmount(by: Decimal) {
       self.amount *= by
     }
 
-    mutating fileprivate func divideAmount(by: Decimal) {
+    fileprivate mutating func divideAmount(by: Decimal) {
       self.amount /= by
     }
   }
@@ -61,7 +61,10 @@ class Section104Holding {
       throw CalculatorError.InvalidData("Disposing of more than is currently held")
     }
 
-    let disposalMatch = DisposalMatch(kind: .Section104(self.state.amount, self.state.costBasis), disposal: disposal, restructureMultiplier: Decimal(1))
+    let disposalMatch = DisposalMatch(
+      kind: .Section104(self.state.amount, self.state.costBasis),
+      disposal: disposal,
+      restructureMultiplier: Decimal(1))
 
     self.state.remove(amount: disposal.amount)
     self.logger.debug("  New state: \(self.state)")
@@ -81,9 +84,8 @@ class Section104Holding {
       self.state.divideAmount(by: multiplier)
       self.logger.debug("  Rebasing by dividing holding by \(multiplier)")
       self.logger.debug("  New state: \(self.state)")
-    case .CapitalReturn(_, _), .Dividend(_, _):
+    case .CapitalReturn(_, _), .Dividend:
       self.logger.debug("  Nothing to do for this asset event.")
-      break
     }
   }
 }

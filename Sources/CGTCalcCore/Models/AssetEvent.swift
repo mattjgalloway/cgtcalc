@@ -28,7 +28,7 @@ public class AssetEvent {
 
 extension AssetEvent: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(asset)>"
+    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset)>"
   }
 }
 

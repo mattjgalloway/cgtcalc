@@ -33,15 +33,15 @@ public struct CalculatorResult {
 
     var carryForwardLoss = Decimal.zero
     self.taxYearSummaries = try disposalMatches
-      .reduce(into: [TaxYear:[DisposalMatch]]()) { (result, disposalMatch) in
+      .reduce(into: [TaxYear: [DisposalMatch]]()) { result, disposalMatch in
         var disposalMatches = result[disposalMatch.taxYear, default: []]
         disposalMatches.append(disposalMatch)
         result[disposalMatch.taxYear] = disposalMatches
       }
       .sorted { $0.key < $1.key }
-      .map { (taxYear, disposalMatches) in
-        var disposalMatchesByDisposal: [Transaction:[DisposalMatch]] = [:]
-        var gainByDisposal: [Transaction:Decimal] = [:]
+      .map { taxYear, disposalMatches in
+        var disposalMatchesByDisposal: [Transaction: [DisposalMatch]] = [:]
+        var gainByDisposal: [Transaction: Decimal] = [:]
 
         var totalProceeds = Decimal.zero
 
@@ -82,7 +82,15 @@ public struct CalculatorResult {
         let basicRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.basicRate * 0.01)
         let higherRateTax = TaxMethods.roundedGain(taxableGain * taxYearRates.higherRate * 0.01)
 
-        return TaxYearSummary(taxYear: taxYear, gain: totalGain, proceeds: TaxMethods.roundedGain(totalProceeds), carryForwardLoss: carryForwardLoss, taxableGain: taxableGain, basicRateTax: basicRateTax, higherRateTax: higherRateTax, disposalResults: disposalResults)
+        return TaxYearSummary(
+          taxYear: taxYear,
+          gain: totalGain,
+          proceeds: TaxMethods.roundedGain(totalProceeds),
+          carryForwardLoss: carryForwardLoss,
+          taxableGain: taxableGain,
+          basicRateTax: basicRateTax,
+          higherRateTax: higherRateTax,
+          disposalResults: disposalResults)
       }
   }
 }

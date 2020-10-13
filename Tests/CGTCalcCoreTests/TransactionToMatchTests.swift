@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 09/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class TransactionToMatchTests: XCTestCase {
-
   func testSplitSuccess() throws {
     let transaction = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "12.345", "1.2345", "12.5")
     let acquisition = TransactionToMatch(transaction: transaction)
@@ -82,5 +81,4 @@ class TransactionToMatchTests: XCTestCase {
     XCTAssertEqual(acquisition.price, Decimal(101))
     XCTAssertEqual(remainder.price, Decimal(101))
   }
-
 }

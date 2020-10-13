@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 10/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class MatchingProcessorTests: XCTestCase {
-
   let logger = StubLogger()
 
   func testSimple() throws {
@@ -53,5 +52,4 @@ class MatchingProcessorTests: XCTestCase {
     // Processed 3 disposals so 3 matches
     XCTAssertEqual(state.disposalMatches.count, 3)
   }
-
 }

@@ -34,7 +34,7 @@ class Section104Processor {
         assetEventDate = .distantFuture
       }
 
-      if assetEventDate <= acquisitionDate && assetEventDate <= disposal.date {
+      if assetEventDate <= acquisitionDate, assetEventDate <= disposal.date {
         let assetEvent = self.state.assetEvents[assetEventIndex]
         section104Holding.process(assetEvent: assetEvent)
         assetEventIndex += 1

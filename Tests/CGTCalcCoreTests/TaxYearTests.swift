@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 09/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class TaxYearTests: XCTestCase {
-
   private func dateFromComponents(year: Int, month: Int, day: Int) -> Date {
     var components = DateComponents()
     components.year = year
@@ -74,9 +73,8 @@ class TaxYearTests: XCTestCase {
   }
 
   func testTaxYearRatesAvailable() throws {
-    for year in 2015...2020 {
+    for year in 2015 ... 2020 {
       XCTAssertNotNil(TaxYear(year: year).rates)
     }
   }
-
 }

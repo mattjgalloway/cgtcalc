@@ -10,9 +10,7 @@ import Foundation
 struct TaxYear {
   let year: Int
 
-  var string: String {
-    get { "\(year-1)/\(year)" }
-  }
+  var string: String { "\(self.year - 1)/\(self.year)" }
 
   init(year: Int) {
     self.year = year
@@ -25,7 +23,7 @@ struct TaxYear {
     if components.month! > 4 {
       year += 1
     }
-    if components.month! == 4 && components.day! > 5 {
+    if components.month! == 4, components.day! > 5 {
       year += 1
     }
     self.init(year: year)
@@ -63,14 +61,14 @@ extension TaxYear {
     let higherRate: Decimal
   }
 
-  static let rates: [TaxYear:Rates] = [
+  static let rates: [TaxYear: Rates] = [
     TaxYear(year: 2015): Rates(exemption: 11000, basicRate: 18, higherRate: 28),
     TaxYear(year: 2016): Rates(exemption: 11100, basicRate: 18, higherRate: 28),
     TaxYear(year: 2017): Rates(exemption: 11100, basicRate: 10, higherRate: 20),
     TaxYear(year: 2018): Rates(exemption: 11300, basicRate: 10, higherRate: 20),
     TaxYear(year: 2019): Rates(exemption: 11700, basicRate: 10, higherRate: 20),
     TaxYear(year: 2020): Rates(exemption: 12000, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
+    TaxYear(year: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20)
   ]
 
   var rates: Rates? {

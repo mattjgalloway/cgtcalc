@@ -49,7 +49,7 @@ public class Transaction {
 
 extension Transaction: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
+    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
   }
 }
 

@@ -5,17 +5,16 @@
 //  Created by Matt Galloway on 09/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class CalculatorTests: XCTestCase {
-
   let logger = StubLogger()
 
   private struct TestData {
     let transactions: [Transaction]
     let assetEvents: [AssetEvent]
-    let gains: [TaxYear:Decimal]
+    let gains: [TaxYear: Decimal]
     let shouldThrow: Bool
   }
 
@@ -50,14 +49,13 @@ class CalculatorTests: XCTestCase {
       transactions: [
         ModelCreation.transaction(.Sell, "28/11/2019", "Foo", "2234.0432", "4.6702", "12.5"),
         ModelCreation.transaction(.Buy, "28/08/2018", "Foo", "812.9", "4.1565", "12.5"),
-        ModelCreation.transaction(.Buy, "01/03/2018", "Foo", "1421.1432", "3.6093", "2"),
+        ModelCreation.transaction(.Buy, "01/03/2018", "Foo", "1421.1432", "3.6093", "2")
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2020): Decimal(string: "1898")!,
+        TaxYear(year: 2020): Decimal(string: "1898")!
       ],
-      shouldThrow: false
-    )
+      shouldThrow: false)
     self.runTest(withData: testData)
   }
 
@@ -68,64 +66,59 @@ class CalculatorTests: XCTestCase {
         ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
   func testAssetEventDividendTooLarge() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5")
       ],
       assetEvents: [
         ModelCreation.assetEvent(.Dividend(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
   func testAssetEventCapitalReturnTooLarge() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5")
       ],
       assetEvents: [
         ModelCreation.assetEvent(.CapitalReturn(Decimal(100), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
   func testAssetEventDividendTooSmall() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5")
       ],
       assetEvents: [
         ModelCreation.assetEvent(.Dividend(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
   func testAssetEventCapitalReturnTooSmall() throws {
     let testData = TestData(
       transactions: [
-        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5")
       ],
       assetEvents: [
         ModelCreation.assetEvent(.CapitalReturn(Decimal(90), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
@@ -133,14 +126,13 @@ class CalculatorTests: XCTestCase {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
-        ModelCreation.transaction(.Buy, "03/01/2020", "Foo", "10", "1", "12.5"),
+        ModelCreation.transaction(.Buy, "03/01/2020", "Foo", "10", "1", "12.5")
       ],
       assetEvents: [
         ModelCreation.assetEvent(.Dividend(Decimal(20), Decimal(1)), "02/01/2020", "Foo")
       ],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
@@ -150,14 +142,13 @@ class CalculatorTests: XCTestCase {
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "1", "10", "0"),
         ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(.Buy, "01/02/2018", "Foo", "1", "1", "0"),
+        ModelCreation.transaction(.Buy, "01/02/2018", "Foo", "1", "1", "0")
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2018): Decimal(string: "9")!,
+        TaxYear(year: 2018): Decimal(string: "9")!
       ],
-      shouldThrow: false
-    )
+      shouldThrow: false)
     self.runTest(withData: testData1)
 
     // Exactly 31 days
@@ -165,14 +156,13 @@ class CalculatorTests: XCTestCase {
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "1", "10", "0"),
         ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(.Buy, "02/02/2018", "Foo", "1", "1", "0"),
+        ModelCreation.transaction(.Buy, "02/02/2018", "Foo", "1", "1", "0")
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2018): Decimal(string: "0")!,
+        TaxYear(year: 2018): Decimal(string: "0")!
       ],
-      shouldThrow: false
-    )
+      shouldThrow: false)
     self.runTest(withData: testData2)
   }
 
@@ -181,12 +171,11 @@ class CalculatorTests: XCTestCase {
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
         ModelCreation.transaction(.Sell, "02/01/2018", "Foo", "1", "10", "0"),
-        ModelCreation.transaction(.Sell, "03/01/2018", "Foo", "1", "10", "0"),
+        ModelCreation.transaction(.Sell, "03/01/2018", "Foo", "1", "10", "0")
       ],
       assetEvents: [],
       gains: [:],
-      shouldThrow: true
-    )
+      shouldThrow: true)
     self.runTest(withData: testData)
   }
 
@@ -196,5 +185,4 @@ class CalculatorTests: XCTestCase {
     let calculator = try Calculator(input: input, logger: self.logger)
     XCTAssertThrowsError(try calculator.process())
   }
-
 }

@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 19/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class TransactionTests: XCTestCase {
-
   func testGrouped() throws {
     let transactionA = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let transactionB = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "20", "1.6", "10")
@@ -65,5 +64,4 @@ class TransactionTests: XCTestCase {
     XCTAssertTrue(set.contains(a))
     XCTAssertTrue(set.contains(b))
   }
-
 }

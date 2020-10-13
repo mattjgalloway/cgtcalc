@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 09/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class DefaultParserTests: XCTestCase {
-
   func testParseBuyTransactionSuccess() throws {
     let sut = DefaultParser()
     let data = "BUY 15/08/2020 Foo 12.345 1.2345 12.5"
@@ -210,5 +209,4 @@ class DefaultParserTests: XCTestCase {
     let data = "UNSPLIT 15/08/2020 Foo abc"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
-
 }

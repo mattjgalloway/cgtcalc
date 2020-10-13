@@ -35,13 +35,13 @@ public class Calculator {
 
   private func processTransactions() throws -> CalculatorResult {
     let transactionsByAsset = self.input.transactions
-      .reduce(into: [String:[Transaction]]()) { (result, transaction) in
+      .reduce(into: [String: [Transaction]]()) { result, transaction in
         var transactions = result[transaction.asset, default: []]
         transactions.append(transaction)
         result[transaction.asset] = transactions
       }
     let assetEventsByAsset = self.input.assetEvents
-      .reduce(into: [String:[AssetEvent]]()) { (result, assetEvent) in
+      .reduce(into: [String: [AssetEvent]]()) { result, assetEvent in
         var assetEvents = result[assetEvent.asset, default: []]
         assetEvents.append(assetEvent)
         result[assetEvent.asset] = assetEvents
@@ -64,11 +64,15 @@ public class Calculator {
           }
         }
         let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
-        let state = AssetProcessorState(asset: asset, acquisitions: acquisitions, disposals: disposals, assetEvents: assetEvents)
+        let state = AssetProcessorState(
+          asset: asset,
+          acquisitions: acquisitions,
+          disposals: disposals,
+          assetEvents: assetEvents)
         try self.preprocessAsset(withState: state)
         return try processAsset(withState: state)
       }
-      .reduce(into: [DisposalMatch]()) { (disposalMatches, assetResult) in
+      .reduce(into: [DisposalMatch]()) { disposalMatches, assetResult in
         disposalMatches.append(contentsOf: assetResult.disposalMatches)
       }
 
@@ -79,19 +83,19 @@ public class Calculator {
     let initial: ([Transaction], Transaction?) = ([], nil)
     return try transactions
       .sorted { $0.date < $1.date }
-      .reduce(into: initial) { (returnValue, transaction) in
+      .reduce(into: initial) { returnValue, transaction in
         guard let groupTransaction = returnValue.1 else {
           returnValue.0.append(transaction)
           returnValue.1 = transaction
           return
         }
-        if groupTransaction.date == transaction.date && groupTransaction.kind == transaction.kind {
+        if groupTransaction.date == transaction.date, groupTransaction.kind == transaction.kind {
           try groupTransaction.groupWith(transaction: transaction)
         } else {
           returnValue.0.append(transaction)
           returnValue.1 = transaction
         }
-    }.0
+      }.0
   }
 
   private func preprocessAsset(withState state: AssetProcessorState) throws {
@@ -109,7 +113,7 @@ public class Calculator {
     // First go over all the capital returns and decrease the price paid for acquisitions.
     var acquisitionsIndex = state.pendingAcquisitions.startIndex
     var assetEventsIndex = state.assetEvents.startIndex
-    while assetEventsIndex < state.assetEvents.endIndex && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+    while assetEventsIndex < state.assetEvents.endIndex, acquisitionsIndex < state.pendingAcquisitions.endIndex {
       let assetEvent = state.assetEvents[assetEventsIndex]
 
       let amount: Decimal
@@ -126,7 +130,7 @@ public class Calculator {
       self.logger.debug(" - Processing capital return event: \(assetEvent).")
 
       var amountLeft = amount
-      while amountLeft > Decimal.zero && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+      while amountLeft > Decimal.zero, acquisitionsIndex < state.pendingAcquisitions.endIndex {
         let acquisition = state.pendingAcquisitions[acquisitionsIndex]
         let apportionedValue = value * (acquisition.amount / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
@@ -136,7 +140,8 @@ public class Calculator {
       }
 
       if amountLeft != Decimal.zero {
-        throw CalculatorError.InvalidData("Error pre-processing \(state.asset). Capital return amount doesn't match acquisitions.")
+        throw CalculatorError
+          .InvalidData("Error pre-processing \(state.asset). Capital return amount doesn't match acquisitions.")
       }
 
       assetEventsIndex += 1
@@ -162,10 +167,12 @@ public class Calculator {
 
       var amountLeft = amount
       var acquisitionsIndex = state.pendingAcquisitions.startIndex
-      while amountLeft > Decimal.zero && acquisitionsIndex < state.pendingAcquisitions.endIndex {
+      while amountLeft > Decimal.zero, acquisitionsIndex < state.pendingAcquisitions.endIndex {
         let acquisition = state.pendingAcquisitions[acquisitionsIndex]
         guard acquisition.date <= assetEvent.date else {
-          throw CalculatorError.InvalidData("Error pre-processing \(state.asset) while processing dividend events. Went past asset event date while matching acquisitions.")
+          throw CalculatorError
+            .InvalidData(
+              "Error pre-processing \(state.asset) while processing dividend events. Went past asset event date while matching acquisitions.")
         }
 
         let apportionedValue = value * (acquisition.amount / amount)
@@ -176,7 +183,9 @@ public class Calculator {
       }
 
       if amountLeft != Decimal.zero {
-        throw CalculatorError.InvalidData("Error pre-processing \(state.asset) while processing dividend events. Amount doesn't match acquisitions.")
+        throw CalculatorError
+          .InvalidData(
+            "Error pre-processing \(state.asset) while processing dividend events. Amount doesn't match acquisitions.")
       }
 
       assetEventsIndex += 1
@@ -200,7 +209,8 @@ public class Calculator {
 
     self.logger.debug("Tax events for \(state.asset)")
     state.disposalMatches.forEach { self.logger.debug("  \($0)") }
-    self.logger.info("Finished processing transactions for \(state.asset). Created \(state.disposalMatches.count) tax events.")
+    self.logger
+      .info("Finished processing transactions for \(state.asset). Created \(state.disposalMatches.count) tax events.")
 
     return AssetResult(asset: state.asset, disposalMatches: state.disposalMatches)
   }

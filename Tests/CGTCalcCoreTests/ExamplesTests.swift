@@ -5,12 +5,11 @@
 //  Created by Matt Galloway on 10/06/2020.
 //
 
-import XCTest
-import Foundation
 @testable import CGTCalcCore
+import Foundation
+import XCTest
 
 class ExamplesTests: XCTestCase {
-
   let record = false
   let logger = StubLogger()
 
@@ -29,7 +28,7 @@ class ExamplesTests: XCTestCase {
       let testName = inputFile.deletingPathExtension().lastPathComponent
       let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
 
-      guard record || fileManager.fileExists(atPath: outputFile.path) else {
+      guard self.record || fileManager.fileExists(atPath: outputFile.path) else {
         XCTFail("Failed to find output for test: \(testName)")
         return
       }
@@ -47,7 +46,7 @@ class ExamplesTests: XCTestCase {
         let presenter = TextPresenter(result: result)
         let outputData = try presenter.process()
 
-        if record {
+        if self.record {
           do {
             try outputData.write(to: outputFile, atomically: true, encoding: .utf8)
           } catch {
@@ -64,12 +63,12 @@ class ExamplesTests: XCTestCase {
       }
     }
 
-    if record {
+    if self.record {
       XCTFail("Record mode")
     }
   }
 
   static let allTests = [
-    ("testExamples", testExamples),
+    ("testExamples", testExamples)
   ]
 }

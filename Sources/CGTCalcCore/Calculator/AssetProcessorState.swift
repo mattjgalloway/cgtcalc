@@ -18,9 +18,7 @@ class AssetProcessorState {
   var processedDisposals: [TransactionToMatch] = []
   var disposalMatches: [DisposalMatch] = []
 
-  var isComplete: Bool {
-    get { self.pendingDisposals.isEmpty }
-  }
+  var isComplete: Bool { self.pendingDisposals.isEmpty }
 
   init(asset: String, acquisitions: [TransactionToMatch], disposals: [TransactionToMatch], assetEvents: [AssetEvent]) {
     self.asset = asset

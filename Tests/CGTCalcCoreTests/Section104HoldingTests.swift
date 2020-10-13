@@ -5,11 +5,10 @@
 //  Created by Matt Galloway on 09/06/2020.
 //
 
-import XCTest
 @testable import CGTCalcCore
+import XCTest
 
 class Section104HoldingTests: XCTestCase {
-
   func testProcessesAcquisitionsCorrectly() throws {
     let sut = Section104Holding(logger: StubLogger())
 
@@ -169,5 +168,4 @@ class Section104HoldingTests: XCTestCase {
       XCTAssertEqual(sut.state.costBasis, Decimal(string: "0"))
     }
   }
-
 }

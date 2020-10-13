@@ -43,7 +43,7 @@ public class DefaultParser {
     try data
       .split { $0.isNewline }
       .forEach { rowData in
-        guard rowData.count > 0 && rowData.first != "#" else {
+        guard rowData.count > 0, rowData.first != "#" else {
           return
         }
 

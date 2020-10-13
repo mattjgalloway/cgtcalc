@@ -6,9 +6,9 @@
 //
 
 #if os(Linux)
-import Glibc
+  import Glibc
 #else
-import Darwin
+  import Darwin
 #endif
 import Foundation
 
@@ -26,6 +26,7 @@ public class BasicLogger: Logger {
     case Warn = 3
     case Error = 4
   }
+
   public var level: Level = .Info
 
   public init() {}
@@ -35,35 +36,36 @@ public class BasicLogger: Logger {
       FileHandle.standardError.write(Data(string.utf8))
     }
   }
+
   private var outputStream = StandardErrorOutputStream()
 
   public func debug(_ str: String) {
     if self.level <= .Debug {
-      print("[DEBUG] \(str)", to: &outputStream)
+      print("[DEBUG] \(str)", to: &self.outputStream)
     }
   }
 
   public func info(_ str: String) {
     if self.level <= .Info {
-      print("[INFO] \(str)", to: &outputStream)
+      print("[INFO] \(str)", to: &self.outputStream)
     }
   }
 
   public func warn(_ str: String) {
     if self.level <= .Warn {
-      print("[WARN] \(str)", to: &outputStream)
+      print("[WARN] \(str)", to: &self.outputStream)
     }
   }
 
   public func error(_ str: String) {
     if self.level <= .Error {
-      print("[ERROR] \(str)", to: &outputStream)
+      print("[ERROR] \(str)", to: &self.outputStream)
     }
   }
 }
 
 extension BasicLogger.Level: Comparable {
-  static public func <(lhs: BasicLogger.Level, rhs: BasicLogger.Level) -> Bool {
+  public static func < (lhs: BasicLogger.Level, rhs: BasicLogger.Level) -> Bool {
     return lhs.rawValue < rhs.rawValue
   }
 }

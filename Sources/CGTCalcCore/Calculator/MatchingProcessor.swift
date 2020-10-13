@@ -28,13 +28,16 @@ class MatchingProcessor {
     try self.process(kind: .SameDay)
     try self.process(kind: .BedAndBreakfast)
 
-    self.logger.info("Finished matching processor. Matched \(self.matchCount) and there are \(self.state.pendingDisposals.count) disposals left.")
+    self.logger
+      .info(
+        "Finished matching processor. Matched \(self.matchCount) and there are \(self.state.pendingDisposals.count) disposals left.")
   }
 
   private func process(kind: Kind) throws {
     var acquisitionIndex = self.state.pendingAcquisitions.startIndex
     var disposalIndex = self.state.pendingDisposals.startIndex
-    while acquisitionIndex < self.state.pendingAcquisitions.endIndex && disposalIndex < self.state.pendingDisposals.endIndex {
+    while acquisitionIndex < self.state.pendingAcquisitions.endIndex,
+      disposalIndex < self.state.pendingDisposals.endIndex {
       let acquisition = self.state.pendingAcquisitions[acquisitionIndex]
       let disposal = self.state.pendingDisposals[disposalIndex]
 
@@ -53,7 +56,7 @@ class MatchingProcessor {
         if acquisition.date < disposal.date {
           acquisitionIndex += 1
           continue
-        } else if disposal.date.addingTimeInterval(60*60*24*30) < acquisition.date {
+        } else if disposal.date.addingTimeInterval(60 * 60 * 24 * 30) < acquisition.date {
           disposalIndex += 1
           continue
         }
@@ -67,10 +70,10 @@ class MatchingProcessor {
               currentMultiplier *= m
             case .Unsplit(let m):
               currentMultiplier /= m
-            case .CapitalReturn(_, _), .Dividend(_, _):
+            case .CapitalReturn(_, _), .Dividend:
               break
             }
-        }
+          }
         restructureMultiplier = currentMultiplier
       }
 
@@ -89,9 +92,15 @@ class MatchingProcessor {
       let disposalMatch: DisposalMatch
       switch kind {
       case .SameDay:
-        disposalMatch = DisposalMatch(kind: .SameDay(acquisition), disposal: disposal, restructureMultiplier: restructureMultiplier)
+        disposalMatch = DisposalMatch(
+          kind: .SameDay(acquisition),
+          disposal: disposal,
+          restructureMultiplier: restructureMultiplier)
       case .BedAndBreakfast:
-        disposalMatch = DisposalMatch(kind: .BedAndBreakfast(acquisition), disposal: disposal, restructureMultiplier: restructureMultiplier)
+        disposalMatch = DisposalMatch(
+          kind: .BedAndBreakfast(acquisition),
+          disposal: disposal,
+          restructureMultiplier: restructureMultiplier)
       }
 
       self.logger.info("Matched \(disposal) against \(acquisition).")
