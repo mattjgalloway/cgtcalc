@@ -9,9 +9,32 @@ import Foundation
 
 public class AssetEvent {
   enum Kind: Equatable {
+    /**
+     * Capital return.
+     * This is also known as "equalisation". It is a part of a dividend that is not regarded as income. It lowers the cost basis for the shares.
+     * First parameter is the amount of shares. Second parameter is the £ value.
+     */
     case CapitalReturn(Decimal, Decimal)
+
+    /**
+     * Dividend.
+     * An income event. Used in capital gains tax purposes only for accumulation share classes where a dividend raises the cost basis for the shares.
+     * First parameter is the amount of shares. Second parameter is the £ value.
+     */
     case Dividend(Decimal, Decimal)
+
+    /**
+     * Stock split.
+     * When a stock splits, e.g. every 1 share is replaced with 4 share.
+     * Parameter is the ratio of the split. e.g. 4 in the example above.
+     */
     case Split(Decimal)
+
+    /**
+     * Stock unsplit.
+     * When a stock does the oposite of a split, e.g. every 4 shares are replaced with 1 share.
+     * Parameter is the ratio of the unsplit. e.g. 4 in the example above.
+     */
     case Unsplit(Decimal)
   }
 
