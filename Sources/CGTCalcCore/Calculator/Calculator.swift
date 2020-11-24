@@ -132,6 +132,12 @@ public class Calculator {
       var amountLeft = amount
       while amountLeft > Decimal.zero, acquisitionsIndex < state.pendingAcquisitions.endIndex {
         let acquisition = state.pendingAcquisitions[acquisitionsIndex]
+        guard acquisition.date <= assetEvent.date else {
+          throw CalculatorError
+            .InvalidData(
+              "Error pre-processing \(state.asset) while processing capital return events. Went past asset event date while matching acquisitions.")
+        }
+
         let apportionedValue = value * (acquisition.amount / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
         acquisition.subtractOffset(amount: apportionedValue)
