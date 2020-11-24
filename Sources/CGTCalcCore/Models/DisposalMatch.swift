@@ -25,8 +25,22 @@ class DisposalMatch {
   }
 
   enum Kind {
+    /**
+     * Same day match.
+     * Parameter is the buy transaction that this disposal was matched against.
+     */
     case SameDay(TransactionToMatch)
+
+    /**
+     * Bed-and-breakfast match (buy within 30 days of a sale).
+     * Parameter is the buy transaction that this disposal was matched against.
+     */
     case BedAndBreakfast(TransactionToMatch)
+
+    /**
+     * Section 104 holding match (pool of shares not matched on any other rule).
+     * First parameter is the amount of holding, second parameter is the cost basis.
+     */
     case Section104(Decimal, Decimal)
   }
 
