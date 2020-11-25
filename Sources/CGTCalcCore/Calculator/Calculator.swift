@@ -112,8 +112,10 @@ public class Calculator {
 
     // First go over all the capital returns and decrease the price paid for acquisitions.
     var acquisitionsIndex = state.pendingAcquisitions.startIndex
+    var disposalsIndex = state.pendingDisposals.startIndex
     var assetEventsIndex = state.assetEvents.startIndex
-    while assetEventsIndex < state.assetEvents.endIndex, acquisitionsIndex < state.pendingAcquisitions.endIndex {
+    var runningTotal = Decimal.zero
+    while assetEventsIndex < state.assetEvents.endIndex {
       let assetEvent = state.assetEvents[assetEventsIndex]
 
       let amount: Decimal
@@ -129,27 +131,67 @@ public class Calculator {
 
       self.logger.debug(" - Processing capital return event: \(assetEvent).")
 
-      var amountLeft = amount
-      while amountLeft > Decimal.zero, acquisitionsIndex < state.pendingAcquisitions.endIndex {
-        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
-        guard acquisition.date <= assetEvent.date else {
-          throw CalculatorError
-            .InvalidData(
-              "Error pre-processing \(state.asset) while processing capital return events. Went past asset event date while matching acquisitions.")
-        }
-
-        let apportionedValue = value * (acquisition.amount / amount)
-        self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
-        acquisition.subtractOffset(amount: apportionedValue)
-        amountLeft -= acquisition.amount
-        acquisitionsIndex += 1
+      guard acquisitionsIndex < state.pendingAcquisitions.endIndex else {
+        throw CalculatorError
+          .InvalidData(
+            "Error pre-processing \(state.asset) while processing capital return events. Found a capital return event but there are no remaining acquisitions to match against.")
       }
 
-      if amountLeft != Decimal.zero {
+      var transactionsBeforeEvent: [TransactionToMatch] = []
+      while acquisitionsIndex < state.pendingAcquisitions.endIndex {
+        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
+        if acquisition.date < assetEvent.date {
+          transactionsBeforeEvent.append(acquisition)
+          acquisitionsIndex += 1
+        } else {
+          break
+        }
+      }
+
+      while disposalsIndex < state.pendingDisposals.endIndex {
+        let disposal = state.pendingDisposals[disposalsIndex]
+        if disposal.date < assetEvent.date {
+          transactionsBeforeEvent.append(disposal)
+          disposalsIndex += 1
+        } else {
+          break
+        }
+      }
+
+      transactionsBeforeEvent.sort { $0.date < $1.date }
+
+      var acquisitionsMatched: [TransactionToMatch] = []
+      var totalAcquisitionsAmount = Decimal.zero
+      try transactionsBeforeEvent.forEach { transaction in
+        switch transaction.transaction.kind {
+        case .Buy:
+          acquisitionsMatched.append(transaction)
+          totalAcquisitionsAmount += transaction.amount
+        case .Sell:
+          // We need to check this is selling ALL at this point, otherwise it's not supported
+          guard transaction.amount == runningTotal + totalAcquisitionsAmount else {
+            throw CalculatorError
+              .InvalidData(
+                "Error pre-processing \(state.asset) while processing capital return events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.")
+          }
+          runningTotal = Decimal.zero
+          totalAcquisitionsAmount = Decimal.zero
+          acquisitionsMatched.removeAll()
+        }
+      }
+
+      guard amount == totalAcquisitionsAmount else {
         throw CalculatorError
           .InvalidData("Error pre-processing \(state.asset). Capital return amount doesn't match acquisitions.")
       }
 
+      acquisitionsMatched.forEach { acquisition in
+        let apportionedValue = value * (acquisition.amount / amount)
+        self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
+        acquisition.subtractOffset(amount: apportionedValue)
+      }
+
+      runningTotal += amount
       assetEventsIndex += 1
     }
 
@@ -171,27 +213,60 @@ public class Calculator {
 
       self.logger.debug(" - Processing dividend event: \(assetEvent).")
 
-      var amountLeft = amount
       var acquisitionsIndex = state.pendingAcquisitions.startIndex
-      while amountLeft > Decimal.zero, acquisitionsIndex < state.pendingAcquisitions.endIndex {
-        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
-        guard acquisition.date <= assetEvent.date else {
-          throw CalculatorError
-            .InvalidData(
-              "Error pre-processing \(state.asset) while processing dividend events. Went past asset event date while matching acquisitions.")
-        }
+      var disposalsIndex = state.pendingDisposals.startIndex
 
+      var transactionsBeforeEvent: [TransactionToMatch] = []
+      while acquisitionsIndex < state.pendingAcquisitions.endIndex {
+        let acquisition = state.pendingAcquisitions[acquisitionsIndex]
+        if acquisition.date < assetEvent.date {
+          transactionsBeforeEvent.append(acquisition)
+          acquisitionsIndex += 1
+        } else {
+          break
+        }
+      }
+
+      while disposalsIndex < state.pendingDisposals.endIndex {
+        let disposal = state.pendingDisposals[disposalsIndex]
+        if disposal.date < assetEvent.date {
+          transactionsBeforeEvent.append(disposal)
+          disposalsIndex += 1
+        } else {
+          break
+        }
+      }
+
+      transactionsBeforeEvent.sort { $0.date < $1.date }
+
+      var acquisitionsMatched: [TransactionToMatch] = []
+      var totalAcquisitionsAmount = Decimal.zero
+      try transactionsBeforeEvent.forEach { transaction in
+        switch transaction.transaction.kind {
+        case .Buy:
+          acquisitionsMatched.append(transaction)
+          totalAcquisitionsAmount += transaction.amount
+        case .Sell:
+          // We need to check this is selling ALL at this point, otherwise it's not supported
+          guard transaction.amount == totalAcquisitionsAmount else {
+            throw CalculatorError
+              .InvalidData(
+                "Error pre-processing \(state.asset) while processing dividend events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.")
+          }
+          totalAcquisitionsAmount = Decimal.zero
+          acquisitionsMatched.removeAll()
+        }
+      }
+
+      guard amount == totalAcquisitionsAmount else {
+        throw CalculatorError
+          .InvalidData("Error pre-processing \(state.asset). Dividend amount doesn't match acquisitions.")
+      }
+
+      acquisitionsMatched.forEach { acquisition in
         let apportionedValue = value * (acquisition.amount / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
         acquisition.addOffset(amount: apportionedValue)
-        amountLeft -= acquisition.amount
-        acquisitionsIndex += 1
-      }
-
-      if amountLeft != Decimal.zero {
-        throw CalculatorError
-          .InvalidData(
-            "Error pre-processing \(state.asset) while processing dividend events. Amount doesn't match acquisitions.")
       }
 
       assetEventsIndex += 1

@@ -2,18 +2,18 @@
 
 Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
 ================================================================================================
-2019/2020   £320   £7768      £12000      £0           £0             £0            £0          
+2019/2020   £265   £7768      £12000      £0           £0             £0            £0          
 
 
 # TAX YEAR DETAILS
 
 ## TAX YEAR 2019/2020
 
-1) SOLD 40 of GB00B3TYHH97 on 05/11/2019 for GAIN of £320
+1) SOLD 40 of GB00B3TYHH97 on 05/11/2019 for GAIN of £265
 Matches with:
-  - BED & BREAKFAST: 20 bought on 10/11/2019 at £185.434 with offset of £-95.12
-  - SECTION 104: 40 at cost basis of £186.253
-Calculation: (40 * 194.22 - 12.5) - ( (20 * 185.434 + 2 + -95.12) + (20 * 186.253) ) = 320
+  - BED & BREAKFAST: 20 bought on 10/11/2019 at £190.9805 with offset of £15.81
+  - SECTION 104: 40 at cost basis of £183.47975
+Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.9805 + 2 + 15.81) + (20 * 183.47975) ) = 265
 
 
 # TRANSACTIONS
