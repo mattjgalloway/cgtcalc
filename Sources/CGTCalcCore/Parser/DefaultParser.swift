@@ -60,7 +60,7 @@ public class DefaultParser {
 
   public func transaction(fromData data: Substring) throws -> Transaction? {
     let strippedData = data.trimmingCharacters(in: .whitespaces)
-    let splitData = strippedData.components(separatedBy: .whitespaces)
+    let splitData = strippedData.components(separatedBy: .whitespaces).filter { $0.count > 0 }
 
     let kind: Transaction.Kind
     switch splitData[0] {
