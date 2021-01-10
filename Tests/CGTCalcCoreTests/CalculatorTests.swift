@@ -185,4 +185,46 @@ class CalculatorTests: XCTestCase {
     let calculator = try Calculator(input: input, logger: self.logger)
     XCTAssertThrowsError(try calculator.process())
   }
+
+  func testCapitalReturnNotEnoughAcquisitionsThrows() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.CapitalReturn(10, 1), "01/02/2018", "Foo"),
+        ModelCreation.assetEvent(.CapitalReturn(10, 1), "01/03/2018", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true)
+    self.runTest(withData: testData)
+  }
+
+  func testSoldNotAllBeforeCapitalReturnThrows() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
+        ModelCreation.transaction(.Sell, "01/02/2018", "Foo", "5", "10", "0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.CapitalReturn(10, 1), "01/03/2018", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true)
+    self.runTest(withData: testData)
+  }
+
+  func testSoldNotAllBeforeDividendThrows() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
+        ModelCreation.transaction(.Sell, "01/02/2018", "Foo", "5", "10", "0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.Dividend(10, 1), "01/03/2018", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true)
+    self.runTest(withData: testData)
+  }
 }
