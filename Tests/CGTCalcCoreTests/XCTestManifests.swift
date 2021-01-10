@@ -33,8 +33,11 @@
       ("testAssetEventWithNoAcquisition", testAssetEventWithNoAcquisition),
       ("testBasicSingleAsset", testBasicSingleAsset),
       ("testBedAndBreakfastEdges", testBedAndBreakfastEdges),
+      ("testCapitalReturnNotEnoughAcquisitionsThrows", testCapitalReturnNotEnoughAcquisitionsThrows),
       ("testDateBefore20080406Throws", testDateBefore20080406Throws),
-      ("testSection104DisposeTooMuch", testSection104DisposeTooMuch)
+      ("testSection104DisposeTooMuch", testSection104DisposeTooMuch),
+      ("testSoldNotAllBeforeCapitalReturnThrows", testSoldNotAllBeforeCapitalReturnThrows),
+      ("testSoldNotAllBeforeDividendThrows", testSoldNotAllBeforeDividendThrows)
     ]
   }
 
