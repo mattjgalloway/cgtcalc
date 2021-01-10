@@ -123,7 +123,8 @@
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__MatchingProcessorTests = [
-      ("testSimple", testSimple)
+      ("testSimple", testSimple),
+      ("testWithAssetEvents", testWithAssetEvents)
     ]
   }
 
