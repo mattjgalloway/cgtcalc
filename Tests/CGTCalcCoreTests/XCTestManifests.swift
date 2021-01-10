@@ -43,6 +43,7 @@
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__DefaultParserTests = [
+      ("testParseAllowsMultipleWhitespace", testParseAllowsMultipleWhitespace),
       ("testParseAssetEventIncorrectKindFails", testParseAssetEventIncorrectKindFails),
       ("testParseBuyTransactionSuccess", testParseBuyTransactionSuccess),
       (
@@ -67,6 +68,7 @@
       ("testParseSplitEventIncorrectAmountFormatFails", testParseSplitEventIncorrectAmountFormatFails),
       ("testParseSplitEventIncorrectNumberOfFieldsFails", testParseSplitEventIncorrectNumberOfFieldsFails),
       ("testParseSplitEventSuccess", testParseSplitEventSuccess),
+      ("testParseStripsTrailingWhitespace", testParseStripsTrailingWhitespace),
       ("testParseTransactionIncorrectAmountFormatFails", testParseTransactionIncorrectAmountFormatFails),
       ("testParseTransactionIncorrectDateFormatFails", testParseTransactionIncorrectDateFormatFails),
       ("testParseTransactionIncorrectExpensesFormatFails", testParseTransactionIncorrectExpensesFormatFails),
