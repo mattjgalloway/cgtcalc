@@ -34,18 +34,8 @@ public class Calculator {
   }
 
   private func processTransactions() throws -> CalculatorResult {
-    let transactionsByAsset = self.input.transactions
-      .reduce(into: [String: [Transaction]]()) { result, transaction in
-        var transactions = result[transaction.asset, default: []]
-        transactions.append(transaction)
-        result[transaction.asset] = transactions
-      }
-    let assetEventsByAsset = self.input.assetEvents
-      .reduce(into: [String: [AssetEvent]]()) { result, assetEvent in
-        var assetEvents = result[assetEvent.asset, default: []]
-        assetEvents.append(assetEvent)
-        result[assetEvent.asset] = assetEvents
-      }
+    let transactionsByAsset = Dictionary(grouping: self.input.transactions, by: \.asset)
+    let assetEventsByAsset = Dictionary(grouping: self.input.assetEvents, by: \.asset)
 
     let allAssets = Set<String>(transactionsByAsset.keys).union(Set<String>(assetEventsByAsset.keys))
 
