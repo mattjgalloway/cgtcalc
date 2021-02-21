@@ -18,10 +18,10 @@ enum ParserError: Error {
 }
 
 public class CalculatorInput {
-  let transactions: [Transaction]
-  let assetEvents: [AssetEvent]
+  public let transactions: [Transaction]
+  public let assetEvents: [AssetEvent]
 
-  init(transactions: [Transaction], assetEvents: [AssetEvent]) {
+  public init(transactions: [Transaction], assetEvents: [AssetEvent]) {
     self.transactions = transactions
     self.assetEvents = assetEvents
   }
