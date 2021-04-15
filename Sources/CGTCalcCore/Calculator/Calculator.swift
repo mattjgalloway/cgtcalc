@@ -41,18 +41,7 @@ public class Calculator {
 
     let allDisposalMatches = try allAssets
       .map { asset -> AssetResult in
-        let transactions = try self.groupSameDayTransactions(transactionsByAsset[asset, default: []])
-        var acquisitions: [TransactionToMatch] = []
-        var disposals: [TransactionToMatch] = []
-        transactions.forEach { transaction in
-          let transactionToMatch = TransactionToMatch(transaction: transaction)
-          switch transaction.kind {
-          case .Buy:
-            acquisitions.append(transactionToMatch)
-          case .Sell:
-            disposals.append(transactionToMatch)
-          }
-        }
+        let (acquisitions, disposals) = try self.splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
         let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
         let state = AssetProcessorState(
           asset: asset,
@@ -69,23 +58,44 @@ public class Calculator {
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
   }
 
-  private func groupSameDayTransactions(_ transactions: [Transaction]) throws -> [Transaction] {
-    let initial: ([Transaction], Transaction?) = ([], nil)
-    return try transactions
+  private func splitAndGroupSameDayTransactions(_ transactions: [Transaction]) throws -> (acquisitions: [TransactionToMatch], disposals: [TransactionToMatch]) {
+    let acquisitions = transactions
+      .filter { $0.kind == .Buy }
       .sorted { $0.date < $1.date }
-      .reduce(into: initial) { returnValue, transaction in
-        guard let groupTransaction = returnValue.1 else {
-          returnValue.0.append(transaction)
-          returnValue.1 = transaction
-          return
+    let disposals = transactions
+      .filter { $0.kind == .Sell }
+      .sorted { $0.date < $1.date }
+
+    func group(_ transactions: [Transaction]) throws -> [TransactionToMatch] {
+      var transactionToMatches: [TransactionToMatch] = []
+
+      var currentDate = Date.distantPast
+      var currentTransactions: [Transaction] = []
+
+      try transactions.forEach { transaction in
+        if currentDate != transaction.date {
+          if !currentTransactions.isEmpty {
+            let groupedTransaction = try Transaction.grouped(currentTransactions)
+            transactionToMatches.append(TransactionToMatch(transaction: groupedTransaction))
+            currentTransactions = []
+          }
+          currentDate = transaction.date
         }
-        if groupTransaction.date == transaction.date, groupTransaction.kind == transaction.kind {
-          try groupTransaction.groupWith(transaction: transaction)
-        } else {
-          returnValue.0.append(transaction)
-          returnValue.1 = transaction
-        }
-      }.0
+        currentTransactions.append(transaction)
+      }
+
+      if !currentTransactions.isEmpty {
+        let groupedTransaction = try Transaction.grouped(currentTransactions)
+        transactionToMatches.append(TransactionToMatch(transaction: groupedTransaction))
+      }
+
+      return transactionToMatches
+    }
+
+    let acquisitionsToMatch = try group(acquisitions)
+    let disposalsToMatch = try group(disposals)
+
+    return (acquisitions: acquisitionsToMatch, disposals: disposalsToMatch)
   }
 
   private func preprocessAsset(withState state: AssetProcessorState) throws {

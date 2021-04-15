@@ -17,10 +17,10 @@ Calculation: (20 * 8 - 14.5) - ( (20 * 8.21667) ) = -19
 
 # TRANSACTIONS
 
-28/10/2018 SOLD 10 of GB00B41YBW71 at £7 with £12.5 expenses
-28/10/2018 SOLD 10 of GB00B41YBW71 at £9 with £2 expenses
 28/08/2018 BOUGHT 10 of GB00B41YBW71 at £5 with £12.5 expenses
+28/10/2018 SOLD 10 of GB00B41YBW71 at £9 with £2 expenses
 28/08/2018 BOUGHT 10 of GB00B41YBW71 at £10 with £2 expenses
+28/10/2018 SOLD 10 of GB00B41YBW71 at £7 with £12.5 expenses
 28/08/2018 BOUGHT 10 of GB00B41YBW71 at £8 with £2 expenses
 
 

@@ -30,20 +30,26 @@ public class Transaction {
     self.expenses = expenses
   }
 
-  func groupWith(transaction: Transaction) throws {
-    guard transaction.kind == self.kind, transaction.date == self.date, transaction.asset == self.asset else {
-      throw CalculatorError.InternalError("Cannot group transactions that don't have the same kind, date and asset.")
+  static func grouped(_ transactions: [Transaction]) throws -> Transaction {
+    guard Set(transactions.map(\.kind)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group transactions that don't have the same kind")
     }
-    let selfCost = self.amount * self.price
-    let otherCost = transaction.amount * transaction.price
-    self.amount += transaction.amount
-    self.price = (selfCost + otherCost) / self.amount
-    self.expenses += transaction.expenses
-    self.groupedTransactions.append(transaction)
-  }
+    guard Set(transactions.map(\.date)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group transactions that don't have the same date")
+    }
+    guard Set(transactions.map(\.asset)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group transactions that don't have the same asset")
+    }
+    guard let firstTransaction = transactions.first else {
+      throw CalculatorError.InternalError("Cannot group 0 transactions")
+    }
 
-  func groupWith(transactions: [Transaction]) throws {
-    try transactions.forEach(self.groupWith(transaction:))
+    let totalAmount = transactions.reduce(Decimal.zero) { $0 + $1.amount }
+    let totalCost = transactions.reduce(Decimal.zero) { $0 + ($1.amount * $1.price) }
+    let totalExpenses = transactions.reduce(Decimal.zero) { $0 + $1.expenses }
+    let averagePrice = totalCost / totalAmount
+
+    return Transaction(kind: firstTransaction.kind, date: firstTransaction.date, asset: firstTransaction.asset, amount: totalAmount, price: averagePrice, expenses: totalExpenses)
   }
 }
 
