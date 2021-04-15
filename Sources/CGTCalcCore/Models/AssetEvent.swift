@@ -8,7 +8,7 @@
 import Foundation
 
 public class AssetEvent {
-  enum Kind: Equatable {
+  public enum Kind: Equatable {
     /**
      * Capital return.
      * This is also known as "equalisation". It is a part of a dividend that is not regarded as income. It lowers the cost basis for the shares.
@@ -42,7 +42,7 @@ public class AssetEvent {
   let date: Date
   let asset: String
 
-  init(kind: Kind, date: Date, asset: String) {
+  public init(kind: Kind, date: Date, asset: String) {
     self.kind = kind
     self.date = date
     self.asset = asset

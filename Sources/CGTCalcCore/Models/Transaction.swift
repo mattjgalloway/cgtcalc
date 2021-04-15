@@ -8,7 +8,7 @@
 import Foundation
 
 public class Transaction {
-  enum Kind {
+  public enum Kind {
     case Buy
     case Sell
   }
@@ -21,7 +21,7 @@ public class Transaction {
   private(set) var expenses: Decimal
   private(set) var groupedTransactions: [Transaction] = []
 
-  init(kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
+  public init(kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
     self.kind = kind
     self.date = date
     self.asset = asset
