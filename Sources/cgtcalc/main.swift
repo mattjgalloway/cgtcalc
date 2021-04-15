@@ -16,7 +16,7 @@ struct CGTCalc: ParsableCommand {
   var filename: String
 
   @Flag(name: .shortAndLong, help: "Enable verbose logging")
-  var verbose: Bool
+  var verbose = false
 
   @Option(name: .shortAndLong, help: "Output file")
   var outputFile: String?
