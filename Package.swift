@@ -10,7 +10,7 @@ let package = Package(
     .executable(name: "cgtcalc", targets: ["cgtcalc"])
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-argument-parser", from: "0.1.0")
+    .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0"))
   ],
   targets: [
     .target(
