@@ -49,7 +49,13 @@ public class Transaction {
     let totalExpenses = transactions.reduce(Decimal.zero) { $0 + $1.expenses }
     let averagePrice = totalCost / totalAmount
 
-    return Transaction(kind: firstTransaction.kind, date: firstTransaction.date, asset: firstTransaction.asset, amount: totalAmount, price: averagePrice, expenses: totalExpenses)
+    return Transaction(
+      kind: firstTransaction.kind,
+      date: firstTransaction.date,
+      asset: firstTransaction.asset,
+      amount: totalAmount,
+      price: averagePrice,
+      expenses: totalExpenses)
   }
 }
 

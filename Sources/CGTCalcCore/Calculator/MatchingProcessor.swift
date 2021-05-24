@@ -37,7 +37,8 @@ class MatchingProcessor {
     var acquisitionIndex = self.state.pendingAcquisitions.startIndex
     var disposalIndex = self.state.pendingDisposals.startIndex
     while acquisitionIndex < self.state.pendingAcquisitions.endIndex,
-      disposalIndex < self.state.pendingDisposals.endIndex {
+          disposalIndex < self.state.pendingDisposals.endIndex
+    {
       let acquisition = self.state.pendingAcquisitions[acquisitionIndex]
       let disposal = self.state.pendingDisposals[disposalIndex]
 

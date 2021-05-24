@@ -8,7 +8,7 @@
 import Foundation
 
 class Section104Holding {
-  private(set) var state: State = State(amount: Decimal.zero, cost: 0.0)
+  private(set) var state = State(amount: Decimal.zero, cost: 0.0)
   private let logger: Logger
 
   struct State {

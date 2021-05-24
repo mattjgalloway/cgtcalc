@@ -41,7 +41,8 @@ public class Calculator {
 
     let allDisposalMatches = try allAssets
       .map { asset -> AssetResult in
-        let (acquisitions, disposals) = try self.splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
+        let (acquisitions, disposals) = try self
+          .splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
         let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
         let state = AssetProcessorState(
           asset: asset,
@@ -58,7 +59,9 @@ public class Calculator {
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
   }
 
-  private func splitAndGroupSameDayTransactions(_ transactions: [Transaction]) throws -> (acquisitions: [TransactionToMatch], disposals: [TransactionToMatch]) {
+  private func splitAndGroupSameDayTransactions(_ transactions: [Transaction]) throws
+    -> (acquisitions: [TransactionToMatch], disposals: [TransactionToMatch])
+  {
     let acquisitions = transactions
       .filter { $0.kind == .Buy }
       .sorted { $0.date < $1.date }

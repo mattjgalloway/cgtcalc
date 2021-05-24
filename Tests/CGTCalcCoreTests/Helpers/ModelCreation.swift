@@ -15,7 +15,8 @@ struct ModelCreation {
     _ asset: String,
     _ amount: String,
     _ price: String,
-    _ expenses: String) -> Transaction {
+    _ expenses: String) -> Transaction
+  {
     return Transaction(
       kind: kind,
       date: DateCreation.date(fromString: date),
