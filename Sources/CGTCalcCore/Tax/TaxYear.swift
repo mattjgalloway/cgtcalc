@@ -68,7 +68,8 @@ extension TaxYear {
     TaxYear(year: 2018): Rates(exemption: 11300, basicRate: 10, higherRate: 20),
     TaxYear(year: 2019): Rates(exemption: 11700, basicRate: 10, higherRate: 20),
     TaxYear(year: 2020): Rates(exemption: 12000, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20)
+    TaxYear(year: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
+    TaxYear(year: 2022): Rates(exemption: 12300, basicRate: 10, higherRate: 20)
   ]
 
   var rates: Rates? {
