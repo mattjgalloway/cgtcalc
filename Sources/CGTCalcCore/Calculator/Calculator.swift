@@ -113,6 +113,16 @@ public class Calculator {
 
     self.logger.info("Begin pre-processing transactions for \(state.asset).")
 
+    // Helper class that holds a transaction and an offset amount left. Used to handle FIFO buy/sell preprocessing.
+    class TransactionTuple {
+      let transaction: TransactionToMatch
+      var amountLeft: Decimal
+      init (transaction: TransactionToMatch) {
+        self.transaction = transaction
+        self.amountLeft = transaction.amount
+      }
+    }
+
     // First go over all the capital returns and decrease the price paid for acquisitions.
     var acquisitionsIndex = state.pendingAcquisitions.startIndex
     var disposalsIndex = state.pendingDisposals.startIndex
@@ -163,26 +173,40 @@ public class Calculator {
 
       transactionsBeforeEvent.sort { $0.date < $1.date }
 
-      var acquisitionsMatched: [TransactionToMatch] = []
+      var acquisitionsMatched: [TransactionTuple] = []
       var netAcquisitionsAmount = Decimal.zero
+
       try transactionsBeforeEvent.forEach { transaction in
         switch transaction.transaction.kind {
         case .Buy:
-          acquisitionsMatched.append(transaction)
+          let transactionTuple = TransactionTuple(transaction: transaction)
+          acquisitionsMatched.append(transactionTuple)
           netAcquisitionsAmount += transaction.amount
         case .Sell:
-          // We need to check this is selling ALL at this point, otherwise it's not supported
-          guard transaction.amount == runningTotal + netAcquisitionsAmount else {
-            let errorMessage = """
-              Error pre-processing \(state.asset) while processing capital return events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.
-              Sell transaction was:
-              \(transaction)
-              """
-            throw CalculatorError.InvalidData(errorMessage)
+          // Run over all acquisitions to now and remove this sale in a FIFO way
+          var amountLeft = transaction.amount
+
+          // First remove from the running total
+          let amountToRemoveFromRunningTotal = min(runningTotal, amountLeft)
+          if amountToRemoveFromRunningTotal > Decimal.zero {
+            runningTotal -= amountToRemoveFromRunningTotal
+            amountLeft -= amountToRemoveFromRunningTotal
           }
-          runningTotal = Decimal.zero
-          netAcquisitionsAmount = Decimal.zero
-          acquisitionsMatched.removeAll()
+
+          // Then remove from the acquisitions since the last capital return event, up until this sale
+          acquisitionsMatched.forEach { acquisitionTransaction in
+            guard amountLeft > Decimal.zero else { return }
+            let amountToRemove = min(acquisitionTransaction.amountLeft, amountLeft)
+            acquisitionTransaction.amountLeft -= amountToRemove
+            amountLeft -= amountToRemove
+          }
+
+          guard amountLeft == Decimal.zero else {
+            throw CalculatorError.InvalidData("Error pre-processing \(state.asset). When processing capital returns, sold more than currently hold.")
+          }
+
+          let netTransactionAmount = transaction.amount - amountToRemoveFromRunningTotal
+          netAcquisitionsAmount -= netTransactionAmount
         }
       }
 
@@ -192,9 +216,10 @@ public class Calculator {
       }
 
       acquisitionsMatched.forEach { acquisition in
-        let apportionedValue = value * (acquisition.amount / amount)
+        guard acquisition.amountLeft > Decimal.zero else { return }
+        let apportionedValue = value * (acquisition.amountLeft / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
-        acquisition.subtractOffset(amount: apportionedValue)
+        acquisition.transaction.subtractOffset(amount: apportionedValue)
       }
 
       runningTotal += amount
@@ -245,25 +270,36 @@ public class Calculator {
 
       transactionsBeforeEvent.sort { $0.date < $1.date }
 
-      var acquisitionsMatched: [TransactionToMatch] = []
+      class TransactionTuple {
+        let transaction: TransactionToMatch
+        var amountLeft: Decimal
+        init (transaction: TransactionToMatch) {
+          self.transaction = transaction
+          self.amountLeft = transaction.amount
+        }
+      }
+      var acquisitionsMatched: [TransactionTuple] = []
       var netAcquisitionsAmount = Decimal.zero
+
       try transactionsBeforeEvent.forEach { transaction in
         switch transaction.transaction.kind {
         case .Buy:
-          acquisitionsMatched.append(transaction)
+          let transactionTuple = TransactionTuple(transaction: transaction)
+          acquisitionsMatched.append(transactionTuple)
           netAcquisitionsAmount += transaction.amount
         case .Sell:
-          // We need to check this is selling ALL at this point, otherwise it's not supported
-          guard transaction.amount == netAcquisitionsAmount else {
-            let errorMessage = """
-              Error pre-processing \(state.asset) while processing dividend events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.
-              Sell transaction was:
-              \(transaction)
-              """
-            throw CalculatorError.InvalidData(errorMessage)
+          // Run over all acquisitions to now and remove this sale in a FIFO way
+          var amountLeft = transaction.amount
+          acquisitionsMatched.forEach { acquisitionTransaction in
+            guard amountLeft > Decimal.zero else { return }
+            let amountToRemove = min(acquisitionTransaction.amountLeft, amountLeft)
+            acquisitionTransaction.amountLeft -= amountToRemove
+            amountLeft -= amountToRemove
           }
-          netAcquisitionsAmount = Decimal.zero
-          acquisitionsMatched.removeAll()
+          guard amountLeft == Decimal.zero else {
+            throw CalculatorError.InvalidData("Error pre-processing \(state.asset). When processing dividends, sold more than currently hold.")
+          }
+          netAcquisitionsAmount -= transaction.amount
         }
       }
 
@@ -273,9 +309,10 @@ public class Calculator {
       }
 
       acquisitionsMatched.forEach { acquisition in
-        let apportionedValue = value * (acquisition.amount / amount)
+        guard acquisition.amountLeft > Decimal.zero else { return }
+        let apportionedValue = value * (acquisition.amountLeft / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
-        acquisition.addOffset(amount: apportionedValue)
+        acquisition.transaction.addOffset(amount: apportionedValue)
       }
 
       assetEventsIndex += 1
