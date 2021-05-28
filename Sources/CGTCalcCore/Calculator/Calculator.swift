@@ -164,26 +164,29 @@ public class Calculator {
       transactionsBeforeEvent.sort { $0.date < $1.date }
 
       var acquisitionsMatched: [TransactionToMatch] = []
-      var totalAcquisitionsAmount = Decimal.zero
+      var netAcquisitionsAmount = Decimal.zero
       try transactionsBeforeEvent.forEach { transaction in
         switch transaction.transaction.kind {
         case .Buy:
           acquisitionsMatched.append(transaction)
-          totalAcquisitionsAmount += transaction.amount
+          netAcquisitionsAmount += transaction.amount
         case .Sell:
           // We need to check this is selling ALL at this point, otherwise it's not supported
-          guard transaction.amount == runningTotal + totalAcquisitionsAmount else {
-            throw CalculatorError
-              .InvalidData(
-                "Error pre-processing \(state.asset) while processing capital return events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.")
+          guard transaction.amount == runningTotal + netAcquisitionsAmount else {
+            let errorMessage = """
+              Error pre-processing \(state.asset) while processing capital return events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.
+              Sell transaction was:
+              \(transaction)
+              """
+            throw CalculatorError.InvalidData(errorMessage)
           }
           runningTotal = Decimal.zero
-          totalAcquisitionsAmount = Decimal.zero
+          netAcquisitionsAmount = Decimal.zero
           acquisitionsMatched.removeAll()
         }
       }
 
-      guard amount == totalAcquisitionsAmount else {
+      guard amount == netAcquisitionsAmount else {
         throw CalculatorError
           .InvalidData("Error pre-processing \(state.asset). Capital return amount doesn't match acquisitions.")
       }
@@ -243,25 +246,28 @@ public class Calculator {
       transactionsBeforeEvent.sort { $0.date < $1.date }
 
       var acquisitionsMatched: [TransactionToMatch] = []
-      var totalAcquisitionsAmount = Decimal.zero
+      var netAcquisitionsAmount = Decimal.zero
       try transactionsBeforeEvent.forEach { transaction in
         switch transaction.transaction.kind {
         case .Buy:
           acquisitionsMatched.append(transaction)
-          totalAcquisitionsAmount += transaction.amount
+          netAcquisitionsAmount += transaction.amount
         case .Sell:
           // We need to check this is selling ALL at this point, otherwise it's not supported
-          guard transaction.amount == totalAcquisitionsAmount else {
-            throw CalculatorError
-              .InvalidData(
-                "Error pre-processing \(state.asset) while processing dividend events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.")
+          guard transaction.amount == netAcquisitionsAmount else {
+            let errorMessage = """
+              Error pre-processing \(state.asset) while processing dividend events. Had disposals but did not dispose of everything held at that point. This is currently un-supported.
+              Sell transaction was:
+              \(transaction)
+              """
+            throw CalculatorError.InvalidData(errorMessage)
           }
-          totalAcquisitionsAmount = Decimal.zero
+          netAcquisitionsAmount = Decimal.zero
           acquisitionsMatched.removeAll()
         }
       }
 
-      guard amount == totalAcquisitionsAmount else {
+      guard amount == netAcquisitionsAmount else {
         throw CalculatorError
           .InvalidData("Error pre-processing \(state.asset). Dividend amount doesn't match acquisitions.")
       }
