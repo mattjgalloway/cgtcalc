@@ -128,6 +128,35 @@ Calculation: (2000 * 4.6702 - 12.5) - ( (500 * 4.7012 + 2) + (1500 * 3.89015) ) 
 NONE
 ```
 
+## Accounting for dividends
+
+**NOTE: The information in this section is my own interpretation. See disclaimer at the top of this README.**
+
+Dividends in funds need special care when accounting for CGT. In both income and accumulation funds, there is an equalisation part of the first dividend payment after shares in the fund are acquired. This part is classed as a return of capital on the initial investment. This therefore means the cost basis of the acquisition needs to be lowered. The remainder of that first dividend (and all of subsequent dividends) are treated as normal income. That normal income doesn't need to be accounted for in income fund classes, but does in accumulation funds because that income is re-invested and so does not need to attract CGT as it will have attracted income tax already.
+
+`cgtcalc` can handle both the equalisation portion of dividends (for income and accumulation fund share classes) and the income portion of dividends (for accumulation fund share classes).
+
+The equalisation portion is a `CAPRETURN` asset event. The income portion is a `DIVIDEND` asset event.
+
+One complication with handling these is what to do when there are semi-disposals (i.e. not the full amount held at time of sale). It's unclear from documentation how that is handled. For example, consider the following set of transactions:
+
+```
+01/08/2019: BUY 10 at £100
+01/09/2019: SELL 5 at £105
+01/01/2020: BUY 10 at £90
+01/04/2020: Dividend equalisation of £50 on 15 shares
+01/04/2020: Dividend income of £30 on 15 shares
+
+01/06/2020: BUY 10 at £80
+01/07/2020: SELL 5 at £100
+01/04/2021: Dividend equalisation of £10 on 10 shares
+01/04/2021: Dividend income of £40 on 20 shares
+```
+
+It's unclear precisely which shares attract equalisation. In the case of the second dividend, depending on how things are calculated, there might be an equalisation payment or there might not be.
+
+`cgtcalc` handles these cases by assuming FIFO for these purposes. So in the example above, the first dividend (both the equalisation and income) would be split `5/15` on the first buy, and `10/15` on the second buy. The second dividend's equalisation portion would be applied to the third buy alone. The second dividend's income portion would be split across the second and third buys at `10/20` each. The first buy doesn't attract the second dividend's income portion because that lot is fully sold by the FIFO ordering scheme.
+
 ## Extending
 
 `cgtcalc` is broken into two parts:
