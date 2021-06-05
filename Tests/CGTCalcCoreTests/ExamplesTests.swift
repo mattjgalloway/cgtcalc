@@ -10,14 +10,11 @@ import Foundation
 import XCTest
 
 class ExamplesTests: XCTestCase {
-  let record = false
   let logger = StubLogger()
 
-  func testExamples() throws {
-    let thisFile = URL(fileURLWithPath: #file)
-    let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("Examples")
-    let inputsDirectory = examplesDirectory.appendingPathComponent("Inputs")
-    let outputsDirectory = examplesDirectory.appendingPathComponent("Outputs")
+  private func runTests(inDirectory directory: URL, record: Bool) throws {
+    let inputsDirectory = directory.appendingPathComponent("Inputs")
+    let outputsDirectory = directory.appendingPathComponent("Outputs")
 
     let fileManager = FileManager()
     let inputs = try fileManager.contentsOfDirectory(at: inputsDirectory, includingPropertiesForKeys: nil, options: [])
@@ -28,7 +25,7 @@ class ExamplesTests: XCTestCase {
       let testName = inputFile.deletingPathExtension().lastPathComponent
       let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
 
-      guard self.record || fileManager.fileExists(atPath: outputFile.path) else {
+      guard record || fileManager.fileExists(atPath: outputFile.path) else {
         XCTFail("Failed to find output for test: \(testName)")
         return
       }
@@ -46,7 +43,7 @@ class ExamplesTests: XCTestCase {
         let presenter = TextPresenter(result: result)
         let outputData = try presenter.process()
 
-        if self.record {
+        if record {
           do {
             try outputData.write(to: outputFile, atomically: true, encoding: .utf8)
           } catch {
@@ -55,6 +52,31 @@ class ExamplesTests: XCTestCase {
         } else {
           let compareOutputData = try String(contentsOf: outputFile)
           if outputData != compareOutputData {
+            let diffPath = "/usr/bin/diff"
+            if fileManager.fileExists(atPath: diffPath) {
+              let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
+              let fileA = tempDirectory.appendingPathComponent(UUID().uuidString)
+              let fileB = tempDirectory.appendingPathComponent(UUID().uuidString)
+
+              try compareOutputData.write(to: fileA, atomically: true, encoding: .utf8)
+              try outputData.write(to: fileB, atomically: true, encoding: .utf8)
+
+              let stdout = Pipe()
+              let diffProcess = Process()
+              diffProcess.launchPath = diffPath
+              diffProcess.standardOutput = stdout
+              diffProcess.arguments = ["-u", fileA.path, fileB.path]
+              diffProcess.launch()
+              diffProcess.waitUntilExit()
+
+              let output = stdout.fileHandleForReading.readDataToEndOfFile()
+              if let string = String(data: output, encoding: .utf8) {
+                print(string)
+              }
+
+              try fileManager.removeItem(at: fileA)
+              try fileManager.removeItem(at: fileB)
+            }
             XCTFail("\(testName) failed")
           }
         }
@@ -63,9 +85,21 @@ class ExamplesTests: XCTestCase {
       }
     }
 
-    if self.record {
+    if record {
       XCTFail("Record mode")
     }
+  }
+
+  func testExamples() throws {
+    let thisFile = URL(fileURLWithPath: #file)
+    let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("Examples")
+    try runTests(inDirectory: examplesDirectory, record: false)
+  }
+
+  func testPrivateExamples() throws {
+    let thisFile = URL(fileURLWithPath: #file)
+    let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("PrivateExamples")
+    try runTests(inDirectory: examplesDirectory, record: false)
   }
 
   static let allTests = [
