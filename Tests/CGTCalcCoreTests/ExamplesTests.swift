@@ -99,7 +99,9 @@ class ExamplesTests: XCTestCase {
   func testPrivateExamples() throws {
     let thisFile = URL(fileURLWithPath: #file)
     let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("PrivateExamples")
-    try runTests(inDirectory: examplesDirectory, record: false)
+    if FileManager.default.fileExists(atPath: examplesDirectory.path) {
+      try runTests(inDirectory: examplesDirectory, record: false)
+    }
   }
 
   static let allTests = [
