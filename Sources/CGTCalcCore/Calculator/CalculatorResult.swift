@@ -61,7 +61,12 @@ public struct CalculatorResult {
             totalGain += roundedGain
             return DisposalResult(disposal: disposal, gain: roundedGain, disposalMatches: disposalMatches)
           }
-          .sorted { $0.disposal.date < $1.disposal.date }
+          .sorted {
+            if $0.disposal.date == $1.disposal.date {
+              return $0.disposal.asset < $1.disposal.asset
+            }
+            return $0.disposal.date < $1.disposal.date
+          }
 
         guard let taxYearRates = taxYear.rates else {
           throw CalculatorError.InternalError("Missing tax year rates for \(taxYear)")
