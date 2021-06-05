@@ -103,6 +103,7 @@ class ExamplesTests: XCTestCase {
   }
 
   static let allTests = [
-    ("testExamples", testExamples)
+    ("testExamples", testExamples),
+    ("testPrivateExamples", testPrivateExamples),
   ]
 }
