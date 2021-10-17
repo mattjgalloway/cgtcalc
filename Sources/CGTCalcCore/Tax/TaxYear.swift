@@ -62,6 +62,7 @@ extension TaxYear {
   }
 
   static let rates: [TaxYear: Rates] = [
+    TaxYear(year: 2014): Rates(exemption: 10900, basicRate: 18, higherRate: 28),
     TaxYear(year: 2015): Rates(exemption: 11000, basicRate: 18, higherRate: 28),
     TaxYear(year: 2016): Rates(exemption: 11100, basicRate: 18, higherRate: 28),
     TaxYear(year: 2017): Rates(exemption: 11100, basicRate: 10, higherRate: 20),
