@@ -31,6 +31,9 @@ public class Transaction {
   }
 
   static func grouped(_ transactions: [Transaction]) throws -> Transaction {
+    guard let firstTransaction = transactions.first else {
+      throw CalculatorError.InternalError("Cannot group 0 transactions")
+    }
     guard Set(transactions.map(\.kind)).count == 1 else {
       throw CalculatorError.InternalError("Cannot group transactions that don't have the same kind")
     }
@@ -39,9 +42,6 @@ public class Transaction {
     }
     guard Set(transactions.map(\.asset)).count == 1 else {
       throw CalculatorError.InternalError("Cannot group transactions that don't have the same asset")
-    }
-    guard let firstTransaction = transactions.first else {
-      throw CalculatorError.InternalError("Cannot group 0 transactions")
     }
 
     let totalAmount = transactions.reduce(Decimal.zero) { $0 + $1.amount }
