@@ -117,7 +117,7 @@ public class Calculator {
     class TransactionTuple {
       let transaction: TransactionToMatch
       var amountLeft: Decimal
-      init (transaction: TransactionToMatch) {
+      init(transaction: TransactionToMatch) {
         self.transaction = transaction
         self.amountLeft = transaction.amount
       }
@@ -202,7 +202,9 @@ public class Calculator {
           }
 
           guard amountLeft == Decimal.zero else {
-            throw CalculatorError.InvalidData("Error pre-processing \(state.asset). When processing capital returns, sold more than currently hold.")
+            throw CalculatorError
+              .InvalidData(
+                "Error pre-processing \(state.asset). When processing capital returns, sold more than currently hold.")
           }
 
           let netTransactionAmount = transaction.amount - amountToRemoveFromRunningTotal
@@ -273,7 +275,7 @@ public class Calculator {
       class TransactionTuple {
         let transaction: TransactionToMatch
         var amountLeft: Decimal
-        init (transaction: TransactionToMatch) {
+        init(transaction: TransactionToMatch) {
           self.transaction = transaction
           self.amountLeft = transaction.amount
         }
@@ -297,7 +299,9 @@ public class Calculator {
             amountLeft -= amountToRemove
           }
           guard amountLeft == Decimal.zero else {
-            throw CalculatorError.InvalidData("Error pre-processing \(state.asset). When processing dividends, sold more than currently hold.")
+            throw CalculatorError
+              .InvalidData(
+                "Error pre-processing \(state.asset). When processing dividends, sold more than currently hold.")
           }
           netAcquisitionsAmount -= transaction.amount
         }

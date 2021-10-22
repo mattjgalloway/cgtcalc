@@ -97,19 +97,19 @@ class ExamplesTests: XCTestCase {
   func testExamples() throws {
     let thisFile = URL(fileURLWithPath: #file)
     let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("Examples")
-    try runTests(inDirectory: examplesDirectory, record: false)
+    try self.runTests(inDirectory: examplesDirectory, record: false)
   }
 
   func testPrivateExamples() throws {
     let thisFile = URL(fileURLWithPath: #file)
     let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("PrivateExamples")
     if FileManager.default.fileExists(atPath: examplesDirectory.path) {
-      try runTests(inDirectory: examplesDirectory, record: false)
+      try self.runTests(inDirectory: examplesDirectory, record: false)
     }
   }
 
   static let allTests = [
     ("testExamples", testExamples),
-    ("testPrivateExamples", testPrivateExamples),
+    ("testPrivateExamples", testPrivateExamples)
   ]
 }

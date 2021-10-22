@@ -56,7 +56,7 @@ public struct CalculatorResult {
 
         var totalGain = Decimal.zero
         let disposalResults =
-          disposalMatchesByDisposal.map { (disposal, disposalMatches) -> DisposalResult in
+          disposalMatchesByDisposal.map { disposal, disposalMatches -> DisposalResult in
             let roundedGain = TaxMethods.roundedGain(gainByDisposal[disposal]!)
             totalGain += roundedGain
             return DisposalResult(disposal: disposal, gain: roundedGain, disposalMatches: disposalMatches)
