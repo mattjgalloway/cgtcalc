@@ -1,6 +1,6 @@
 # cgtcalc: UK capital gains tax calculator
 
-[![Build Status](https://travis-ci.org/mattjgalloway/cgtcalc.svg?branch=master)](https://travis-ci.org/mattjgalloway/cgtcalc)
+![Build status](https://github.com/mattjgalloway/cgtcalc/actions/workflows/swift.yml/badge.svg)
 [![codecov](https://codecov.io/gh/mattjgalloway/cgtcalc/branch/master/graph/badge.svg)](https://codecov.io/gh/mattjgalloway/cgtcalc)
 
 **DISCLAIMER: I am not a financial professional and cannot give tax advice. This calculator is intended for sample purposes only. Always do your own calculations for your self assessment. I accept no responsibility for any errors this calculator produces.**
