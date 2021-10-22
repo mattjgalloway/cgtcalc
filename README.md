@@ -207,6 +207,8 @@ First the test looks for all the [input data files](Tests/CGTCalcCoreTests/Examp
 
 It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in [Tests/CGTCalcCoreTests/PrivateExamples/](Tests/CGTCalcCoreTests/PrivateExamples/). They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
 
+Finally, if you want to re-record the tests, then you can set `record` to `true` when calling `runTests` in `testExamples` and `testPrivateExamples`. Note that if the output file doesn't exist then the output is recorded even if record mode is off.
+
 ## Donate
 
 If you like this and you'd like to buy me a coffee or a beer then I would say thank you and ask you to [send to my PayPal](https://paypal.me/mattjgalloway?locale.x=en_GB).
