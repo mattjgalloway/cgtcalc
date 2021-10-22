@@ -73,8 +73,8 @@ class TaxYearTests: XCTestCase {
   }
 
   func testTaxYearRatesAvailable() throws {
-    for year in 2015 ... 2020 {
-      XCTAssertNotNil(TaxYear(year: year).rates)
+    for year in 2014 ... 2020 {
+      XCTAssertNotNil(TaxYear.rates[TaxYear(year: year)])
     }
   }
 }

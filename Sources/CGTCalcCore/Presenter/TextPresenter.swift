@@ -23,7 +23,7 @@ public class TextPresenter {
   public func process() throws -> String {
     var output = ""
     output += "# SUMMARY\n\n"
-    output += try self.summaryTable()
+    output += self.summaryTable()
 
     output += "\n\n"
 
@@ -47,17 +47,14 @@ public class TextPresenter {
     return "£\(amount.rounded(to: 2).string)"
   }
 
-  private func summaryTable() throws -> String {
-    let rows = try self.result.taxYearSummaries
+  private func summaryTable() -> String {
+    let rows = self.result.taxYearSummaries
       .reduce(into: [[String]]()) { output, summary in
-        guard let taxYearRates = summary.taxYear.rates else {
-          throw CalculatorError.InternalError("Missing tax year rates for \(summary.taxYear)")
-        }
         let row = [
           summary.taxYear.string,
           self.formattedCurrency(summary.gain),
           self.formattedCurrency(summary.proceeds),
-          self.formattedCurrency(taxYearRates.exemption),
+          self.formattedCurrency(summary.exemption),
           self.formattedCurrency(summary.carryForwardLoss),
           self.formattedCurrency(summary.taxableGain),
           self.formattedCurrency(summary.basicRateTax),

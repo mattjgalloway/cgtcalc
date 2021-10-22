@@ -21,6 +21,7 @@ public struct CalculatorResult {
     let taxYear: TaxYear
     let gain: Decimal
     let proceeds: Decimal
+    let exemption: Decimal
     let carryForwardLoss: Decimal
     let taxableGain: Decimal
     let basicRateTax: Decimal
@@ -68,7 +69,7 @@ public struct CalculatorResult {
             return $0.disposal.date < $1.disposal.date
           }
 
-        guard let taxYearRates = taxYear.rates else {
+        guard let taxYearRates = TaxYear.rates[taxYear] else {
           throw CalculatorError.InternalError("Missing tax year rates for \(taxYear)")
         }
 
@@ -91,6 +92,7 @@ public struct CalculatorResult {
           taxYear: taxYear,
           gain: totalGain,
           proceeds: TaxMethods.roundedGain(totalProceeds),
+          exemption: taxYearRates.exemption,
           carryForwardLoss: carryForwardLoss,
           taxableGain: taxableGain,
           basicRateTax: basicRateTax,
