@@ -140,6 +140,8 @@ Dividends in funds need special care when accounting for CGT. In both income and
 
 The equalisation portion is a `CAPRETURN` asset event. The income portion is a `DIVIDEND` asset event.
 
+### Unclear rules of semi-disposals
+
 One complication with handling these is what to do when there are semi-disposals (i.e. not the full amount held at time of sale). It's unclear from documentation how that is handled. For example, consider the following set of transactions:
 
 ```
