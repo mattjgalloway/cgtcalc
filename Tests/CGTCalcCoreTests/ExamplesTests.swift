@@ -23,15 +23,19 @@ class ExamplesTests: XCTestCase {
       guard inputFile.pathExtension == "txt" else { continue }
 
       let testName = inputFile.deletingPathExtension().lastPathComponent
-      let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
-
-      guard record || fileManager.fileExists(atPath: outputFile.path) else {
-        XCTFail("Failed to find output for test: \(testName)")
-        return
-      }
 
       guard let inputData = try? String(contentsOf: inputFile) else {
         XCTFail("Failed to read input for test: \(testName)")
+        return
+      }
+
+      let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
+      let outputFileExists = fileManager.fileExists(atPath: outputFile.path)
+
+      let allowRecord = record || !outputFileExists
+
+      guard allowRecord || outputFileExists else {
+        XCTFail("Failed to find output for test: \(testName)")
         return
       }
 
@@ -43,7 +47,7 @@ class ExamplesTests: XCTestCase {
         let presenter = TextPresenter(result: result)
         let outputData = try presenter.process()
 
-        if record {
+        if allowRecord {
           do {
             try outputData.write(to: outputFile, atomically: true, encoding: .utf8)
           } catch {
