@@ -195,7 +195,17 @@ let output = try presenter.process()
 
 ## Tests
 
-`cgtcalc` includes a comprehensive test suite. The most interesting ones are in [Tests/CGTCalcCoreTests/Examples](Tests/CGTCalcCoreTests/Examples). These are full end-to-end tests which have [input data files](Tests/CGTCalcCoreTests/Examples/Inputs) and check against equivalent [output files](Tests/CGTCalcCoreTests/Examples/Outputs). Those are worth looking at to see how the calculator responds to given inputs.
+`cgtcalc` includes a comprehensive test suite. There are tests that cover the basic functionality through unit tests. There are also tests that take sample input and assert that the output matches that which is expected.
+
+### Input/output tests
+
+The tests that take sample input and assert on the required output are the most interesting ones because you can see what the output of the tool is for a given input. These are full end-to-end tests.
+
+The test that controls these tests can be found here: [Tests/CGTCalcCoreTests/ExamplesTests.swift](Tests/CGTCalcCoreTests/ExamplesTests.swift)
+
+First the test looks for all the [input data files](Tests/CGTCalcCoreTests/Examples/Inputs). Then it iterates over each of them and runs `cgtcalc` on the file. It finds the corresponding file in the [output files](Tests/CGTCalcCoreTests/Examples/Outputs) and checks that the output is identical. Any difference is reported and the test failed.
+
+It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in [Tests/CGTCalcCoreTests/PrivateExamples/](Tests/CGTCalcCoreTests/PrivateExamples/). They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
 
 ## Donate
 
