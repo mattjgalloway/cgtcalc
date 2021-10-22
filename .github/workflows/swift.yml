@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  test-macos:
     runs-on: macos-latest
 
     steps:
@@ -21,3 +21,16 @@ jobs:
       run: xcrun llvm-cov export -format="lcov" .build/debug/cgtcalcPackageTests.xctest/Contents/MacOS/cgtcalcPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
     - name: Upload code coverage
       uses: codecov/codecov-action@v2.1.0
+  
+  test-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Swift
+      uses: fwal/setup-swift@v1
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
