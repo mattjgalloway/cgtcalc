@@ -45,17 +45,26 @@ class ExamplesTests: XCTestCase {
         let calculator = try Calculator(input: input, logger: self.logger)
         let result = try calculator.process()
         let presenter = TextPresenter(result: result)
-        let outputData = try presenter.process()
+        let output = try presenter.process()
+
+        let outputString: String
+        switch output {
+        case .data:
+          XCTFail("Shouldn't return data")
+          return
+        case .string(let string):
+          outputString = string
+        }
 
         if allowRecord {
           do {
-            try outputData.write(to: outputFile, atomically: true, encoding: .utf8)
+            try outputString.write(to: outputFile, atomically: true, encoding: .utf8)
           } catch {
             XCTFail("Failed to write output data: \(error)")
           }
         } else {
           let compareOutputData = try String(contentsOf: outputFile)
-          if outputData != compareOutputData {
+          if outputString != compareOutputData {
             let diffPath = "/usr/bin/diff"
             if fileManager.fileExists(atPath: diffPath) {
               let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
@@ -63,7 +72,7 @@ class ExamplesTests: XCTestCase {
               let fileB = tempDirectory.appendingPathComponent(UUID().uuidString)
 
               try compareOutputData.write(to: fileA, atomically: true, encoding: .utf8)
-              try outputData.write(to: fileB, atomically: true, encoding: .utf8)
+              try outputString.write(to: fileB, atomically: true, encoding: .utf8)
 
               let stdout = Pipe()
               let diffProcess = Process()

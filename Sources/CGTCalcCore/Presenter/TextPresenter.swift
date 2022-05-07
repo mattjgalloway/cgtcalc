@@ -7,11 +7,11 @@
 
 import Foundation
 
-public class TextPresenter {
+public class TextPresenter: Presenter {
   private let result: CalculatorResult
   private let dateFormatter: DateFormatter
 
-  public init(result: CalculatorResult) {
+  public required init(result: CalculatorResult) {
     self.result = result
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -20,7 +20,7 @@ public class TextPresenter {
     self.dateFormatter = dateFormatter
   }
 
-  public func process() throws -> String {
+  public func process() throws -> PresenterResult {
     var output = ""
     output += "# SUMMARY\n\n"
     output += self.summaryTable()
@@ -40,7 +40,7 @@ public class TextPresenter {
     output += "# ASSET EVENTS\n\n"
     output += self.assetEventsTable()
 
-    return output
+    return .string(output)
   }
 
   private func formattedCurrency(_ amount: Decimal) -> String {

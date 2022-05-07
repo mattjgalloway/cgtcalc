@@ -42,9 +42,19 @@ struct CGTCalc: ParsableCommand {
 
       if let outputFile = self.outputFile, outputFile != "-" {
         let outputFileUrl = URL(fileURLWithPath: outputFile)
-        try output.write(to: outputFileUrl, atomically: true, encoding: .utf8)
+        switch output {
+        case .data(let data):
+          try data.write(to: outputFileUrl)
+        case .string(let string):
+          try string.write(to: outputFileUrl, atomically: true, encoding: .utf8)
+        }
       } else {
-        print(output)
+        switch output {
+        case .data:
+          print("Cannot output to console for this presenter. Choose a file to write to instead.")
+        case .string(let string):
+          print(string)
+        }
       }
     } catch {
       logger.error("Failed: \(error)")
