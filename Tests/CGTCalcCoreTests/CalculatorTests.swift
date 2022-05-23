@@ -53,7 +53,7 @@ class CalculatorTests: XCTestCase {
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2020): Decimal(string: "1898")!
+        TaxYear(yearEnding: 2020): Decimal(string: "1898")!
       ],
       shouldThrow: false)
     self.runTest(withData: testData)
@@ -146,7 +146,7 @@ class CalculatorTests: XCTestCase {
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2018): Decimal(string: "9")!
+        TaxYear(yearEnding: 2018): Decimal(string: "9")!
       ],
       shouldThrow: false)
     self.runTest(withData: testData1)
@@ -160,7 +160,7 @@ class CalculatorTests: XCTestCase {
       ],
       assetEvents: [],
       gains: [
-        TaxYear(year: 2018): Decimal(string: "0")!
+        TaxYear(yearEnding: 2018): Decimal(string: "0")!
       ],
       shouldThrow: false)
     self.runTest(withData: testData2)

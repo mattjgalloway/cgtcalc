@@ -17,7 +17,7 @@ class DescriptionTests: XCTestCase {
   }
 
   func testTaxYear() throws {
-    let sut = TaxYear(year: 2020)
+    let sut = TaxYear(yearEnding: 2020)
     let description = sut.description
     let expected = "2019/2020"
     XCTAssertEqual(description, expected)

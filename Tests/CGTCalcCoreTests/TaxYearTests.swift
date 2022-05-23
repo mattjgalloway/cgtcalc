@@ -52,20 +52,20 @@ class TaxYearTests: XCTestCase {
 
   func testTaxYearStringCorrect() throws {
     do {
-      let taxYear = TaxYear(year: 2019)
+      let taxYear = TaxYear(yearEnding: 2019)
       XCTAssertEqual(taxYear.string, "2018/2019")
     }
 
     do {
-      let taxYear = TaxYear(year: 2020)
+      let taxYear = TaxYear(yearEnding: 2020)
       XCTAssertEqual(taxYear.string, "2019/2020")
     }
   }
 
   func testTaxYearCompare() throws {
-    let taxYear1 = TaxYear(year: 2019)
-    let taxYear2 = TaxYear(year: 2020)
-    let taxYear3 = TaxYear(year: 2020)
+    let taxYear1 = TaxYear(yearEnding: 2019)
+    let taxYear2 = TaxYear(yearEnding: 2020)
+    let taxYear3 = TaxYear(yearEnding: 2020)
     XCTAssertLessThan(taxYear1, taxYear2)
     XCTAssertGreaterThan(taxYear2, taxYear1)
     XCTAssertNotEqual(taxYear1, taxYear2)

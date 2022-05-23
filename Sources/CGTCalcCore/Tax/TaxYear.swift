@@ -12,7 +12,7 @@ struct TaxYear {
 
   var string: String { "\(self.year - 1)/\(self.year)" }
 
-  init(year: Int) {
+  init(yearEnding year: Int) {
     self.year = year
   }
 
@@ -26,7 +26,7 @@ struct TaxYear {
     if components.month! == 4, components.day! > 5 {
       year += 1
     }
-    self.init(year: year)
+    self.init(yearEnding: year)
   }
 }
 
@@ -62,14 +62,14 @@ extension TaxYear {
   }
 
   static let rates: [TaxYear: Rates] = [
-    TaxYear(year: 2014): Rates(exemption: 10900, basicRate: 18, higherRate: 28),
-    TaxYear(year: 2015): Rates(exemption: 11000, basicRate: 18, higherRate: 28),
-    TaxYear(year: 2016): Rates(exemption: 11100, basicRate: 18, higherRate: 28),
-    TaxYear(year: 2017): Rates(exemption: 11100, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2018): Rates(exemption: 11300, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2019): Rates(exemption: 11700, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2020): Rates(exemption: 12000, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
-    TaxYear(year: 2022): Rates(exemption: 12300, basicRate: 10, higherRate: 20)
+    TaxYear(yearEnding: 2014): Rates(exemption: 10900, basicRate: 18, higherRate: 28),
+    TaxYear(yearEnding: 2015): Rates(exemption: 11000, basicRate: 18, higherRate: 28),
+    TaxYear(yearEnding: 2016): Rates(exemption: 11100, basicRate: 18, higherRate: 28),
+    TaxYear(yearEnding: 2017): Rates(exemption: 11100, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2018): Rates(exemption: 11300, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2019): Rates(exemption: 11700, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2020): Rates(exemption: 12000, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2022): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
   ]
 }
