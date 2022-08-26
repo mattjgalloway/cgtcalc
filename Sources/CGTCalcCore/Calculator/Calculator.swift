@@ -310,7 +310,8 @@ public class Calculator {
 
       guard amount == netAcquisitionsAmount else {
         throw CalculatorError
-          .InvalidData("Error pre-processing \(state.asset). Dividend amount doesn't match acquisitions.")
+          .InvalidData(
+            "Error pre-processing \(state.asset). Dividend amount \(amount) doesn't match acquisitions \(netAcquisitionsAmount).")
       }
 
       acquisitionsMatched.forEach { acquisition in
