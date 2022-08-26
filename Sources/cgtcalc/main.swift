@@ -9,7 +9,7 @@ import ArgumentParser
 import CGTCalcCore
 import Foundation
 
-let VERSION = "0.1.0"
+let VERSION = "0.2.0"
 
 struct CGTCalc: ParsableCommand {
   @Argument(help: "The input data filename")
@@ -20,6 +20,14 @@ struct CGTCalc: ParsableCommand {
 
   @Option(name: .shortAndLong, help: "Output file")
   var outputFile: String?
+
+  enum PresenterType: String, ExpressibleByArgument {
+    case text
+    case pdf
+  }
+
+  @Option(name: .shortAndLong, help: "Presenter type (`text`, `pdf`)")
+  var presenter: PresenterType = .text
 
   static var configuration = CommandConfiguration(commandName: "cgtcalc", version: VERSION)
 
@@ -37,7 +45,13 @@ struct CGTCalc: ParsableCommand {
       let calculator = try Calculator(input: input, logger: logger)
       let result = try calculator.process()
 
-      let presenter = TextPresenter(result: result)
+      let presenter: Presenter
+      switch self.presenter {
+      case .text:
+        presenter = TextPresenter(result: result)
+      case .pdf:
+        presenter = PDFPresenter(result: result)
+      }
       let output = try presenter.process()
 
       if let outputFile = self.outputFile, outputFile != "-" {
