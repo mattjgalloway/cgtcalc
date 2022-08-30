@@ -43,7 +43,8 @@ public class Calculator {
       .map { asset -> AssetResult in
         let (acquisitions, disposals) = try self
           .splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
-        let assetEvents = assetEventsByAsset[asset, default: []].sorted { $0.date < $1.date }
+        let assetEvents = try self
+          .sortAndGroupSameDayAssetEvents(assetEventsByAsset[asset, default: []])
         let state = AssetProcessorState(
           asset: asset,
           acquisitions: acquisitions,
@@ -57,6 +58,19 @@ public class Calculator {
       }
 
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
+  }
+
+  private func sortAndGroupSameDayAssetEvents(_ assetEvents: [AssetEvent]) throws -> [AssetEvent] {
+    var groupedAssetEvents: [AssetEvent] = []
+
+    for (_, byDateAssetEvents) in Dictionary(grouping: assetEvents, by: { $0.date }) {
+      for (_, byKindAssetEvents) in Dictionary(grouping: byDateAssetEvents, by: { $0.kind.case }) {
+        let groupedAssetEvent = try AssetEvent.grouped(byKindAssetEvents)
+        groupedAssetEvents.append(groupedAssetEvent)
+      }
+    }
+
+    return groupedAssetEvents.sorted { $0.date < $1.date }
   }
 
   private func splitAndGroupSameDayTransactions(_ transactions: [Transaction]) throws

@@ -36,6 +36,27 @@ public class AssetEvent {
      * Parameter is the ratio of the unsplit. e.g. 4 in the example above.
      */
     case Unsplit(Decimal)
+
+    // Allowing for stripped enum (without the associated values)
+    var `case`: Case {
+      switch self {
+      case .CapitalReturn:
+        return .CapitalReturn
+      case .Dividend:
+        return .Dividend
+      case .Split:
+        return .Split
+      case .Unsplit:
+        return .Unsplit
+      }
+    }
+
+    enum Case {
+      case CapitalReturn
+      case Dividend
+      case Split
+      case Unsplit
+    }
   }
 
   let kind: Kind
@@ -46,6 +67,69 @@ public class AssetEvent {
     self.kind = kind
     self.date = date
     self.asset = asset
+  }
+
+  public static func grouped(_ events: [AssetEvent]) throws -> AssetEvent {
+    guard let firstEvent = events.first else {
+      throw CalculatorError.InternalError("Cannot group 0 asset events")
+    }
+    guard events.count > 1 else {
+      return events[0]
+    }
+    guard Set(events.map(\.kind.case)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group asset events that don't have the same kind")
+    }
+    guard Set(events.map(\.date)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group asset events that don't have the same date")
+    }
+    guard Set(events.map(\.asset)).count == 1 else {
+      throw CalculatorError.InternalError("Cannot group asset events that don't have the same asset")
+    }
+
+    switch firstEvent.kind.case {
+    case .CapitalReturn:
+      var runningAmount = Decimal.zero
+      var runningValue = Decimal.zero
+      for event in events {
+        if case .CapitalReturn(let amount, let value) = event.kind {
+          runningAmount += amount
+          runningValue += value
+        }
+      }
+      return AssetEvent(
+        kind: .CapitalReturn(runningAmount, runningValue),
+        date: firstEvent.date,
+        asset: firstEvent.asset)
+
+    case .Dividend:
+      var runningAmount = Decimal.zero
+      var runningValue = Decimal.zero
+      for event in events {
+        if case .Dividend(let amount, let value) = event.kind {
+          runningAmount += amount
+          runningValue += value
+        }
+      }
+      return AssetEvent(kind: .Dividend(runningAmount, runningValue), date: firstEvent.date, asset: firstEvent.asset)
+
+    case .Split:
+      var runningAmount = Decimal(1)
+      for event in events {
+        if case .Split(let amount) = event.kind {
+          runningAmount *= amount
+        }
+      }
+      return AssetEvent(kind: .Split(runningAmount), date: firstEvent.date, asset: firstEvent.asset)
+
+    case .Unsplit:
+      var runningAmount = Decimal(1)
+      for event in events {
+        if case .Unsplit(let amount) = event.kind {
+          runningAmount *= amount
+        }
+      }
+      return AssetEvent(kind: .Unsplit(runningAmount), date: firstEvent.date, asset: firstEvent.asset)
+    }
   }
 }
 
