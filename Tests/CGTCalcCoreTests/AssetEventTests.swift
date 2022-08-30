@@ -83,7 +83,7 @@ class AssetEventTests: XCTestCase {
 
   func testGroupedDifferentAsset() throws {
     let a = ModelCreation.assetEvent(.Dividend(10, 1), "01/01/2020", "Foo")
-    let b = ModelCreation.assetEvent(.Dividend(20, 2), "02/01/2020", "Bar")
+    let b = ModelCreation.assetEvent(.Dividend(20, 2), "01/01/2020", "Bar")
     XCTAssertThrowsError(try AssetEvent.grouped([a, b]))
   }
 
