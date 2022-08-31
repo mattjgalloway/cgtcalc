@@ -65,8 +65,8 @@ class ExamplesTests: XCTestCase {
         } else {
           let compareOutputData = try String(contentsOf: outputFile)
           if outputString != compareOutputData {
-            let diffPath = "/usr/bin/diff"
-            if fileManager.fileExists(atPath: diffPath) {
+            let diffURL = URL(fileURLWithPath: "/usr/bin/diff")
+            if fileManager.fileExists(atPath: diffURL.path) {
               let tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
               let fileA = tempDirectory.appendingPathComponent(UUID().uuidString)
               let fileB = tempDirectory.appendingPathComponent(UUID().uuidString)
@@ -76,10 +76,10 @@ class ExamplesTests: XCTestCase {
 
               let stdout = Pipe()
               let diffProcess = Process()
-              diffProcess.launchPath = diffPath
+              diffProcess.executableURL = diffURL
               diffProcess.standardOutput = stdout
               diffProcess.arguments = ["-u", fileA.path, fileB.path]
-              diffProcess.launch()
+              try diffProcess.run()
               diffProcess.waitUntilExit()
 
               let output = stdout.fileHandleForReading.readDataToEndOfFile()
