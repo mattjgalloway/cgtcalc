@@ -40,7 +40,7 @@ class CalculatorTests: XCTestCase {
         XCTAssertEqual(gain, taxYearSummary.gain)
       }
     } catch {
-      XCTFail("Failed to calculate")
+      XCTFail("Failed to calculate: \(error)")
     }
   }
 
