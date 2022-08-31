@@ -1,8 +1,1 @@
-import XCTest
-
-import CGTCalcCoreTests
-
-var tests = [XCTestCaseEntry]()
-tests += CGTCalcCoreTests.__allTests()
-
-XCTMain(tests)
+fatalError("Run the tests with `swift test`.")
