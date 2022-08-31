@@ -260,4 +260,37 @@ class CalculatorTests: XCTestCase {
       shouldThrow: false)
     self.runTest(withData: testData)
   }
+
+  func testDividendEvent() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "2.0", "100.0", "0.0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.Dividend(2, 10), "01/02/2018", "Foo")
+      ],
+      gains: [
+        TaxYear(yearEnding: 2018): Decimal(string: "-10")!
+      ],
+      shouldThrow: false)
+    self.runTest(withData: testData)
+  }
+
+  func testCapitalReturnAndDividendEvents() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "2.0", "100.0", "0.0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.CapitalReturn(2, 5), "01/02/2018", "Foo"),
+        ModelCreation.assetEvent(.Dividend(2, 10), "01/02/2018", "Foo")
+      ],
+      gains: [
+        TaxYear(yearEnding: 2018): Decimal(string: "-5")!
+      ],
+      shouldThrow: false)
+    self.runTest(withData: testData)
+  }
 }
