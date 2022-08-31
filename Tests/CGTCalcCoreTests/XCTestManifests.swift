@@ -7,6 +7,15 @@
     // to regenerate.
     static let __allTests__AssetEventTests = [
       ("testEquality", testEquality),
+      ("testGroupedCapitalReturn", testGroupedCapitalReturn),
+      ("testGroupedDifferentAsset", testGroupedDifferentAsset),
+      ("testGroupedDifferentDate", testGroupedDifferentDate),
+      ("testGroupedDifferentKind", testGroupedDifferentKind),
+      ("testGroupedDividend", testGroupedDividend),
+      ("testGroupedEmptyArray", testGroupedEmptyArray),
+      ("testGroupedMultiple", testGroupedMultiple),
+      ("testGroupedSplit", testGroupedSplit),
+      ("testGroupedUnsplit", testGroupedUnsplit),
       ("testHashable", testHashable)
     ]
   }
@@ -33,11 +42,17 @@
       ("testAssetEventWithNoAcquisition", testAssetEventWithNoAcquisition),
       ("testBasicSingleAsset", testBasicSingleAsset),
       ("testBedAndBreakfastEdges", testBedAndBreakfastEdges),
+      ("testCapitalReturnAndDividendEvents", testCapitalReturnAndDividendEvents),
+      ("testCapitalReturnEvent", testCapitalReturnEvent),
+      ("testCapitalReturnEventSameDayCombine", testCapitalReturnEventSameDayCombine),
       ("testCapitalReturnNotEnoughAcquisitionsThrows", testCapitalReturnNotEnoughAcquisitionsThrows),
       ("testDateBefore20080406Throws", testDateBefore20080406Throws),
+      ("testDividendEvent", testDividendEvent),
       ("testSection104DisposeTooMuch", testSection104DisposeTooMuch),
-      ("testSoldNotAllBeforeCapitalReturnThrows", testSoldNotAllBeforeCapitalReturnThrows),
-      ("testSoldNotAllBeforeDividendThrows", testSoldNotAllBeforeDividendThrows)
+      ("testSoldMoreThanOwnWithCapitalReturnEventThrows", testSoldMoreThanOwnWithCapitalReturnEventThrows),
+      ("testSoldMoreThanOwnWithDividendEventThrows", testSoldMoreThanOwnWithDividendEventThrows),
+      ("testSoldNotAllBeforeCapitalReturn", testSoldNotAllBeforeCapitalReturn),
+      ("testSoldNotAllBeforeDividend", testSoldNotAllBeforeDividend)
     ]
   }
 
