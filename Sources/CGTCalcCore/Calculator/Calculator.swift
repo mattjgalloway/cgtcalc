@@ -287,14 +287,6 @@ public class Calculator {
 
       transactionsBeforeEvent.sort { $0.date < $1.date }
 
-      class TransactionTuple {
-        let transaction: TransactionToMatch
-        var amountLeft: Decimal
-        init(transaction: TransactionToMatch) {
-          self.transaction = transaction
-          self.amountLeft = transaction.amount
-        }
-      }
       var acquisitionsMatched: [TransactionTuple] = []
       var netAcquisitionsAmount = Decimal.zero
 
