@@ -200,6 +200,34 @@ class CalculatorTests: XCTestCase {
     self.runTest(withData: testData)
   }
 
+  func testSoldMoreThanOwnWithCapitalReturnEventThrows() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
+        ModelCreation.transaction(.Sell, "01/02/2018", "Foo", "15", "10", "0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.CapitalReturn(10, 1), "01/03/2018", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true)
+    self.runTest(withData: testData)
+  }
+
+  func testSoldMoreThanOwnWithDividendEventThrows() throws {
+    let testData = TestData(
+      transactions: [
+        ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
+        ModelCreation.transaction(.Sell, "01/02/2018", "Foo", "15", "10", "0")
+      ],
+      assetEvents: [
+        ModelCreation.assetEvent(.Dividend(10, 1), "01/03/2018", "Foo")
+      ],
+      gains: [:],
+      shouldThrow: true)
+    self.runTest(withData: testData)
+  }
+
   func testSoldNotAllBeforeCapitalReturn() throws {
     let testData = TestData(
       transactions: [
