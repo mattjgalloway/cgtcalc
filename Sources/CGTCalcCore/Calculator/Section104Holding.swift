@@ -7,6 +7,9 @@
 
 import Foundation
 
+// TODO: Change Section104Holding so that it takes list of acquisitions, disposals and split/unsplit asset events.
+// TODO: Then a Section 104 disposal match should be changed to have an amount and acquisitions list rather than the cost basis. Cost basis is then calculated from the acquisition events.
+
 class Section104Holding {
   private(set) var state = State(amount: Decimal.zero, cost: 0.0)
   private let logger: Logger
