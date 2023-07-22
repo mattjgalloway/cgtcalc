@@ -9,6 +9,9 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 ## TAX YEAR 2018/2019
 
+0 gains with total of 0.
+1 losses with total of 19.
+
 1) SOLD 20 of GB00B41YBW71 on 28/10/2018 for LOSS of £19
 Matches with:
   - SECTION 104: 30 at cost basis of £8.21667

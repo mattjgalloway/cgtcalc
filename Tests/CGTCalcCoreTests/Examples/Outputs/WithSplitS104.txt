@@ -9,6 +9,9 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 ## TAX YEAR 2018/2019
 
+1 gains with total of 40.
+0 losses with total of 0.
+
 1) SOLD 40 of FOO on 01/04/2019 for GAIN of £40
 Matches with:
   - SECTION 104: 40 at cost basis of £5

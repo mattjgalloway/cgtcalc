@@ -10,12 +10,18 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 ## TAX YEAR 2019/2020
 
+1 gains with total of 28.
+0 losses with total of 0.
+
 1) SOLD 5 of FOOBAR on 01/09/2019 for GAIN of £28
 Matches with:
   - SECTION 104: 10 at cost basis of £99.33333
 Calculation: (5 * 105 - 0) - ( (5 * 99.33333) ) = 28
 
 ## TAX YEAR 2020/2021
+
+1 gains with total of 253.
+0 losses with total of 0.
 
 1) SOLD 20 of FOOBAR on 01/07/2020 for GAIN of £253
 Matches with:

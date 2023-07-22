@@ -101,6 +101,15 @@ public class TextPresenter: Presenter {
     return self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
         output += "## TAX YEAR \(summary.taxYear)\n\n"
+
+        let gains = summary.disposalResults.filter({$0.gain >= 0})
+        output += "\(gains.count) gains with total of \(gains.reduce(Decimal.zero) {$0 + $1.gain}).\n"
+
+        let losses = summary.disposalResults.filter({$0.gain < 0})
+        output += "\(losses.count) losses with total of \(losses.reduce(Decimal.zero) {$0 - $1.gain}).\n"
+
+        output += "\n"
+
         var count = 1
         summary.disposalResults
           .forEach { disposalResult in

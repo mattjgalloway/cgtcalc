@@ -10,12 +10,18 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 ## TAX YEAR 2019/2020
 
+1 gains with total of 60.
+0 losses with total of 0.
+
 1) SOLD 40 of GB00B3TYHH97 on 01/12/2019 for GAIN of £60
 Matches with:
   - SECTION 104: 40 at cost basis of £10.5
 Calculation: (40 * 12 - 0) - ( (40 * 10.5) ) = 60
 
 ## TAX YEAR 2020/2021
+
+1 gains with total of 540.
+0 losses with total of 0.
 
 1) SOLD 100 of GB00B3TYHH97 on 01/06/2020 for GAIN of £540
 Matches with:

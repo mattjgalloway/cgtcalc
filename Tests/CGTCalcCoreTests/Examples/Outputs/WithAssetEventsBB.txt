@@ -9,6 +9,9 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 ## TAX YEAR 2019/2020
 
+1 gains with total of 265.
+0 losses with total of 0.
+
 1) SOLD 40 of GB00B3TYHH97 on 05/11/2019 for GAIN of £265
 Matches with:
   - BED & BREAKFAST: 20 bought on 10/11/2019 at £190.9805 with offset of £15.81
