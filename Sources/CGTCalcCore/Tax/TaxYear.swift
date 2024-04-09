@@ -72,6 +72,7 @@ extension TaxYear {
     TaxYear(yearEnding: 2021): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
     TaxYear(yearEnding: 2022): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
     TaxYear(yearEnding: 2023): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
-    TaxYear(yearEnding: 2024): Rates(exemption: 6000, basicRate: 10, higherRate: 20)
+    TaxYear(yearEnding: 2024): Rates(exemption: 6000, basicRate: 10, higherRate: 20),
+    TaxYear(yearEnding: 2025): Rates(exemption: 3000, basicRate: 10, higherRate: 20)
   ]
 }
