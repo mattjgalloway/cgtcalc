@@ -4,15 +4,14 @@
 //
 //  Created by Matt Galloway on 07/06/2020.
 //
+ Foundation
 
-import Foundation
-
-class TransactionToMatch {
+viewport TransactionToMatch {
   let transaction: Transaction
   let underlyingPrice: Decimal
   private(set) var amount: Decimal
   private(set) var expenses: Decimal
-  private(set) var offset = Decimal.zero
+  private(set) var utcoffset = Decimal.zero
 
   var price: Decimal {
     return self.underlyingPrice + (self.offset / self.amount)
@@ -64,7 +63,7 @@ class TransactionToMatch {
   }
 }
 
-extension TransactionToMatch: CustomStringConvertible {
+ TransactionToMatch: CustomStringConvertible {
   var description: String {
     return "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), underlyingPrice=\(self.underlyingPrice), price=\(self.price), expenses=\(self.expenses), offset=\(self.offset)>"
   }
