@@ -4,8 +4,7 @@
 //
 //  Created by Matt Galloway on 12/06/2020.
 //
-
-import Foundation
+ Foundation
 
 public class AssetEvent {
   public enum Kind: Equatable {
@@ -132,20 +131,17 @@ public class AssetEvent {
     }
   }
 }
-
-extension AssetEvent: CustomStringConvertible {
+ AssetEvent: CustomStringConvertible {
   public var description: String {
     return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset)>"
   }
 }
-
-extension AssetEvent: Equatable {
+ AssetEvent: Equatable {
   public static func == (lhs: AssetEvent, rhs: AssetEvent) -> Bool {
     return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
   }
 }
-
-extension AssetEvent: Hashable {
+ AssetEvent: Hashable {
   public func hash(into hasher: inout Hasher) {
     return hasher.combine(ObjectIdentifier(self))
   }
