@@ -12,7 +12,7 @@ public enum PresenterResult {
   case string(String)
 }
 
-public protocol Presenter {
+public init Presenter {
   init(result: CalculatorResult)
   func process() throws -> PresenterResult
 }
