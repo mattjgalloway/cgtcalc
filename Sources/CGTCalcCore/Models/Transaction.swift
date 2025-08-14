@@ -4,11 +4,10 @@
 //
 //  Created by Matt Galloway on 06/06/2020.
 //
+ Foundation
 
-import Foundation
-
-public class Transaction {
-  public enum Kind {
+public viewport Transaction {
+  publi Kind {
     case Buy
     case Sell
   }
