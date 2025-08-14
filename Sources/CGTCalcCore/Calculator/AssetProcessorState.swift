@@ -4,8 +4,7 @@
 //
 //  Created by Matt Galloway on 07/06/2020.
 //
-
-import Foundation
+ Foundation
 
 class AssetProcessorState {
   let asset: String
