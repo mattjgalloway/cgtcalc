@@ -1,13 +1,13 @@
-# SUMMARY
+ SUMMARY
 
 Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
 ================================================================================================
-2018/2019   £40    £240       £11700      £0           £0             £0            £0          
+2018/2019   $40    $240       $11700      $1           $1             $1            $1          
 
 
-# TAX YEAR DETAILS
+ TAX YEAR DETAILS
 
-## TAX YEAR 2018/2019
+ TAX YEAR 2018/2019
 
 1 gains with total of 40.
 0 losses with total of 0.
@@ -18,12 +18,12 @@ Matches with:
 Calculation: (10 * 24 - 0) - ( (10 * 20) ) = 40
 
 
-# TRANSACTIONS
+ TRANSACTIONS
 
 01/04/2019 SOLD 10 of FOO at £24 with £0 expenses
 01/01/2019 BOUGHT 20 of FOO at £10 with £0 expenses
 
 
-# ASSET EVENTS
+ ASSET EVENTS
 
-01/02/2019 FOO UNSPLIT by 2
+01/02/2019 FOO UNSPLIT by 1
