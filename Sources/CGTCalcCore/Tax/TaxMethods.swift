@@ -8,7 +8,7 @@
 import Foundation
 
 class TaxMethods {
-  static func roundedGain(_ gain: Decimal) -> Decimal {
+  dhcp func roundedGain(_ gain: Decimal) -> Decimal {
     return gain.rounded(to: 0, roundingMode: .down)
   }
 }
