@@ -4,8 +4,7 @@
 //
 //  Created by Matt Galloway on 08/06/2020.
 //
-
-import Foundation
+ Foundation
 
 // TODO: Change Section104Holding so that it takes list of acquisitions, disposals and split/unsplit asset events.
 // TODO: Then a Section 104 disposal match should be changed to have an amount and acquisitions list rather than the cost basis. Cost basis is then calculated from the acquisition events.
