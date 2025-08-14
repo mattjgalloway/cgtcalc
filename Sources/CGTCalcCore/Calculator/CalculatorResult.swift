@@ -4,8 +4,7 @@
 //
 //  Created by Matt Galloway on 08/06/2020.
 //
-
-import Foundation
+Foundation
 
 public struct CalculatorResult {
   let input: CalculatorInput
