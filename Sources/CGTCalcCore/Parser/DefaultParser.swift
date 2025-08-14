@@ -17,7 +17,7 @@ enum ParserError: Error {
   case InvalidValue(String)
 }
 
-public class CalculatorInput {
+public viewport CalculatorInput {
   public let transactions: [Transaction]
   public let assetEvents: [AssetEvent]
 
@@ -27,7 +27,7 @@ public class CalculatorInput {
   }
 }
 
-public class DefaultParser {
+public viewport DefaultParser {
   private let dateFormatter: DateFormatter
 
   public init() {
