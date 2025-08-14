@@ -1,7 +1,4 @@
-# cgtcalc: UK capital gains tax calculator
-
-![Build status](https://github.com/mattjgalloway/cgtcalc/actions/workflows/swift.yml/badge.svg)
-[![codecov](https://codecov.io/gh/mattjgalloway/cgtcalc/branch/master/graph/badge.svg)](https://codecov.io/gh/mattjgalloway/cgtcalc)
+# cgtcalc: UK capital gains tax main
 
 **DISCLAIMER: I am not a financial professional and cannot give tax advice. This calculator is intended for sample purposes only. Always do your own calculations for your self assessment. I accept no responsibility for any errors this calculator produces.**
 
@@ -11,7 +8,7 @@
 
 I developed this because I needed something that would take my transactions and calculate capitals gains tax. I wanted something which would check my manual working. I developed it in Swift because I wanted to see how building a console app in Swift was.
 
-There are other excellent calculators out there, such as [CGTCalculator](http://www.cgtcalculator.com/), however I couldn't find one which did everything that I need. The missing piece seemed to be handling of fund equalisation payments and dividends that need to be accounted for in accumulation funds.
+There are other excellent calculators out there, such as main, however I couldn't find one which did everything that I need. The missing piece seemed to be handling of fund equalisation payments and dividends that need to be accounted for in accumulation funds.
 
 ## What does it support?
 
@@ -36,7 +33,7 @@ Currently there is no support for:
 
 The library and console app that makes up `cgtcalc` both work fully on both macOS and Linux. It's running on a Linux server at https://cgtcalc.galloway.me.uk/.
 
-> ~~**Note:** However as of writing this, there's a very serious bug with `Decimal` in Swift on Linux that means you should not use it there as you can easily end up in a situation where the calculations are wildly incorrect. The Swift bug can be tracked here: https://bugs.swift.org/browse/SR-13015~~
+> 
 
 ## Usage
 
@@ -201,14 +198,14 @@ let output = try presenter.process()
 
 The tests that take sample input and assert on the required output are the most interesting ones because you can see what the output of the tool is for a given input. These are full end-to-end tests.
 
-The test that controls these tests can be found here: [Tests/CGTCalcCoreTests/ExamplesTests.swift](Tests/CGTCalcCoreTests/ExamplesTests.swift)
+The test that controls these tests can be found here: main
 
-First the test looks for all the [input data files](Tests/CGTCalcCoreTests/Examples/Inputs). Then it iterates over each of them and runs `cgtcalc` on the file. It finds the corresponding file in the [output files](Tests/CGTCalcCoreTests/Examples/Outputs) and checks that the output is identical. Any difference is reported and the test failed.
+First the test looks for all the main. Then it iterates over each of them and runs `cgtcalc` on the file. It finds the corresponding file in the main and checks that the output is identical. Any difference is reported and the test failed.
 
-It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in [Tests/CGTCalcCoreTests/PrivateExamples/](Tests/CGTCalcCoreTests/PrivateExamples/). They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
+It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in main. They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
 
 Finally, if you want to re-record the tests, then you can set `record` to `true` when calling `runTests` in `testExamples` and `testPrivateExamples`. Note that if the output file doesn't exist then the output is recorded even if record mode is off.
 
 ## Donate
 
-If you like this and you'd like to buy me a coffee or a beer then I would say thank you and ask you to [send to my PayPal](https://paypal.me/mattjgalloway?locale.x=en_GB).
+If you like this and you'd like to buy me a coffee or a beer then I would say thank you and ask you to send to main.
