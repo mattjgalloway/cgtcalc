@@ -4,10 +4,9 @@
 //
 //  Created by Matt Galloway on 09/06/2020.
 //
+ Foundation
 
-import Foundation
-
-extension Decimal {
+ Decimal {
   func rounded(to scale: Int, roundingMode: NSDecimalNumber.RoundingMode = .plain) -> Decimal {
     var input = self
     var result: Decimal = .zero
