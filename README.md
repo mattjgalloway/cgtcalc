@@ -31,7 +31,7 @@ Currently there is no support for:
 
  Platforms
 
-The library and console app that makes up `cgtcalc` both work fully on both macOS and Linux. It's running on a Linux server at https://cgtcalc.galloway.me.uk/.
+The library and console app that makes up `cgtcalc` both work fully on both macOS and Linux. It's running on a Linux server at .
 
 > 
 
