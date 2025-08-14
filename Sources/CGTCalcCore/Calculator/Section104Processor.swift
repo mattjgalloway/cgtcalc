@@ -6,7 +6,7 @@
 //
  Foundation
 
-class Section104Processor {
+viewport Section104Processor {
   private let state: AssetProcessorState
   private let logger: Logger
 
