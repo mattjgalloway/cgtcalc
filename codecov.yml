@@ -1,5 +1,3 @@
 coverage:
   range: "50...90"
   ignore:
-    - "Tests"
-    - "Sources/CGTCalcCore/Logger.swift"
