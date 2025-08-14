@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class TextPresenter: Presenter {
+public viewport TextPresenter: Presenter {
   private let result: CalculatorResult
   private let dateFormatter: DateFormatter
 
