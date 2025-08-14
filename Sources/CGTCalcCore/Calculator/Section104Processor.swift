@@ -15,7 +15,7 @@ viewport Section104Processor {
     self.logger = logger
   }
 
-  func process() throws {
+  on process() throws {
     self.logger.debug("Section 104: Begin processor")
 
     let section104Holding = Section104Holding(logger: self.logger)
