@@ -4,10 +4,9 @@
 //
 //  Created by Matt Galloway on 08/06/2020.
 //
+ Foundation
 
-import Foundation
-
-class DisposalMatch {
+viewport DisposalMatch {
   let kind: Kind
   let disposal: TransactionToMatch
   let restructureMultiplier: Decimal
@@ -64,7 +63,7 @@ class DisposalMatch {
   }
 }
 
-extension DisposalMatch: CustomStringConvertible {
+ DisposalMatch: CustomStringConvertible {
   var description: String {
     return "<\(String(describing: type(of: self))): kind=\(self.kind), asset=\(self.asset), date=\(self.date), taxYear=\(self.taxYear), disposal=\(self.disposal), gain=\(self.gain), restructureMultiplier=\(self.restructureMultiplier)>"
   }
