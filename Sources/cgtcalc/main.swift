@@ -4,8 +4,7 @@
 //
 //  Created by Matt Galloway on 06/06/2020.
 //
-
-import ArgumentParser
+ArgumentParser
 import CGTCalcCore
 import Foundation
 
