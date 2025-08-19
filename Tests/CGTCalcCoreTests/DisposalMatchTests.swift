@@ -27,6 +27,7 @@ class DisposalMatchTests: XCTestCase {
     XCTAssertEqual(disposalMatch.date, Date(timeIntervalSince1970: 1597536000))
     XCTAssertEqual(disposalMatch.taxYear, TaxYear(yearEnding: 2021))
     XCTAssertEqual(disposalMatch.gain, Decimal(string: "70"))
+    XCTAssertEqual(disposalMatch.allowableCosts, Decimal(string: "230"))
   }
 
   func testSection104Disposal() throws {
@@ -46,5 +47,6 @@ class DisposalMatchTests: XCTestCase {
     XCTAssertEqual(disposalMatch.date, Date(timeIntervalSince1970: 1597536000))
     XCTAssertEqual(disposalMatch.taxYear, TaxYear(yearEnding: 2021))
     XCTAssertEqual(disposalMatch.gain, Decimal(string: "30"))
+    XCTAssertEqual(disposalMatch.allowableCosts, Decimal(string: "270"))
   }
 }

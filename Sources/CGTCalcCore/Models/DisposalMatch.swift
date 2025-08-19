@@ -62,6 +62,11 @@ class DisposalMatch {
       return disposalProceeds - acquisitionProceeds
     }
   }
+
+  var allowableCosts: Decimal {
+    // TODO: Should probably make the DisposalMatch hold the costs and the gain is calculated from the costs, not the other way around
+    return self.disposal.value - self.gain
+  }
 }
 
 extension DisposalMatch: CustomStringConvertible {
