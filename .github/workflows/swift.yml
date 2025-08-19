@@ -19,8 +19,10 @@ jobs:
       run: swift test -v --enable-code-coverage
     - name: Generate lcov report
       run: xcrun llvm-cov export -format="lcov" .build/debug/cgtcalcPackageTests.xctest/Contents/MacOS/cgtcalcPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
-    - name: Upload code coverage
+    - name: Upload code coverage to Codecov
       uses: codecov/codecov-action@v5
+    - name: Upload test results to Codecov
+      uses: codecov/test-results-action@v1
   
   test-linux:
     runs-on: ubuntu-latest
