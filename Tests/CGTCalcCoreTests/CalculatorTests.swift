@@ -37,7 +37,7 @@ class CalculatorTests: XCTestCase {
           XCTFail("Unexpected tax year found")
           return
         }
-        XCTAssertEqual(gain, taxYearSummary.gain)
+        XCTAssertEqual(gain, taxYearSummary.overallGains)
       }
     } catch {
       XCTFail("Failed to calculate: \(error)")

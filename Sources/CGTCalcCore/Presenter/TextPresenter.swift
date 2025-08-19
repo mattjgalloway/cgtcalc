@@ -57,11 +57,11 @@ public class TextPresenter: Presenter {
       .reduce(into: [[String]]()) { output, summary in
         let row = [
           summary.taxYear.string,
-          self.formattedCurrency(summary.gain),
+          self.formattedCurrency(summary.overallGains),
           self.formattedCurrency(summary.proceeds),
           self.formattedCurrency(summary.exemption),
           self.formattedCurrency(summary.carryForwardLoss),
-          self.formattedCurrency(summary.taxableGain),
+          self.formattedCurrency(summary.taxableGains),
           self.formattedCurrency(summary.basicRateTax),
           self.formattedCurrency(summary.higherRateTax)
         ]
@@ -107,11 +107,8 @@ public class TextPresenter: Presenter {
       .reduce(into: "") { output, summary in
         output += "## TAX YEAR \(summary.taxYear)\n\n"
 
-        let gains = summary.disposalResults.filter({$0.gain >= 0})
-        output += "\(gains.count) gains with total of \(gains.reduce(Decimal.zero) {$0 + $1.gain}).\n"
-
-        let losses = summary.disposalResults.filter({$0.gain < 0})
-        output += "\(losses.count) losses with total of \(losses.reduce(Decimal.zero) {$0 - $1.gain}).\n"
+        output += "\(summary.gainsCount) gains with total of \(summary.totalGains).\n"
+        output += "\(summary.lossesCount) losses with total of \(summary.totalLosses).\n"
 
         output += "\n"
 
@@ -138,13 +135,7 @@ public class TextPresenter: Presenter {
   private func taxReturnInfoOutput() -> String {
     return self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
-        let disposalsCount = summary.disposalResults.count
-        let gains = summary.disposalResults.filter({$0.gain >= 0})
-        let totalGains = gains.reduce(Decimal.zero) {$0 + $1.gain}
-        let losses = summary.disposalResults.filter({$0.gain < 0})
-        let totalLosses = losses.reduce(Decimal.zero) {$0 - $1.gain}
-
-        output += "\(summary.taxYear): Disposals = \(disposalsCount), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(totalGains), total losses = \(totalLosses)\n"
+        output += "\(summary.taxYear): Disposals = \(summary.disposalResults.count), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(summary.totalGains), total losses = \(summary.totalLosses)\n"
       }
   }
 
