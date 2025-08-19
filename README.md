@@ -32,6 +32,8 @@ Currently there is no support for:
 1) Transactions before 6th April 2008.
 2) Anything I haven't thought of (as I say in the disclaimer - I am not a financial professional).
 
+> **_NOTE:_** **Important!** Currently the calculator does not handle anything related to the changes during the 2024/25 tax year where the rates changes after 29th October 2024. You must calculate this manually.
+
 ## Platforms
 
 The library and console app that makes up `cgtcalc` both work fully on both macOS and Linux. It's running on a Linux server at https://cgtcalc.galloway.me.uk/.
