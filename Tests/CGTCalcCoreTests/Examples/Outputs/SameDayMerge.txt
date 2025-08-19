@@ -18,6 +18,11 @@ Matches with:
 Calculation: (20 * 8 - 14.5) - ( (20 * 8.21667) ) = -19
 
 
+# TAX RETURN INFORMATION
+
+2018/2019: Disposals = 1, proceeds = 160, allowable costs = 178, total gains = 0, total losses = 19
+
+
 # TRANSACTIONS
 
 28/10/2018 SOLD 10 of GB00B41YBW71 at £7 with £12.5 expenses

@@ -29,6 +29,12 @@ Matches with:
 Calculation: (100 * 25 - 0) - ( (100 * 19.6) ) = 540
 
 
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 480, allowable costs = 420, total gains = 60, total losses = 0
+2020/2021: Disposals = 1, proceeds = 2500, allowable costs = 1960, total gains = 540, total losses = 0
+
+
 # TRANSACTIONS
 
 01/06/2020 SOLD 100 of GB00B3TYHH97 at £25 with £0 expenses

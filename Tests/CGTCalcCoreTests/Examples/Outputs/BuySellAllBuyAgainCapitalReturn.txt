@@ -29,6 +29,12 @@ Matches with:
 Calculation: (40 * 197.12 - 12.5) - ( (40 * 196.95225) ) = -6
 
 
+# TAX RETURN INFORMATION
+
+2018/2019: Disposals = 1, proceeds = 19422, allowable costs = 18337, total gains = 1084, total losses = 0
+2019/2020: Disposals = 1, proceeds = 7884, allowable costs = 7890, total gains = 0, total losses = 6
+
+
 # TRANSACTIONS
 
 01/06/2019 SOLD 40 of GB00B3TYHH97 at £197.12 with £12.5 expenses

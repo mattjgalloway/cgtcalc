@@ -7,6 +7,10 @@ Tax year   Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)
 # TAX YEAR DETAILS
 
 
+# TAX RETURN INFORMATION
+
+
+
 # TRANSACTIONS
 
 NONE

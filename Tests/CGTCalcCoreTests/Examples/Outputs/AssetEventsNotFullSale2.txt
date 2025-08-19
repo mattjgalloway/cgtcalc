@@ -29,6 +29,12 @@ Matches with:
 Calculation: (20 * 100 - 0) - ( (20 * 87.33333) ) = 253
 
 
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 525, allowable costs = 496, total gains = 28, total losses = 0
+2020/2021: Disposals = 1, proceeds = 2000, allowable costs = 1746, total gains = 253, total losses = 0
+
+
 # TRANSACTIONS
 
 01/07/2020 SOLD 20 of FOOBAR at £100 with £0 expenses

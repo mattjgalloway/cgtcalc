@@ -19,6 +19,11 @@ Matches with:
 Calculation: (20 * 12 - 0) - ( (10 * 10 + 0) + (20 * 5 + 0) ) = 40
 
 
+# TAX RETURN INFORMATION
+
+2018/2019: Disposals = 1, proceeds = 240, allowable costs = 200, total gains = 40, total losses = 0
+
+
 # TRANSACTIONS
 
 20/02/2019 BOUGHT 20 of FOO at £5 with £0 expenses

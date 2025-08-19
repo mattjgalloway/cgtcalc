@@ -1,0 +1,41 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+================================================================================================
+2018/2019   £-40   £6000      £11700      £40          £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2018/2019
+
+1 gains with total of 980.
+1 losses with total of 1020.
+
+1) SOLD 1000 of STOCK on 28/08/2018 for GAIN of £980
+Matches with:
+  - SAME DAY: 1000 bought on 28/08/2018 at £1
+Calculation: (1000 * 2 - 10) - ( (1000 * 1 + 10) ) = 980
+
+2) SOLD 1000 of STOCK on 28/10/2018 for LOSS of £1020
+Matches with:
+  - SAME DAY: 1000 bought on 28/10/2018 at £5
+Calculation: (1000 * 4 - 10) - ( (1000 * 5 + 10) ) = -1020
+
+
+# TAX RETURN INFORMATION
+
+2018/2019: Disposals = 2, proceeds = 6000, allowable costs = 6040, total gains = 980, total losses = 1020
+
+
+# TRANSACTIONS
+
+28/10/2018 SOLD 1000 of STOCK at £4 with £10 expenses
+28/10/2018 BOUGHT 1000 of STOCK at £5 with £10 expenses
+28/08/2018 SOLD 1000 of STOCK at £2 with £10 expenses
+28/08/2018 BOUGHT 1000 of STOCK at £1 with £10 expenses
+
+
+# ASSET EVENTS
+
+NONE

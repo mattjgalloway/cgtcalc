@@ -32,6 +32,11 @@ public class TextPresenter: Presenter {
 
     output += "\n"
 
+    output += "# TAX RETURN INFORMATION\n\n"
+    output += self.taxReturnInfoOutput()
+
+    output += "\n\n"
+
     output += "# TRANSACTIONS\n\n"
     output += self.transactionsTable()
 
@@ -127,6 +132,19 @@ public class TextPresenter: Presenter {
             output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
             count += 1
           }
+      }
+  }
+
+  private func taxReturnInfoOutput() -> String {
+    return self.result.taxYearSummaries
+      .reduce(into: "") { output, summary in
+        let disposalsCount = summary.disposalResults.count
+        let gains = summary.disposalResults.filter({$0.gain >= 0})
+        let totalGains = gains.reduce(Decimal.zero) {$0 + $1.gain}
+        let losses = summary.disposalResults.filter({$0.gain < 0})
+        let totalLosses = losses.reduce(Decimal.zero) {$0 - $1.gain}
+
+        output += "\(summary.taxYear): Disposals = \(disposalsCount), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(totalGains), total losses = \(totalLosses)\n"
       }
   }
 

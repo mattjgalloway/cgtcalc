@@ -21,6 +21,7 @@ public struct CalculatorResult {
     let taxYear: TaxYear
     let gain: Decimal
     let proceeds: Decimal
+    let allowableCosts: Decimal
     let exemption: Decimal
     let carryForwardLoss: Decimal
     let taxableGain: Decimal
@@ -45,6 +46,7 @@ public struct CalculatorResult {
         var gainByDisposal: [Transaction: Decimal] = [:]
 
         var totalProceeds = Decimal.zero
+        var totalAllowableCosts = Decimal.zero
 
         disposalMatches.forEach { disposalMatch in
           let disposal = disposalMatch.disposal.transaction
@@ -53,6 +55,7 @@ public struct CalculatorResult {
           disposalMatchesByDisposal[disposal] = matches
           gainByDisposal[disposal, default: Decimal.zero] += disposalMatch.gain
           totalProceeds += disposalMatch.disposal.value
+          totalAllowableCosts += disposalMatch.allowableCosts
         }
 
         var totalGain = Decimal.zero
@@ -92,6 +95,7 @@ public struct CalculatorResult {
           taxYear: taxYear,
           gain: totalGain,
           proceeds: TaxMethods.roundedGain(totalProceeds),
+          allowableCosts: TaxMethods.roundedGain(totalAllowableCosts),
           exemption: taxYearRates.exemption,
           carryForwardLoss: carryForwardLoss,
           taxableGain: taxableGain,
