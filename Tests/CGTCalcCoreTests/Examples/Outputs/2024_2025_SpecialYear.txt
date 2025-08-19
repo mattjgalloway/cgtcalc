@@ -1,0 +1,56 @@
+# SUMMARY
+
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=================================================================================================
+2024/2025   £5920   £36000     £3000       £0           £2920          £292          £584        
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2024/2025
+
+2 gains with total of 7960.
+2 losses with total of 2040.
+
+1) SOLD 1000 of STOCK on 29/08/2024 for LOSS of £1020
+Matches with:
+  - SAME DAY: 1000 bought on 29/08/2024 at £10
+Calculation: (1000 * 9 - 10) - ( (1000 * 10 + 10) ) = -1020
+
+2) SOLD 1000 of STOCK on 29/10/2024 for GAIN of £4980
+Matches with:
+  - SAME DAY: 1000 bought on 29/10/2024 at £5
+Calculation: (1000 * 10 - 10) - ( (1000 * 5 + 10) ) = 4980
+
+3) SOLD 1000 of STOCK on 30/10/2024 for GAIN of £2980
+Matches with:
+  - SAME DAY: 1000 bought on 30/10/2024 at £5
+Calculation: (1000 * 8 - 10) - ( (1000 * 5 + 10) ) = 2980
+
+4) SOLD 1000 of STOCK on 30/12/2024 for LOSS of £1020
+Matches with:
+  - SAME DAY: 1000 bought on 30/12/2024 at £10
+Calculation: (1000 * 9 - 10) - ( (1000 * 10 + 10) ) = -1020
+
+
+# TAX RETURN INFORMATION
+
+2024/2025: Disposals = 4, proceeds = 36000, allowable costs = 30080, total gains = 7960, total losses = 2040
+    > Gains to (and inc.) 29th October = 4980, gains after 29th October = 2980
+
+
+# TRANSACTIONS
+
+30/12/2024 SOLD 1000 of STOCK at £9 with £10 expenses
+30/12/2024 BOUGHT 1000 of STOCK at £10 with £10 expenses
+30/10/2024 SOLD 1000 of STOCK at £8 with £10 expenses
+30/10/2024 BOUGHT 1000 of STOCK at £5 with £10 expenses
+29/10/2024 SOLD 1000 of STOCK at £10 with £10 expenses
+29/10/2024 BOUGHT 1000 of STOCK at £5 with £10 expenses
+29/08/2024 SOLD 1000 of STOCK at £9 with £10 expenses
+29/08/2024 BOUGHT 1000 of STOCK at £10 with £10 expenses
+
+
+# ASSET EVENTS
+
+NONE

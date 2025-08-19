@@ -136,6 +136,9 @@ public class TextPresenter: Presenter {
     return self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
         output += "\(summary.taxYear): Disposals = \(summary.disposalResults.count), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(summary.totalGains), total losses = \(summary.totalLosses)\n"
+        if let postProcessor = TaxYear.postProcessors[summary.taxYear] {
+          output += "    > " + postProcessor.extraTaxReturnInformation(for: summary) + "\n"
+        }
       }
   }
 
