@@ -247,13 +247,14 @@ class DefaultParserTests: XCTestCase {
   func testEmptyDataTransaction() throws {
     let sut = DefaultParser()
     let data = ""
-    XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
+    let transaction = try sut.transaction(fromData: Substring(data))
+    XCTAssertNil(transaction)
   }
 
   func testEmptyDataAssetEvent() throws {
     let sut = DefaultParser()
     let data = ""
-    let transaction = try sut.assetEvent(fromData: Substring(data))
-    XCTAssertNil(transaction)
+    let assetEvent = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNil(assetEvent)
   }
 }

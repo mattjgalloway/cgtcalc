@@ -62,8 +62,8 @@ public class DefaultParser {
     let strippedData = data.trimmingCharacters(in: .whitespaces)
     let splitData = strippedData.components(separatedBy: .whitespaces).filter { $0.count > 0 }
 
-    guard splitData.count == 6 else {
-      throw ParserError.IncorrectNumberOfFields(String(data))
+    guard splitData.count > 0 else {
+      return nil
     }
 
     let kind: Transaction.Kind
@@ -74,6 +74,10 @@ public class DefaultParser {
       kind = .Sell
     default:
       return nil
+    }
+
+    guard splitData.count == 6 else {
+      throw ParserError.IncorrectNumberOfFields(String(data))
     }
 
     guard let date = dateFormatter.date(from: splitData[1]) else {
@@ -102,7 +106,7 @@ public class DefaultParser {
     let splitData = strippedData.components(separatedBy: .whitespaces).filter { $0.count > 0 }
 
     guard splitData.count > 0 else {
-      throw ParserError.IncorrectNumberOfFields(String(data))
+      return nil
     }
 
     switch splitData[0] {
