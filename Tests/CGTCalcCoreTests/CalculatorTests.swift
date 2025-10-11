@@ -32,10 +32,10 @@ class CalculatorTests: XCTestCase {
       }
 
       XCTAssertEqual(result.taxYearSummaries.count, data.gains.count)
-      result.taxYearSummaries.forEach { taxYearSummary in
+      for taxYearSummary in result.taxYearSummaries {
         guard let gain = data.gains[taxYearSummary.taxYear] else {
           XCTFail("Unexpected tax year found")
-          return
+          continue
         }
         XCTAssertEqual(gain, taxYearSummary.overallGains)
       }

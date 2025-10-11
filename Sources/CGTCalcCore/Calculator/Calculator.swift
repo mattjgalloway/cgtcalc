@@ -51,7 +51,7 @@ public class Calculator {
           disposals: disposals,
           assetEvents: assetEvents)
         try self.preprocessAsset(withState: state)
-        return try processAsset(withState: state)
+        return try self.processAsset(withState: state)
       }
       .reduce(into: [DisposalMatch]()) { disposalMatches, assetResult in
         disposalMatches.append(contentsOf: assetResult.disposalMatches)
@@ -208,8 +208,8 @@ public class Calculator {
           }
 
           // Then remove from the acquisitions since the last capital return event, up until this sale
-          acquisitionsMatched.forEach { acquisitionTransaction in
-            guard amountLeft > Decimal.zero else { return }
+          for acquisitionTransaction in acquisitionsMatched {
+            guard amountLeft > Decimal.zero else { continue }
             let amountToRemove = min(acquisitionTransaction.amountLeft, amountLeft)
             acquisitionTransaction.amountLeft -= amountToRemove
             amountLeft -= amountToRemove
@@ -232,8 +232,8 @@ public class Calculator {
             "Error pre-processing \(state.asset). Capital return amount \(amount) doesn't match acquisitions \(netAcquisitionsAmount).")
       }
 
-      acquisitionsMatched.forEach { acquisition in
-        guard acquisition.amountLeft > Decimal.zero else { return }
+      for acquisition in acquisitionsMatched {
+        guard acquisition.amountLeft > Decimal.zero else { continue }
         let apportionedValue = value * (acquisition.amountLeft / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
         acquisition.transaction.subtractOffset(amount: apportionedValue)
@@ -299,8 +299,8 @@ public class Calculator {
         case .Sell:
           // Run over all acquisitions to now and remove this sale in a FIFO way
           var amountLeft = transaction.amount
-          acquisitionsMatched.forEach { acquisitionTransaction in
-            guard amountLeft > Decimal.zero else { return }
+          for acquisitionTransaction in acquisitionsMatched {
+            guard amountLeft > Decimal.zero else { continue }
             let amountToRemove = min(acquisitionTransaction.amountLeft, amountLeft)
             acquisitionTransaction.amountLeft -= amountToRemove
             amountLeft -= amountToRemove
@@ -320,8 +320,8 @@ public class Calculator {
             "Error pre-processing \(state.asset). Dividend amount \(amount) doesn't match acquisitions \(netAcquisitionsAmount).")
       }
 
-      acquisitionsMatched.forEach { acquisition in
-        guard acquisition.amountLeft > Decimal.zero else { return }
+      for acquisition in acquisitionsMatched {
+        guard acquisition.amountLeft > Decimal.zero else { continue }
         let apportionedValue = value * (acquisition.amountLeft / amount)
         self.logger.debug("    - Matching to acquisition \(acquisition), apportioned value of \(apportionedValue).")
         acquisition.transaction.addOffset(amount: apportionedValue)

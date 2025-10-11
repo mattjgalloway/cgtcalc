@@ -8,7 +8,7 @@
 @testable import CGTCalcCore
 import Foundation
 
-struct ModelCreation {
+enum ModelCreation {
   static func transaction(
     _ kind: Transaction.Kind,
     _ date: String,

@@ -113,29 +113,29 @@ public class TextPresenter: Presenter {
         output += "\n"
 
         var count = 1
-        summary.disposalResults
-          .forEach { disposalResult in
-            output += "\(count)) SOLD \(disposalResult.disposal.amount)"
-            output += " of \(disposalResult.disposal.asset)"
-            output += " on \(self.dateFormatter.string(from: disposalResult.disposal.date))"
-            output += " for "
-            output += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
-            output +=
-              " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
-            output += "Matches with:\n"
-            disposalResult.disposalMatches.forEach { disposalMatch in
-              output += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: self.dateFormatter))\n"
-            }
-            output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
-            count += 1
+        for disposalResult in summary.disposalResults {
+          output += "\(count)) SOLD \(disposalResult.disposal.amount)"
+          output += " of \(disposalResult.disposal.asset)"
+          output += " on \(self.dateFormatter.string(from: disposalResult.disposal.date))"
+          output += " for "
+          output += disposalResult.gain.isSignMinus ? "LOSS" : "GAIN"
+          output +=
+            " of \(self.formattedCurrency(disposalResult.gain * (disposalResult.gain.isSignMinus ? -1 : 1)))\n"
+          output += "Matches with:\n"
+          for disposalMatch in disposalResult.disposalMatches {
+            output += "  - \(TextPresenter.disposalMatchDetails(disposalMatch, dateFormatter: self.dateFormatter))\n"
           }
+          output += "Calculation: \(TextPresenter.disposalResultCalculationString(disposalResult))\n\n"
+          count += 1
+        }
       }
   }
 
   private func taxReturnInfoOutput() -> String {
     return self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
-        output += "\(summary.taxYear): Disposals = \(summary.disposalResults.count), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(summary.totalGains), total losses = \(summary.totalLosses)\n"
+        output +=
+          "\(summary.taxYear): Disposals = \(summary.disposalResults.count), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(summary.totalGains), total losses = \(summary.totalLosses)\n"
         if let postProcessor = TaxYear.postProcessors[summary.taxYear] {
           output += "    > " + postProcessor.extraTaxReturnInformation(for: summary) + "\n"
         }
@@ -148,7 +148,7 @@ public class TextPresenter: Presenter {
     }
 
     return self.result.input.transactions.reduce(into: "") { result, transaction in
-      result += "\(dateFormatter.string(from: transaction.date)) "
+      result += "\(self.dateFormatter.string(from: transaction.date)) "
       switch transaction.kind {
       case .Buy:
         result += "BOUGHT "
@@ -166,7 +166,7 @@ public class TextPresenter: Presenter {
     }
 
     return self.result.input.assetEvents.reduce(into: "") { result, assetEvent in
-      result += "\(dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
+      result += "\(self.dateFormatter.string(from: assetEvent.date)) \(assetEvent.asset) "
       switch assetEvent.kind {
       case .CapitalReturn(let amount, let value):
         result += "CAPITAL RETURN on \(amount) for \(self.formattedCurrency(value))"

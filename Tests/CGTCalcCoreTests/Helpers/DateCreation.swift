@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DateCreation {
+enum DateCreation {
   private static let dateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.locale = Locale(identifier: "en_US_POSIX")

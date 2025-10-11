@@ -52,7 +52,7 @@ public struct CalculatorResult {
         var totalProceeds = Decimal.zero
         var totalAllowableCosts = Decimal.zero
 
-        disposalMatches.forEach { disposalMatch in
+        for disposalMatch in disposalMatches {
           let disposal = disposalMatch.disposal.transaction
           var matches = disposalMatchesByDisposal[disposal, default: []]
           matches.append(disposalMatch)

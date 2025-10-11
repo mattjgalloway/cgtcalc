@@ -74,10 +74,10 @@ extension TaxYear {
     TaxYear(yearEnding: 2023): Rates(exemption: 12300, basicRate: 10, higherRate: 20),
     TaxYear(yearEnding: 2024): Rates(exemption: 6000, basicRate: 10, higherRate: 20),
     TaxYear(yearEnding: 2025): Rates(exemption: 3000, basicRate: 10, higherRate: 20),
-    TaxYear(yearEnding: 2026): Rates(exemption: 3000, basicRate: 18, higherRate: 24),
+    TaxYear(yearEnding: 2026): Rates(exemption: 3000, basicRate: 18, higherRate: 24)
   ]
 
   static let postProcessors: [TaxYear: TaxYearPostProcessor] = [
-    TaxYear(yearEnding: 2025): TaxYearPostProcessor20242025(),
+    TaxYear(yearEnding: 2025): TaxYearPostProcessor20242025()
   ]
 }
