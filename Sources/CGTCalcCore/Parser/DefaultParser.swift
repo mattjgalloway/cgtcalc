@@ -62,6 +62,10 @@ public class DefaultParser {
     let strippedData = data.trimmingCharacters(in: .whitespaces)
     let splitData = strippedData.components(separatedBy: .whitespaces).filter { $0.count > 0 }
 
+    guard splitData.count == 6 else {
+      throw ParserError.IncorrectNumberOfFields(String(data))
+    }
+
     let kind: Transaction.Kind
     switch splitData[0] {
     case "BUY":
@@ -70,10 +74,6 @@ public class DefaultParser {
       kind = .Sell
     default:
       return nil
-    }
-
-    guard splitData.count == 6 else {
-      throw ParserError.IncorrectNumberOfFields(String(data))
     }
 
     guard let date = dateFormatter.date(from: splitData[1]) else {
@@ -98,7 +98,12 @@ public class DefaultParser {
   }
 
   public func assetEvent(fromData data: Substring) throws -> AssetEvent? {
-    let splitData = data.components(separatedBy: .whitespaces)
+    let strippedData = data.trimmingCharacters(in: .whitespaces)
+    let splitData = strippedData.components(separatedBy: .whitespaces).filter { $0.count > 0 }
+
+    guard splitData.count > 0 else {
+      throw ParserError.IncorrectNumberOfFields(String(data))
+    }
 
     switch splitData[0] {
     case "DIVIDEND":

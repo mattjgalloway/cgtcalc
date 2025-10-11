@@ -235,4 +235,25 @@ class DefaultParserTests: XCTestCase {
     let data = "UNSPLIT 15/08/2020 Foo abc"
     XCTAssertThrowsError(try sut.assetEvent(fromData: Substring(data)))
   }
+
+  func testEmptyDataCalculatorInput() throws {
+    let sut = DefaultParser()
+    let data = ""
+    let calculatorInput = try sut.calculatorInput(fromData: data)
+    XCTAssertEqual(calculatorInput.transactions.count, 0)
+    XCTAssertEqual(calculatorInput.assetEvents.count, 0)
+  }
+
+  func testEmptyDataTransaction() throws {
+    let sut = DefaultParser()
+    let data = ""
+    XCTAssertThrowsError(try sut.transaction(fromData: Substring(data)))
+  }
+
+  func testEmptyDataAssetEvent() throws {
+    let sut = DefaultParser()
+    let data = ""
+    let transaction = try sut.assetEvent(fromData: Substring(data))
+    XCTAssertNil(transaction)
+  }
 }
