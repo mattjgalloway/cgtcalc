@@ -257,4 +257,10 @@ class DefaultParserTests: XCTestCase {
     let assetEvent = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNil(assetEvent)
   }
+
+  func testInvalidData() throws {
+    let sut = DefaultParser()
+    let data = "NOT A CORRECT ROW"
+    XCTAssertThrowsError(try sut.calculatorInput(fromData: data))
+  }
 }
