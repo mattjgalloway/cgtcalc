@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "cgtcalc",
   platforms: [
-    .macOS(.v15),
+    .macOS(.v15)
   ],
   products: [
     .library(name: "CGTCalcCore", targets: ["CGTCalcCore"]),
@@ -28,8 +28,6 @@ let package = Package(
       name: "CGTCalcCoreTests",
       dependencies: ["CGTCalcCore"],
       resources: [
-        .copy("TestData"),
-      ]
-    )
-  ],
-)
+        .copy("TestData")
+      ])
+  ])

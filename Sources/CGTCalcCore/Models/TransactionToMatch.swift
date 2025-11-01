@@ -17,6 +17,7 @@ final class TransactionToMatch: Sendable {
     var expenses: Decimal
     var offset: Decimal
   }
+
   private let state: Mutex<State>
 
   var amount: Decimal {
@@ -52,7 +53,11 @@ final class TransactionToMatch: Sendable {
   }
 
   convenience init(transaction: Transaction) {
-    self.init(transaction: transaction, amount: transaction.amount, expenses: transaction.expenses, offset: Decimal.zero)
+    self.init(
+      transaction: transaction,
+      amount: transaction.amount,
+      expenses: transaction.expenses,
+      offset: Decimal.zero)
   }
 
   private init(transaction: Transaction, amount: Decimal, expenses: Decimal, offset: Decimal) {
@@ -70,7 +75,11 @@ final class TransactionToMatch: Sendable {
       let remainderAmount = $0.amount - amount
       let remainderExpenses = $0.expenses * remainderAmount / $0.amount
       let remainderOffset = $0.offset * remainderAmount / $0.amount
-      let remainder = TransactionToMatch(transaction: self.transaction, amount: remainderAmount, expenses: remainderExpenses, offset: remainderOffset)
+      let remainder = TransactionToMatch(
+        transaction: self.transaction,
+        amount: remainderAmount,
+        expenses: remainderExpenses,
+        offset: remainderOffset)
 
       $0.amount = amount
       $0.expenses = $0.expenses - remainderExpenses

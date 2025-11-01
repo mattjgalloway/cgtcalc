@@ -1,5 +1,5 @@
 //
-//  main.swift
+//  cgtcalc.swift
 //  cgtcalc
 //
 //  Created by Matt Galloway on 06/06/2020.

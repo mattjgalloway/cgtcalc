@@ -39,7 +39,7 @@ public final class BasicLogger: Logger {
     }
   }
 
-  nonisolated(unsafe) private var outputStream = StandardErrorOutputStream()
+  private nonisolated(unsafe) var outputStream = StandardErrorOutputStream()
 
   private func writeToOutput(_ str: String) {
     print(str, to: &self.outputStream)
@@ -47,25 +47,25 @@ public final class BasicLogger: Logger {
 
   public func debug(_ str: String) {
     if self.level <= .Debug {
-      writeToOutput("[DEBUG] \(str)")
+      self.writeToOutput("[DEBUG] \(str)")
     }
   }
 
   public func info(_ str: String) {
     if self.level <= .Info {
-      writeToOutput("[INFO] \(str)")
+      self.writeToOutput("[INFO] \(str)")
     }
   }
 
   public func warn(_ str: String) {
     if self.level <= .Warn {
-      writeToOutput("[WARN] \(str)")
+      self.writeToOutput("[WARN] \(str)")
     }
   }
 
   public func error(_ str: String) {
     if self.level <= .Error {
-      writeToOutput("[ERROR] \(str)")
+      self.writeToOutput("[ERROR] \(str)")
     }
   }
 }
