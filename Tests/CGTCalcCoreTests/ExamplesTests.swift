@@ -108,7 +108,7 @@ class ExamplesTests: XCTestCase {
       XCTFail("Can't find resources")
       return
     }
-    let examplesDirectory = resourceURL.appendingPathComponent("Examples")
+    let examplesDirectory = resourceURL.appendingPathComponent("Resources/Examples")
     try await self.runTests(inDirectory: examplesDirectory, record: false)
   }
 
@@ -117,7 +117,7 @@ class ExamplesTests: XCTestCase {
       XCTFail("Can't find resources")
       return
     }
-    let examplesDirectory = resourceURL.appendingPathComponent("PrivateExamples")
+    let examplesDirectory = resourceURL.appendingPathComponent("Resources/PrivateExamples")
     if FileManager.default.fileExists(atPath: examplesDirectory.path) {
       try await self.runTests(inDirectory: examplesDirectory, record: false)
     }
