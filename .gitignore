@@ -6,7 +6,7 @@ xcuserdata/
 /.swiftpm
 
 # Private examples that should not be committed
-/Tests/CGTCalcCoreTests/Resources/PrivateExamples
+/Tests/CGTCalcCoreTests/TestData/PrivateExamples
 
 # Private samplex
 /Samples/

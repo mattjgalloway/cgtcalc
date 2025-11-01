@@ -28,7 +28,7 @@ let package = Package(
       name: "CGTCalcCoreTests",
       dependencies: ["CGTCalcCore"],
       resources: [
-        .copy("Resources"),
+        .copy("TestData"),
       ]
     )
   ],
