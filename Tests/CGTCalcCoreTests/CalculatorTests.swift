@@ -18,18 +18,20 @@ class CalculatorTests: XCTestCase {
     let shouldThrow: Bool
   }
 
-  private func runTest(withData data: TestData) {
+  private func runTest(withData data: TestData) async {
     do {
       let input = CalculatorInput(transactions: data.transactions, assetEvents: data.assetEvents)
       let calculator = try Calculator(input: input, logger: self.logger)
 
-      let result: CalculatorResult
       if data.shouldThrow {
-        XCTAssertThrowsError(try calculator.process())
+        do {
+          _ = try await calculator.process()
+          XCTFail("Should have thrown")
+        } catch {}
         return
-      } else {
-        result = try calculator.process()
       }
+
+      let result = try await calculator.process()
 
       XCTAssertEqual(result.taxYearSummaries.count, data.gains.count)
       for taxYearSummary in result.taxYearSummaries {
@@ -44,7 +46,7 @@ class CalculatorTests: XCTestCase {
     }
   }
 
-  func testBasicSingleAsset() throws {
+  func testBasicSingleAsset() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Sell, "28/11/2019", "Foo", "2234.0432", "4.6702", "12.5"),
@@ -56,10 +58,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2020): Decimal(string: "1898")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventWithNoAcquisition() throws {
+  func testAssetEventWithNoAcquisition() async throws {
     let testData = TestData(
       transactions: [],
       assetEvents: [
@@ -67,10 +69,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventDividendTooLarge() throws {
+  func testAssetEventDividendTooLarge() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5")
@@ -80,10 +82,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventCapitalReturnTooLarge() throws {
+  func testAssetEventCapitalReturnTooLarge() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "90", "1", "12.5")
@@ -93,10 +95,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventDividendTooSmall() throws {
+  func testAssetEventDividendTooSmall() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5")
@@ -106,10 +108,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventCapitalReturnTooSmall() throws {
+  func testAssetEventCapitalReturnTooSmall() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "100", "1", "12.5")
@@ -119,10 +121,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testAssetEventDividendNotMatchingAmount() throws {
+  func testAssetEventDividendNotMatchingAmount() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
@@ -133,10 +135,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testBedAndBreakfastEdges() throws {
+  func testBedAndBreakfastEdges() async throws {
     // Exactly 30 days
     let testData1 = TestData(
       transactions: [
@@ -149,7 +151,7 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "9")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData1)
+    await self.runTest(withData: testData1)
 
     // Exactly 31 days
     let testData2 = TestData(
@@ -163,10 +165,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "0")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData2)
+    await self.runTest(withData: testData2)
   }
 
-  func testSection104DisposeTooMuch() throws {
+  func testSection104DisposeTooMuch() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "12.5"),
@@ -176,17 +178,20 @@ class CalculatorTests: XCTestCase {
       assetEvents: [],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testDateBefore20080406Throws() throws {
+  func testDateBefore20080406Throws() async throws {
     let transaction = ModelCreation.transaction(.Buy, "05/04/2008", "Foo", "1", "1", "0")
     let input = CalculatorInput(transactions: [transaction], assetEvents: [])
     let calculator = try Calculator(input: input, logger: self.logger)
-    XCTAssertThrowsError(try calculator.process())
+    do {
+      _ = try await calculator.process()
+      XCTFail("Should have thrown")
+    } catch {}
   }
 
-  func testCapitalReturnNotEnoughAcquisitionsThrows() throws {
+  func testCapitalReturnNotEnoughAcquisitionsThrows() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0")
@@ -197,10 +202,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testSoldMoreThanOwnWithCapitalReturnEventThrows() throws {
+  func testSoldMoreThanOwnWithCapitalReturnEventThrows() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
@@ -211,10 +216,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testSoldMoreThanOwnWithDividendEventThrows() throws {
+  func testSoldMoreThanOwnWithDividendEventThrows() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
@@ -225,10 +230,10 @@ class CalculatorTests: XCTestCase {
       ],
       gains: [:],
       shouldThrow: true)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testSoldNotAllBeforeCapitalReturn() throws {
+  func testSoldNotAllBeforeCapitalReturn() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
@@ -241,10 +246,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "5")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testSoldNotAllBeforeDividend() throws {
+  func testSoldNotAllBeforeDividend() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Buy, "01/01/2018", "Foo", "10", "10", "0"),
@@ -257,10 +262,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "-5")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testCapitalReturnEvent() throws {
+  func testCapitalReturnEvent() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
@@ -273,10 +278,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "10")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testCapitalReturnEventSameDayCombine() throws {
+  func testCapitalReturnEventSameDayCombine() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
@@ -290,10 +295,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "10")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testDividendEvent() throws {
+  func testDividendEvent() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
@@ -306,10 +311,10 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "-10")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 
-  func testCapitalReturnAndDividendEvents() throws {
+  func testCapitalReturnAndDividendEvents() async throws {
     let testData = TestData(
       transactions: [
         ModelCreation.transaction(.Sell, "01/03/2018", "Foo", "2.0", "100.0", "0.0"),
@@ -323,6 +328,6 @@ class CalculatorTests: XCTestCase {
         TaxYear(yearEnding: 2018): Decimal(string: "-5")!
       ],
       shouldThrow: false)
-    self.runTest(withData: testData)
+    await self.runTest(withData: testData)
   }
 }

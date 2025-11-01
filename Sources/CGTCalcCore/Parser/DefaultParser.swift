@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ParserError: Error {
+enum ParserError: Error, Sendable {
   case IncorrectNumberOfFields(String)
   case InvalidKind(String)
   case InvalidDate(String)
@@ -17,7 +17,7 @@ enum ParserError: Error {
   case InvalidValue(String)
 }
 
-public class CalculatorInput {
+public final class CalculatorInput: Sendable {
   public let transactions: [Transaction]
   public let assetEvents: [AssetEvent]
 
@@ -27,7 +27,7 @@ public class CalculatorInput {
   }
 }
 
-public class DefaultParser {
+public final class DefaultParser: Sendable {
   private let dateFormatter: DateFormatter
 
   public init() {

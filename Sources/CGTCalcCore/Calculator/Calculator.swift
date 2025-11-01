@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Calculator {
+public final class Calculator: Sendable {
   private let input: CalculatorInput
   private let logger: Logger
 
@@ -16,15 +16,15 @@ public class Calculator {
     self.logger = logger
   }
 
-  public func process() throws -> CalculatorResult {
+  public func process() async throws -> CalculatorResult {
     self.logger.info("Begin processing")
-    try self.preprocessTransactions()
-    let calculatorResult = try self.processTransactions()
+    try await self.preprocessTransactions()
+    let calculatorResult = try await self.processTransactions()
     self.logger.info("Finished processing")
     return calculatorResult
   }
 
-  private func preprocessTransactions() throws {
+  private func preprocessTransactions() async throws {
     for transaction in self.input.transactions {
       // 6th April 2008 is when new CGT rules came in. We only support those new rules.
       if transaction.date < Date(timeIntervalSince1970: 1207440000) {
@@ -33,7 +33,7 @@ public class Calculator {
     }
   }
 
-  private func processTransactions() throws -> CalculatorResult {
+  private func processTransactions() async throws -> CalculatorResult {
     let transactionsByAsset = Dictionary(grouping: self.input.transactions, by: \.asset)
     let assetEventsByAsset = Dictionary(grouping: self.input.assetEvents, by: \.asset)
 

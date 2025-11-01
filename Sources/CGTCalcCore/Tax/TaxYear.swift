@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TaxYear {
+struct TaxYear: Sendable {
   let year: Int
 
   var string: String { "\(self.year - 1)/\(self.year)" }

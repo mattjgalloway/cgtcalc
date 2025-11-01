@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AssetResult {
+final class AssetResult {
   let asset: String
   let disposalMatches: [DisposalMatch]
 

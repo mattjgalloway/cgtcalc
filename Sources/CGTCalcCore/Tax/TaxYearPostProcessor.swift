@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol TaxYearPostProcessor {
+protocol TaxYearPostProcessor: Sendable {
   func extraTaxReturnInformation(for summary: CalculatorResult.TaxYearSummary) -> String
 }
 

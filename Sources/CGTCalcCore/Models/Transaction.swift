@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class Transaction {
-  public enum Kind {
+public final class Transaction: Sendable {
+  public enum Kind: Sendable {
     case Buy
     case Sell
   }
@@ -16,10 +16,10 @@ public class Transaction {
   let kind: Kind
   let date: Date
   let asset: String
-  private(set) var amount: Decimal
-  private(set) var price: Decimal
-  private(set) var expenses: Decimal
-  private(set) var groupedTransactions: [Transaction] = []
+  let amount: Decimal
+  let price: Decimal
+  let expenses: Decimal
+  let groupedTransactions: [Transaction] = []
 
   public init(kind: Kind, date: Date, asset: String, amount: Decimal, price: Decimal, expenses: Decimal) {
     self.kind = kind

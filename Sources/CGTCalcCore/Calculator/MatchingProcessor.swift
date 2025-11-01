@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MatchingProcessor {
+final class MatchingProcessor {
   private let state: AssetProcessorState
   private let logger: Logger
   private var matchCount: Int = 0

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AssetProcessorState {
+final class AssetProcessorState {
   let asset: String
 
   var pendingAcquisitions: [TransactionToMatch]

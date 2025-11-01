@@ -7,17 +7,17 @@
 
 import Foundation
 
-public struct CalculatorResult {
+public struct CalculatorResult: Sendable {
   let input: CalculatorInput
   let taxYearSummaries: [TaxYearSummary]
 
-  struct DisposalResult {
+  struct DisposalResult: Sendable {
     let disposal: Transaction
     let gain: Decimal
     let disposalMatches: [DisposalMatch]
   }
 
-  struct TaxYearSummary {
+  struct TaxYearSummary: Sendable {
     let taxYear: TaxYear
     let overallGains: Decimal
     let proceeds: Decimal

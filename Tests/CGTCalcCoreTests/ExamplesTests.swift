@@ -12,7 +12,7 @@ import XCTest
 class ExamplesTests: XCTestCase {
   let logger = StubLogger()
 
-  private func runTests(inDirectory directory: URL, record: Bool) throws {
+  private func runTests(inDirectory directory: URL, record: Bool) async throws {
     let inputsDirectory = directory.appendingPathComponent("Inputs")
     let outputsDirectory = directory.appendingPathComponent("Outputs")
 
@@ -24,7 +24,7 @@ class ExamplesTests: XCTestCase {
 
       let testName = inputFile.deletingPathExtension().lastPathComponent
 
-      guard let inputData = try? String(contentsOf: inputFile) else {
+      guard let inputData = try? String(contentsOf: inputFile, encoding: .utf8) else {
         XCTFail("Failed to read input for test: \(testName)")
         return
       }
@@ -43,7 +43,7 @@ class ExamplesTests: XCTestCase {
         let parser = DefaultParser()
         let input = try parser.calculatorInput(fromData: inputData)
         let calculator = try Calculator(input: input, logger: self.logger)
-        let result = try calculator.process()
+        let result = try await calculator.process()
         let presenter = TextPresenter(result: result)
         let output = try presenter.process()
 
@@ -63,7 +63,7 @@ class ExamplesTests: XCTestCase {
             XCTFail("Failed to write output data: \(error)")
           }
         } else {
-          let compareOutputData = try String(contentsOf: outputFile)
+          let compareOutputData = try String(contentsOf: outputFile, encoding: .utf8)
           if outputString != compareOutputData {
             let diffURL = URL(fileURLWithPath: "/usr/bin/diff")
             if fileManager.fileExists(atPath: diffURL.path) {
@@ -103,17 +103,23 @@ class ExamplesTests: XCTestCase {
     }
   }
 
-  func testExamples() throws {
-    let thisFile = URL(fileURLWithPath: #file)
-    let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("Examples")
-    try self.runTests(inDirectory: examplesDirectory, record: false)
+  func testExamples() async throws {
+    guard let resourceURL = Bundle.module.resourceURL else {
+      XCTFail("Can't find resources")
+      return
+    }
+    let examplesDirectory = resourceURL.appendingPathComponent("Examples")
+    try await self.runTests(inDirectory: examplesDirectory, record: false)
   }
 
-  func testPrivateExamples() throws {
-    let thisFile = URL(fileURLWithPath: #file)
-    let examplesDirectory = thisFile.deletingLastPathComponent().appendingPathComponent("PrivateExamples")
+  func testPrivateExamples() async throws {
+    guard let resourceURL = Bundle.module.resourceURL else {
+      XCTFail("Can't find resources")
+      return
+    }
+    let examplesDirectory = resourceURL.appendingPathComponent("PrivateExamples")
     if FileManager.default.fileExists(atPath: examplesDirectory.path) {
-      try self.runTests(inDirectory: examplesDirectory, record: false)
+      try await self.runTests(inDirectory: examplesDirectory, record: false)
     }
   }
 

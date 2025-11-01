@@ -12,54 +12,60 @@
 #endif
 import Foundation
 
-public protocol Logger {
+public protocol Logger: Sendable {
   func debug(_ str: String)
   func info(_ str: String)
   func warn(_ str: String)
   func error(_ str: String)
 }
 
-public class BasicLogger: Logger {
-  public enum Level: Int {
+public final class BasicLogger: Logger {
+  public enum Level: Int, Sendable {
     case Debug = 1
     case Info = 2
     case Warn = 3
     case Error = 4
   }
 
-  public var level: Level = .Info
+  private let level: Level
 
-  public init() {}
+  public init(level: Level = .Info) {
+    self.level = level
+  }
 
-  private class StandardErrorOutputStream: TextOutputStream {
+  private final class StandardErrorOutputStream: TextOutputStream, Sendable {
     func write(_ string: String) {
       FileHandle.standardError.write(Data(string.utf8))
     }
   }
 
-  private var outputStream = StandardErrorOutputStream()
+  nonisolated(unsafe) private var outputStream = StandardErrorOutputStream()
+
+  private func writeToOutput(_ str: String) {
+    print(str, to: &self.outputStream)
+  }
 
   public func debug(_ str: String) {
     if self.level <= .Debug {
-      print("[DEBUG] \(str)", to: &self.outputStream)
+      writeToOutput("[DEBUG] \(str)")
     }
   }
 
   public func info(_ str: String) {
     if self.level <= .Info {
-      print("[INFO] \(str)", to: &self.outputStream)
+      writeToOutput("[INFO] \(str)")
     }
   }
 
   public func warn(_ str: String) {
     if self.level <= .Warn {
-      print("[WARN] \(str)", to: &self.outputStream)
+      writeToOutput("[WARN] \(str)")
     }
   }
 
   public func error(_ str: String) {
     if self.level <= .Error {
-      print("[ERROR] \(str)", to: &self.outputStream)
+      writeToOutput("[ERROR] \(str)")
     }
   }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class DisposalMatch {
+final class DisposalMatch: Sendable {
   let kind: Kind
   let disposal: TransactionToMatch
   let restructureMultiplier: Decimal
@@ -24,7 +24,7 @@ class DisposalMatch {
     return TaxYear(containingDate: self.disposal.date)
   }
 
-  enum Kind {
+  enum Kind: Sendable {
     /**
      * Same day match.
      * Parameter is the buy transaction that this disposal was matched against.
