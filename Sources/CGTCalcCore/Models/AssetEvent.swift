@@ -8,7 +8,7 @@
 import Foundation
 
 public final class AssetEvent: Sendable {
-  public enum Kind: Equatable, Sendable {
+  public enum Kind: Equatable, Hashable, Sendable {
     /**
      * Capital return.
      * This is also known as "equalisation". It is a part of a dividend that is not regarded as income. It lowers the cost basis for the shares.

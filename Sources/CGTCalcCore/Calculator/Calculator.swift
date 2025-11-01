@@ -39,7 +39,9 @@ public final class Calculator: Sendable {
 
     let allAssets = Set<String>(transactionsByAsset.keys).union(Set<String>(assetEventsByAsset.keys))
 
-    let allDisposalMatches = try await withThrowingTaskGroup(of: [DisposalMatch].self, returning: [DisposalMatch].self) { group in
+    let allDisposalMatches = try await withThrowingTaskGroup(of: [DisposalMatch].self,
+                                                             returning: [DisposalMatch].self)
+    { group in
       for asset in allAssets {
         group.addTask {
           let (acquisitions, disposals) = try self

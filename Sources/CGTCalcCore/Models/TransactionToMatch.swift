@@ -6,42 +6,21 @@
 //
 
 import Foundation
-import Synchronization
 
-final class TransactionToMatch: Sendable {
+final class TransactionToMatch {
   let transaction: Transaction
   let underlyingPrice: Decimal
 
-  private struct State {
-    var amount: Decimal
-    var expenses: Decimal
-    var offset: Decimal
-  }
-
-  private let state: Mutex<State>
-
-  var amount: Decimal {
-    self.state.withLock { $0.amount }
-  }
-
-  var expenses: Decimal {
-    self.state.withLock { $0.expenses }
-  }
-
-  var offset: Decimal {
-    self.state.withLock { $0.offset }
-  }
+  var amount: Decimal
+  var expenses: Decimal
+  var offset: Decimal
 
   var price: Decimal {
-    self.state.withLock {
-      self.underlyingPrice + ($0.offset / $0.amount)
-    }
+    self.underlyingPrice + (self.offset / self.amount)
   }
 
   var value: Decimal {
-    self.state.withLock {
-      (self.underlyingPrice * $0.amount) + $0.offset
-    }
+    (self.underlyingPrice * self.amount) + self.offset
   }
 
   var asset: String {
@@ -63,43 +42,47 @@ final class TransactionToMatch: Sendable {
   private init(transaction: Transaction, amount: Decimal, expenses: Decimal, offset: Decimal) {
     self.transaction = transaction
     self.underlyingPrice = transaction.price
-    self.state = Mutex(State(amount: amount, expenses: expenses, offset: offset))
+    self.amount = amount
+    self.expenses = expenses
+    self.offset = offset
   }
 
   func split(withAmount amount: Decimal) throws -> TransactionToMatch {
-    let remainder = try self.state.withLock {
-      guard amount <= $0.amount else {
-        throw CalculatorError.InternalError("Tried to split calculator transaction by more than its amount")
-      }
-
-      let remainderAmount = $0.amount - amount
-      let remainderExpenses = $0.expenses * remainderAmount / $0.amount
-      let remainderOffset = $0.offset * remainderAmount / $0.amount
-      let remainder = TransactionToMatch(
-        transaction: self.transaction,
-        amount: remainderAmount,
-        expenses: remainderExpenses,
-        offset: remainderOffset)
-
-      $0.amount = amount
-      $0.expenses = $0.expenses - remainderExpenses
-      $0.offset = $0.offset - remainderOffset
-
-      return remainder
+    guard amount <= self.amount else {
+      throw CalculatorError.InternalError("Tried to split calculator transaction by more than its amount")
     }
+
+    let remainderAmount = self.amount - amount
+    let remainderExpenses = self.expenses * remainderAmount / self.amount
+    let remainderOffset = self.offset * remainderAmount / self.amount
+    let remainder = TransactionToMatch(
+      transaction: self.transaction,
+      amount: remainderAmount,
+      expenses: remainderExpenses,
+      offset: remainderOffset)
+
+    self.amount = amount
+    self.expenses = self.expenses - remainderExpenses
+    self.offset = self.offset - remainderOffset
+
     return remainder
   }
 
   func addOffset(amount: Decimal) {
-    self.state.withLock {
-      $0.offset += amount
-    }
+    self.offset += amount
   }
 
   func subtractOffset(amount: Decimal) {
-    self.state.withLock {
-      $0.offset -= amount
-    }
+    self.offset -= amount
+  }
+
+  func createMatchedTransaction() -> MatchedTransaction {
+    return MatchedTransaction(
+      transaction: self.transaction,
+      underlyingPrice: self.underlyingPrice,
+      amount: self.amount,
+      expenses: self.expenses,
+      offset: self.offset)
   }
 }
 

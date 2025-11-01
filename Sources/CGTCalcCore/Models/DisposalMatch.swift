@@ -9,7 +9,7 @@ import Foundation
 
 final class DisposalMatch: Sendable {
   let kind: Kind
-  let disposal: TransactionToMatch
+  let disposal: MatchedTransaction
   let restructureMultiplier: Decimal
 
   var asset: String {
@@ -29,13 +29,13 @@ final class DisposalMatch: Sendable {
      * Same day match.
      * Parameter is the buy transaction that this disposal was matched against.
      */
-    case SameDay(TransactionToMatch)
+    case SameDay(MatchedTransaction)
 
     /**
      * Bed-and-breakfast match (buy within 30 days of a sale).
      * Parameter is the buy transaction that this disposal was matched against.
      */
-    case BedAndBreakfast(TransactionToMatch)
+    case BedAndBreakfast(MatchedTransaction)
 
     /**
      * Section 104 holding match (pool of shares not matched on any other rule).
@@ -44,7 +44,7 @@ final class DisposalMatch: Sendable {
     case Section104(Decimal, Decimal)
   }
 
-  init(kind: Kind, disposal: TransactionToMatch, restructureMultiplier: Decimal) {
+  init(kind: Kind, disposal: MatchedTransaction, restructureMultiplier: Decimal) {
     self.kind = kind
     self.disposal = disposal
     self.restructureMultiplier = restructureMultiplier

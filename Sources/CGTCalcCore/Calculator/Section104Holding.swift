@@ -66,7 +66,7 @@ class Section104Holding {
 
     let disposalMatch = DisposalMatch(
       kind: .Section104(self.state.amount, self.state.costBasis),
-      disposal: disposal,
+      disposal: disposal.createMatchedTransaction(),
       restructureMultiplier: Decimal(1))
 
     self.state.remove(amount: disposal.amount)
