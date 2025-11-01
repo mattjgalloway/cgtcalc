@@ -39,23 +39,26 @@ public final class Calculator: Sendable {
 
     let allAssets = Set<String>(transactionsByAsset.keys).union(Set<String>(assetEventsByAsset.keys))
 
-    let allDisposalMatches = try allAssets
-      .map { asset -> AssetResult in
-        let (acquisitions, disposals) = try self
-          .splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
-        let assetEvents = try self
-          .sortAndGroupSameDayAssetEvents(assetEventsByAsset[asset, default: []])
-        let state = AssetProcessorState(
-          asset: asset,
-          acquisitions: acquisitions,
-          disposals: disposals,
-          assetEvents: assetEvents)
-        try self.preprocessAsset(withState: state)
-        return try self.processAsset(withState: state)
+    let allDisposalMatches = try await withThrowingTaskGroup(of: [DisposalMatch].self, returning: [DisposalMatch].self) { group in
+      for asset in allAssets {
+        group.addTask {
+          let (acquisitions, disposals) = try self
+            .splitAndGroupSameDayTransactions(transactionsByAsset[asset, default: []])
+          let assetEvents = try self
+            .sortAndGroupSameDayAssetEvents(assetEventsByAsset[asset, default: []])
+          let state = AssetProcessorState(
+            asset: asset,
+            acquisitions: acquisitions,
+            disposals: disposals,
+            assetEvents: assetEvents)
+          try self.preprocessAsset(withState: state)
+          let assetResult = try self.processAsset(withState: state)
+          return assetResult.disposalMatches
+        }
       }
-      .reduce(into: [DisposalMatch]()) { disposalMatches, assetResult in
-        disposalMatches.append(contentsOf: assetResult.disposalMatches)
-      }
+
+      return try await group.reduce(into: []) { $0 += $1 }
+    }
 
     return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
   }
