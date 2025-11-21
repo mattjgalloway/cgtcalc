@@ -20,6 +20,9 @@ final class AssetProcessorState {
 
   var isComplete: Bool { self.pendingDisposals.isEmpty }
 
+  var finalHolding: Decimal?
+  var finalCostBasis: Decimal?
+
   init(asset: String, acquisitions: [TransactionToMatch], disposals: [TransactionToMatch], assetEvents: [AssetEvent]) {
     self.asset = asset
     self.pendingAcquisitions = acquisitions

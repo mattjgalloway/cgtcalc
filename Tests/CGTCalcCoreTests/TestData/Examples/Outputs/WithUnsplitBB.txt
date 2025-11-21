@@ -24,6 +24,11 @@ Calculation: (20 * 12 - 0) - ( (10 * 10 + 0) + (5 * 20 + 0) ) = 40
 2018/2019: Disposals = 1, proceeds = 240, allowable costs = 200, total gains = 40, total losses = 0
 
 
+# HOLDINGS
+
+FOO: 10 units acquired at £20 cost basis
+
+
 # TRANSACTIONS
 
 20/02/2019 BOUGHT 5 of FOO at £20 with £0 expenses

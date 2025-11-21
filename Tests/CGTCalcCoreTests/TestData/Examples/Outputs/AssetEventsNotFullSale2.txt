@@ -35,6 +35,11 @@ Calculation: (20 * 100 - 0) - ( (20 * 87.33333) ) = 253
 2020/2021: Disposals = 1, proceeds = 2000, allowable costs = 1746, total gains = 253, total losses = 0
 
 
+# HOLDINGS
+
+FOOBAR: 5 units acquired at £87.33333 cost basis
+
+
 # TRANSACTIONS
 
 01/07/2020 SOLD 20 of FOOBAR at £100 with £0 expenses

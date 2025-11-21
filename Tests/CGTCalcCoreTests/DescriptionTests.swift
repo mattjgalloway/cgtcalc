@@ -10,9 +10,9 @@ import XCTest
 
 class DescriptionTests: XCTestCase {
   func testAssetResult() throws {
-    let sut = AssetResult(asset: "Foo", disposalMatches: [])
+    let sut = AssetResult(asset: "Foo", disposalMatches: [], holding: Decimal.zero, costBasis: Decimal.zero)
     let description = sut.description
-    let expected = "<AssetResult: asset=Foo, disposalMatches=[]>"
+    let expected = "<AssetResult: asset=Foo, disposalMatches=[], holding=0, costBasis=0>"
     XCTAssertEqual(description, expected)
   }
 
@@ -42,7 +42,12 @@ class DescriptionTests: XCTestCase {
 
   func testMatchedTransaction() throws {
     let transaction = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
-    let sut = MatchedTransaction(transaction: transaction, underlyingPrice: Decimal(1.23), amount: Decimal(1234), expenses: Decimal(12.5), offset: Decimal(0))
+    let sut = MatchedTransaction(
+      transaction: transaction,
+      underlyingPrice: Decimal(1.23),
+      amount: Decimal(1234),
+      expenses: Decimal(12.5),
+      offset: Decimal(0))
     let description = sut.description
     let expected =
       "<MatchedTransaction: transaction=<Transaction: kind=Buy, date=2020-01-01 00:00:00 +0000, asset=Foo, amount=1234, price=1.23, expenses=12.5, groupedTransactions=[]>, amount=1234, underlyingPrice=1.23, price=1.23, expenses=12.5, offset=0>"

@@ -12,7 +12,7 @@ import XCTest
 class ExamplesTests: XCTestCase {
   let logger = StubLogger()
 
-  private func runTests(inDirectory directory: URL, record: Bool) async throws {
+  private func runTests(inDirectory directory: URL, recordPath: URL?) async throws {
     let inputsDirectory = directory.appendingPathComponent("Inputs")
     let outputsDirectory = directory.appendingPathComponent("Outputs")
 
@@ -32,9 +32,7 @@ class ExamplesTests: XCTestCase {
       let outputFile = outputsDirectory.appendingPathComponent(inputFile.lastPathComponent)
       let outputFileExists = fileManager.fileExists(atPath: outputFile.path)
 
-      let allowRecord = record || !outputFileExists
-
-      guard allowRecord || outputFileExists else {
+      guard recordPath != nil || outputFileExists else {
         XCTFail("Failed to find output for test: \(testName)")
         return
       }
@@ -56,9 +54,11 @@ class ExamplesTests: XCTestCase {
           outputString = string
         }
 
-        if allowRecord {
+        if let recordPath {
           do {
-            try outputString.write(to: outputFile, atomically: true, encoding: .utf8)
+            let recordFile = recordPath.appendingPathComponent("Outputs")
+              .appendingPathComponent(inputFile.lastPathComponent)
+            try outputString.write(to: recordFile, atomically: true, encoding: .utf8)
           } catch {
             XCTFail("Failed to write output data: \(error)")
           }
@@ -98,7 +98,7 @@ class ExamplesTests: XCTestCase {
       }
     }
 
-    if record {
+    if recordPath != nil {
       XCTFail("Record mode")
     }
   }
@@ -108,8 +108,9 @@ class ExamplesTests: XCTestCase {
       XCTFail("Can't find resources")
       return
     }
-    let examplesDirectory = resourceURL.appendingPathComponent("TestData/Examples")
-    try await self.runTests(inDirectory: examplesDirectory, record: false)
+    let path = "TestData/Examples"
+    let examplesDirectory = resourceURL.appendingPathComponent(path)
+    try await self.runTests(inDirectory: examplesDirectory, recordPath: nil)
   }
 
   func testPrivateExamples() async throws {
@@ -117,9 +118,10 @@ class ExamplesTests: XCTestCase {
       XCTFail("Can't find resources")
       return
     }
-    let examplesDirectory = resourceURL.appendingPathComponent("TestData/PrivateExamples")
+    let path = "TestData/PrivateExamples"
+    let examplesDirectory = resourceURL.appendingPathComponent(path)
     if FileManager.default.fileExists(atPath: examplesDirectory.path) {
-      try await self.runTests(inDirectory: examplesDirectory, record: false)
+      try await self.runTests(inDirectory: examplesDirectory, recordPath: nil)
     }
   }
 

@@ -24,7 +24,13 @@ class Section104Processor {
     var acquisitions = self.state.pendingAcquisitions.sorted { $0.date > $1.date }
     var assetEventIndex = self.state.assetEvents.startIndex
 
-    while let disposal = self.state.pendingDisposals.first {
+    while true {
+      guard assetEventIndex < self.state.assetEvents.endIndex || !acquisitions.isEmpty || !self.state.pendingDisposals
+        .isEmpty
+      else {
+        break
+      }
+
       let acquisitionDate = acquisitions.last?.date ?? Date.distantFuture
 
       let assetEventDate: Date
@@ -34,12 +40,15 @@ class Section104Processor {
         assetEventDate = .distantFuture
       }
 
-      if assetEventDate <= acquisitionDate, assetEventDate <= disposal.date {
+      let disposal = self.state.pendingDisposals.first
+      let disposalDate = disposal?.date ?? .distantFuture
+
+      if assetEventDate <= acquisitionDate, assetEventDate <= disposalDate {
         let assetEvent = self.state.assetEvents[assetEventIndex]
         section104Holding.process(assetEvent: assetEvent)
         assetEventIndex += 1
         continue
-      } else if acquisitionDate <= disposal.date {
+      } else if acquisitionDate <= disposalDate {
         if let acquisition = acquisitions.last {
           section104Holding.process(acquisition: acquisition)
           _ = acquisitions.removeLast()
@@ -47,11 +56,16 @@ class Section104Processor {
         continue
       }
 
-      let disposalMatch = try section104Holding.process(disposal: disposal)
-      self.state.processedDisposals.append(disposal)
-      self.state.pendingDisposals.remove(at: self.state.pendingDisposals.startIndex)
-      self.state.disposalMatches.append(disposalMatch)
+      if let disposal {
+        let disposalMatch = try section104Holding.process(disposal: disposal)
+        self.state.processedDisposals.append(disposal)
+        self.state.pendingDisposals.remove(at: self.state.pendingDisposals.startIndex)
+        self.state.disposalMatches.append(disposalMatch)
+      }
     }
+
+    self.state.finalHolding = section104Holding.currentHolding
+    self.state.finalCostBasis = section104Holding.currentCostBasis
 
     self.logger.debug("Section 104: Finished processor. There are \(self.state.pendingDisposals.count) disposals left.")
   }

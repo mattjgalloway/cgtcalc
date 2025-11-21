@@ -24,6 +24,11 @@ Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.9805 + 2 + 15.81) + (20 * 183.47
 2019/2020: Disposals = 1, proceeds = 7768, allowable costs = 7503, total gains = 265, total losses = 0
 
 
+# HOLDINGS
+
+GB00B3TYHH97: 20 units acquired at £183.47975 cost basis
+
+
 # TRANSACTIONS
 
 10/11/2019 BOUGHT 20 of GB00B3TYHH97 at £190.19 with £2 expenses

@@ -28,6 +28,10 @@ Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 2018/2019: Disposals = 2, proceeds = 93, allowable costs = 133, total gains = 0, total losses = 40
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 28/08/2018 SOLD 10 of FOO at £4.6702 with £12.5 expenses

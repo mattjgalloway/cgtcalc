@@ -23,6 +23,10 @@ Calculation: (40 * 194.22 - 12.5) - ( (40 * 183.47975) ) = 417
 2019/2020: Disposals = 1, proceeds = 7768, allowable costs = 7351, total gains = 417, total losses = 0
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 05/12/2019 SOLD 40 of GB00B3TYHH97 at £194.22 with £12.5 expenses

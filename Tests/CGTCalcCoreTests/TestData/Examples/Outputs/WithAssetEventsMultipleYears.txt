@@ -35,6 +35,10 @@ Calculation: (100 * 25 - 0) - ( (100 * 19.6) ) = 540
 2020/2021: Disposals = 1, proceeds = 2500, allowable costs = 1960, total gains = 540, total losses = 0
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 01/06/2020 SOLD 100 of GB00B3TYHH97 at £25 with £0 expenses

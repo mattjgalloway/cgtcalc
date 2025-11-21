@@ -28,6 +28,10 @@ Calculation: (1000 * 4 - 10) - ( (1000 * 5 + 10) ) = -1020
 2018/2019: Disposals = 2, proceeds = 6000, allowable costs = 6040, total gains = 980, total losses = 1020
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 28/10/2018 SOLD 1000 of STOCK at £4 with £10 expenses

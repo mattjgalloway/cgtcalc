@@ -39,8 +39,8 @@ public final class Calculator: Sendable {
 
     let allAssets = Set<String>(transactionsByAsset.keys).union(Set<String>(assetEventsByAsset.keys))
 
-    let allDisposalMatches = try await withThrowingTaskGroup(of: [DisposalMatch].self,
-                                                             returning: [DisposalMatch].self)
+    let allAssetResults = try await withThrowingTaskGroup(of: AssetResult.self,
+                                                          returning: [AssetResult].self)
     { group in
       for asset in allAssets {
         group.addTask {
@@ -55,14 +55,34 @@ public final class Calculator: Sendable {
             assetEvents: assetEvents)
           try self.preprocessAsset(withState: state)
           let assetResult = try self.processAsset(withState: state)
-          return assetResult.disposalMatches
+          return assetResult
         }
       }
 
-      return try await group.reduce(into: []) { $0 += $1 }
+      return try await group.reduce(into: []) { $0.append($1) }
     }
 
-    return try CalculatorResult(input: self.input, disposalMatches: allDisposalMatches)
+    let (allDisposalMatches, allHoldings) = allAssetResults.reduce(into: (
+      disposalMatches: [DisposalMatch](),
+      holdings: [CalculatorResult.Holding]()))
+    {
+      $0.disposalMatches += $1.disposalMatches
+
+      let holding = CalculatorResult.Holding(
+        asset: $1.asset,
+        amount: $1.holding,
+        costBasis: $1.costBasis)
+      $0.holdings.append(holding)
+    }
+
+    let filteredAndSortedHoldings = allHoldings
+      .filter { $0.amount != Decimal.zero }
+      .sorted { $0.asset < $1.asset }
+
+    return try CalculatorResult(
+      input: self.input,
+      disposalMatches: allDisposalMatches,
+      holdings: filteredAndSortedHoldings)
   }
 
   private func sortAndGroupSameDayAssetEvents(_ assetEvents: [AssetEvent]) throws -> [AssetEvent] {
@@ -347,7 +367,7 @@ public final class Calculator: Sendable {
     let section104Processor = Section104Processor(state: state, logger: self.logger)
     try section104Processor.process()
 
-    if !state.isComplete {
+    guard state.isComplete, let finalHolding = state.finalHolding, let finalCostBasis = state.finalCostBasis else {
       throw CalculatorError.Incomplete
     }
 
@@ -356,6 +376,10 @@ public final class Calculator: Sendable {
     self.logger
       .info("Finished processing transactions for \(state.asset). Created \(state.disposalMatches.count) tax events.")
 
-    return AssetResult(asset: state.asset, disposalMatches: state.disposalMatches)
+    return AssetResult(
+      asset: state.asset,
+      disposalMatches: state.disposalMatches,
+      holding: finalHolding,
+      costBasis: finalCostBasis)
   }
 }

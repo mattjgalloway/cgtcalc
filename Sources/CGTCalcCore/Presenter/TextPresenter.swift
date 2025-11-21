@@ -37,6 +37,11 @@ public final class TextPresenter: Presenter {
 
     output += "\n\n"
 
+    output += "# HOLDINGS\n\n"
+    output += self.holdingsTable()
+
+    output += "\n\n"
+
     output += "# TRANSACTIONS\n\n"
     output += self.transactionsTable()
 
@@ -140,6 +145,16 @@ public final class TextPresenter: Presenter {
           output += "    > " + postProcessor.extraTaxReturnInformation(for: summary) + "\n"
         }
       }
+  }
+
+  private func holdingsTable() -> String {
+    guard self.result.holdings.count > 0 else {
+      return "NONE"
+    }
+
+    return self.result.holdings.reduce(into: "") { result, holding in
+      result += "\(holding.asset): \(holding.amount) units acquired at £\(holding.costBasis.rounded(to: 5).string) cost basis\n"
+    }
   }
 
   private func transactionsTable() -> String {

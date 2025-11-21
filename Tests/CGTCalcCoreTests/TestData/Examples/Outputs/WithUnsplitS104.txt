@@ -23,6 +23,10 @@ Calculation: (10 * 24 - 0) - ( (10 * 20) ) = 40
 2018/2019: Disposals = 1, proceeds = 240, allowable costs = 200, total gains = 40, total losses = 0
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 01/04/2019 SOLD 10 of FOO at £24 with £0 expenses

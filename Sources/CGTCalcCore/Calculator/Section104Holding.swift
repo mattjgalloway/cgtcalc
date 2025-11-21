@@ -14,6 +14,14 @@ class Section104Holding {
   private(set) var state = State(amount: Decimal.zero, cost: 0.0)
   private let logger: Logger
 
+  var currentHolding: Decimal {
+    return self.state.amount
+  }
+
+  var currentCostBasis: Decimal {
+    return self.state.costBasis
+  }
+
   struct State {
     private(set) var amount: Decimal
     private(set) var cost: Decimal

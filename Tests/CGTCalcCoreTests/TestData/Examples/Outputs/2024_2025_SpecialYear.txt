@@ -39,6 +39,10 @@ Calculation: (1000 * 9 - 10) - ( (1000 * 10 + 10) ) = -1020
     > Gains to (and inc.) 29th October = 4980, gains after 29th October = 2980
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 30/12/2024 SOLD 1000 of STOCK at £9 with £10 expenses

@@ -47,6 +47,10 @@ Calculation: (1 * 20000 - 0) - ( (1 * 1000 + 0) ) = 19000
 2019/2020: Disposals = 1, proceeds = 20000, allowable costs = 1000, total gains = 19000, total losses = 0
 
 
+# HOLDINGS
+
+NONE
+
 # TRANSACTIONS
 
 01/01/2018 BOUGHT 1 of GB00B41YBW71 at £1000 with £0 expenses

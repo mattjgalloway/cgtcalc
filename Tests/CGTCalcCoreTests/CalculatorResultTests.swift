@@ -19,6 +19,6 @@ class CalculatorResultTests: XCTestCase {
       disposal: disposalSub.createMatchedTransaction(),
       restructureMultiplier: Decimal(1))
     let input = CalculatorInput(transactions: [acquisition, disposal], assetEvents: [])
-    XCTAssertThrowsError(try CalculatorResult(input: input, disposalMatches: [disposalMatch]))
+    XCTAssertThrowsError(try CalculatorResult(input: input, disposalMatches: [disposalMatch], holdings: []))
   }
 }

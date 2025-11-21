@@ -10,6 +10,7 @@ import Foundation
 public struct CalculatorResult: Sendable {
   let input: CalculatorInput
   let taxYearSummaries: [TaxYearSummary]
+  let holdings: [Holding]
 
   struct DisposalResult: Sendable {
     let disposal: Transaction
@@ -34,8 +35,15 @@ public struct CalculatorResult: Sendable {
     let disposalResults: [DisposalResult]
   }
 
-  init(input: CalculatorInput, disposalMatches: [DisposalMatch]) throws {
+  struct Holding: Sendable {
+    let asset: String
+    let amount: Decimal
+    let costBasis: Decimal
+  }
+
+  init(input: CalculatorInput, disposalMatches: [DisposalMatch], holdings: [Holding]) throws {
     self.input = input
+    self.holdings = holdings
 
     var carryForwardLoss = Decimal.zero
     self.taxYearSummaries = try disposalMatches

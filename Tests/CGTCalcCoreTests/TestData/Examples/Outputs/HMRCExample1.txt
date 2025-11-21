@@ -28,6 +28,11 @@ Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 2018/2019: Disposals = 2, proceeds = 5440, allowable costs = 4810, total gains = 629, total losses = 0
 
 
+# HOLDINGS
+
+Lobster: 400 units acquired at £4.18667 cost basis
+
+
 # TRANSACTIONS
 
 01/04/2014 BOUGHT 1000 of Lobster at £4 with £150 expenses
