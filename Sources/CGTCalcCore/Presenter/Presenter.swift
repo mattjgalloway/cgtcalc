@@ -7,12 +7,12 @@
 
 import Foundation
 
-public enum PresenterResult {
+public enum PresenterResult: Sendable {
   case data(Data)
   case string(String)
 }
 
-public protocol Presenter {
+public protocol Presenter: Sendable {
   init(result: CalculatorResult)
   func process() throws -> PresenterResult
 }
