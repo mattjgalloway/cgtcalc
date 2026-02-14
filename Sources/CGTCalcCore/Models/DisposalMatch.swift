@@ -13,15 +13,15 @@ final class DisposalMatch: Sendable {
   let restructureMultiplier: Decimal
 
   var asset: String {
-    return self.disposal.asset
+    self.disposal.asset
   }
 
   var date: Date {
-    return self.disposal.date
+    self.disposal.date
   }
 
   var taxYear: TaxYear {
-    return TaxYear(containingDate: self.disposal.date)
+    TaxYear(containingDate: self.disposal.date)
   }
 
   enum Kind: Sendable {
@@ -65,12 +65,12 @@ final class DisposalMatch: Sendable {
 
   var allowableCosts: Decimal {
     // TODO: Should probably make the DisposalMatch hold the costs and the gain is calculated from the costs, not the other way around
-    return self.disposal.value - self.gain
+    self.disposal.value - self.gain
   }
 }
 
 extension DisposalMatch: CustomStringConvertible {
   var description: String {
-    return "<\(String(describing: type(of: self))): kind=\(self.kind), asset=\(self.asset), date=\(self.date), taxYear=\(self.taxYear), disposal=\(self.disposal), gain=\(self.gain), restructureMultiplier=\(self.restructureMultiplier)>"
+    "<\(String(describing: type(of: self))): kind=\(self.kind), asset=\(self.asset), date=\(self.date), taxYear=\(self.taxYear), disposal=\(self.disposal), gain=\(self.gain), restructureMultiplier=\(self.restructureMultiplier)>"
   }
 }

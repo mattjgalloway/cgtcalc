@@ -61,18 +61,18 @@ public final class Transaction: Sendable {
 
 extension Transaction: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
+    "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset), amount=\(self.amount), price=\(self.price), expenses=\(self.expenses), groupedTransactions=\(self.groupedTransactions)>"
   }
 }
 
 extension Transaction: Equatable {
   public static func == (lhs: Transaction, rhs: Transaction) -> Bool {
-    return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
   }
 }
 
 extension Transaction: Hashable {
   public func hash(into hasher: inout Hasher) {
-    return hasher.combine(ObjectIdentifier(self))
+    hasher.combine(ObjectIdentifier(self))
   }
 }

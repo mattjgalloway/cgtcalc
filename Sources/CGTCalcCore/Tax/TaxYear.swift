@@ -34,13 +34,13 @@ struct TaxYear: Sendable {
 
 extension TaxYear: CustomStringConvertible {
   var description: String {
-    return self.string
+    self.string
   }
 }
 
 extension TaxYear: Comparable {
   static func < (lhs: TaxYear, rhs: TaxYear) -> Bool {
-    return lhs.year < rhs.year
+    lhs.year < rhs.year
   }
 }
 

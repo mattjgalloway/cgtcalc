@@ -17,7 +17,7 @@ enum ModelCreation {
     _ price: String,
     _ expenses: String) -> Transaction
   {
-    return Transaction(
+    Transaction(
       kind: kind,
       date: DateCreation.date(fromString: date),
       asset: asset,
@@ -27,6 +27,6 @@ enum ModelCreation {
   }
 
   static func assetEvent(_ kind: AssetEvent.Kind, _ date: String, _ asset: String) -> AssetEvent {
-    return AssetEvent(kind: kind, date: DateCreation.date(fromString: date), asset: asset)
+    AssetEvent(kind: kind, date: DateCreation.date(fromString: date), asset: asset)
   }
 }

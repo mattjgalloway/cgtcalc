@@ -9,6 +9,6 @@ import Foundation
 
 class TaxMethods {
   static func roundedGain(_ gain: Decimal) -> Decimal {
-    return gain.rounded(to: 0, roundingMode: .down)
+    gain.rounded(to: 0, roundingMode: .down)
   }
 }

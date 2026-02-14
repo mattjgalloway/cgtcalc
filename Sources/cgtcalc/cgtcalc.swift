@@ -25,11 +25,10 @@ struct CGTCalc: AsyncParsableCommand {
   static let configuration = CommandConfiguration(commandName: "cgtcalc", version: Self.VERSION)
 
   func run() async throws {
-    let logLevel: BasicLogger.Level
-    if self.verbose {
-      logLevel = .Debug
+    let logLevel: BasicLogger.Level = if self.verbose {
+      .Debug
     } else {
-      logLevel = .Info
+      .Info
     }
     let logger = BasicLogger(level: logLevel)
 

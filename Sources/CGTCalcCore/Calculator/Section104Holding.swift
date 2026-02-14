@@ -15,11 +15,11 @@ class Section104Holding {
   private let logger: Logger
 
   var currentHolding: Decimal {
-    return self.state.amount
+    self.state.amount
   }
 
   var currentCostBasis: Decimal {
-    return self.state.costBasis
+    self.state.costBasis
   }
 
   struct State {
@@ -103,6 +103,6 @@ class Section104Holding {
 
 extension Section104Holding.State: CustomStringConvertible {
   var description: String {
-    return "<\(String(describing: type(of: self))): amount=\(self.amount), cost=\(self.cost), costBasis=\(self.costBasis)>"
+    "<\(String(describing: type(of: self))): amount=\(self.amount), cost=\(self.cost), costBasis=\(self.costBasis)>"
   }
 }

@@ -90,15 +90,14 @@ final class MatchingProcessor {
         self.state.pendingAcquisitions.insert(splitAcquisition, at: acquisitionIndex + 1)
       }
 
-      let disposalMatch: DisposalMatch
-      switch kind {
+      let disposalMatch = switch kind {
       case .SameDay:
-        disposalMatch = DisposalMatch(
+        DisposalMatch(
           kind: .SameDay(acquisition.createMatchedTransaction()),
           disposal: disposal.createMatchedTransaction(),
           restructureMultiplier: restructureMultiplier)
       case .BedAndBreakfast:
-        disposalMatch = DisposalMatch(
+        DisposalMatch(
           kind: .BedAndBreakfast(acquisition.createMatchedTransaction()),
           disposal: disposal.createMatchedTransaction(),
           restructureMultiplier: restructureMultiplier)

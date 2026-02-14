@@ -77,7 +77,7 @@ final class TransactionToMatch {
   }
 
   func createMatchedTransaction() -> MatchedTransaction {
-    return MatchedTransaction(
+    MatchedTransaction(
       transaction: self.transaction,
       underlyingPrice: self.underlyingPrice,
       amount: self.amount,
@@ -88,6 +88,6 @@ final class TransactionToMatch {
 
 extension TransactionToMatch: CustomStringConvertible {
   var description: String {
-    return "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), underlyingPrice=\(self.underlyingPrice), price=\(self.price), expenses=\(self.expenses), offset=\(self.offset)>"
+    "<\(String(describing: type(of: self))): transaction=\(self.transaction), amount=\(self.amount), underlyingPrice=\(self.underlyingPrice), price=\(self.price), expenses=\(self.expenses), offset=\(self.offset)>"
   }
 }

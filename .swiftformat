@@ -1,4 +1,4 @@
---swiftversion 5
+--swiftversion 6
 
 --binarygrouping none
 --closingparen same-line

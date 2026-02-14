@@ -72,6 +72,6 @@ public final class BasicLogger: Logger {
 
 extension BasicLogger.Level: Comparable {
   public static func < (lhs: BasicLogger.Level, rhs: BasicLogger.Level) -> Bool {
-    return lhs.rawValue < rhs.rawValue
+    lhs.rawValue < rhs.rawValue
   }
 }

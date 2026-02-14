@@ -41,13 +41,13 @@ public final class AssetEvent: Sendable {
     var `case`: Case {
       switch self {
       case .CapitalReturn:
-        return .CapitalReturn
+        .CapitalReturn
       case .Dividend:
-        return .Dividend
+        .Dividend
       case .Split:
-        return .Split
+        .Split
       case .Unsplit:
-        return .Unsplit
+        .Unsplit
       }
     }
 
@@ -135,18 +135,18 @@ public final class AssetEvent: Sendable {
 
 extension AssetEvent: CustomStringConvertible {
   public var description: String {
-    return "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset)>"
+    "<\(String(describing: type(of: self))): kind=\(self.kind), date=\(self.date), asset=\(self.asset)>"
   }
 }
 
 extension AssetEvent: Equatable {
   public static func == (lhs: AssetEvent, rhs: AssetEvent) -> Bool {
-    return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
   }
 }
 
 extension AssetEvent: Hashable {
   public func hash(into hasher: inout Hasher) {
-    return hasher.combine(ObjectIdentifier(self))
+    hasher.combine(ObjectIdentifier(self))
   }
 }

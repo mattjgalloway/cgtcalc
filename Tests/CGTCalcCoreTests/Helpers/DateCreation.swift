@@ -17,6 +17,6 @@ enum DateCreation {
   }()
 
   static func date(fromString string: String) -> Date {
-    return self.dateFormatter.date(from: string)!
+    self.dateFormatter.date(from: string)!
   }
 }

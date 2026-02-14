@@ -33,11 +33,10 @@ class Section104Processor {
 
       let acquisitionDate = acquisitions.last?.date ?? Date.distantFuture
 
-      let assetEventDate: Date
-      if assetEventIndex < self.state.assetEvents.endIndex {
-        assetEventDate = self.state.assetEvents[assetEventIndex].date
+      let assetEventDate: Date = if assetEventIndex < self.state.assetEvents.endIndex {
+        self.state.assetEvents[assetEventIndex].date
       } else {
-        assetEventDate = .distantFuture
+        .distantFuture
       }
 
       let disposal = self.state.pendingDisposals.first

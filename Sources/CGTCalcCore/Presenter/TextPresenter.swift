@@ -54,7 +54,7 @@ public final class TextPresenter: Presenter {
   }
 
   private func formattedCurrency(_ amount: Decimal) -> String {
-    return "£\(amount.rounded(to: 2).string)"
+    "£\(amount.rounded(to: 2).string)"
   }
 
   private func summaryTable() -> String {
@@ -83,7 +83,7 @@ public final class TextPresenter: Presenter {
       "Tax (basic)",
       "Tax (higher)"
     ]
-    let initialMaxWidths = headerRow.map { $0.count }
+    let initialMaxWidths = headerRow.map(\.count)
     let maxWidths = rows.reduce(into: initialMaxWidths) { result, row in
       for i in 0 ..< result.count {
         result[i] = max(result[i], row[i].count)
@@ -108,7 +108,7 @@ public final class TextPresenter: Presenter {
   }
 
   private func detailsOutput() -> String {
-    return self.result.taxYearSummaries
+    self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
         output += "## TAX YEAR \(summary.taxYear)\n\n"
 
@@ -137,7 +137,7 @@ public final class TextPresenter: Presenter {
   }
 
   private func taxReturnInfoOutput() -> String {
-    return self.result.taxYearSummaries
+    self.result.taxYearSummaries
       .reduce(into: "") { output, summary in
         output +=
           "\(summary.taxYear): Disposals = \(summary.disposalResults.count), proceeds = \(summary.proceeds), allowable costs = \(summary.allowableCosts), total gains = \(summary.totalGains), total losses = \(summary.totalLosses)\n"

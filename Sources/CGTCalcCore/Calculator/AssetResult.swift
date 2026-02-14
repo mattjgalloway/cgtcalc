@@ -23,6 +23,6 @@ final class AssetResult: Sendable {
 
 extension AssetResult: CustomStringConvertible {
   var description: String {
-    return "<\(String(describing: type(of: self))): asset=\(self.asset), disposalMatches=\(self.disposalMatches), holding=\(self.holding), costBasis=\(self.costBasis)>"
+    "<\(String(describing: type(of: self))): asset=\(self.asset), disposalMatches=\(self.disposalMatches), holding=\(self.holding), costBasis=\(self.costBasis)>"
   }
 }
