@@ -10,7 +10,9 @@ import Foundation
 struct TaxYear: Sendable {
   let year: Int
 
-  var string: String { "\(self.year - 1)/\(self.year)" }
+  var string: String {
+    "\(self.year - 1)/\(self.year)"
+  }
 
   init(yearEnding year: Int) {
     self.year = year
@@ -42,11 +44,7 @@ extension TaxYear: Comparable {
   }
 }
 
-extension TaxYear: Equatable {
-  static func == (lhs: TaxYear, rhs: TaxYear) -> Bool {
-    return lhs.year == rhs.year
-  }
-}
+extension TaxYear: Equatable {}
 
 extension TaxYear: Hashable {
   func hash(into hasher: inout Hasher) {

@@ -9,7 +9,7 @@
 import XCTest
 
 class AssetEventTests: XCTestCase {
-  func testEquality() throws {
+  func testEquality() {
     let a = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
     let b = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
     let c = a
@@ -18,7 +18,7 @@ class AssetEventTests: XCTestCase {
     XCTAssertEqual(a, c)
   }
 
-  func testHashable() throws {
+  func testHashable() {
     let a = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
     let b = ModelCreation.assetEvent(.Dividend(Decimal(1), Decimal(1)), "01/01/2020", "Foo")
     let c = a

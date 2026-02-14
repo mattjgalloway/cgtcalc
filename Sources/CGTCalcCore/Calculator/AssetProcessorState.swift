@@ -18,7 +18,9 @@ final class AssetProcessorState {
   var processedDisposals: [TransactionToMatch] = []
   var disposalMatches: [DisposalMatch] = []
 
-  var isComplete: Bool { self.pendingDisposals.isEmpty }
+  var isComplete: Bool {
+    self.pendingDisposals.isEmpty
+  }
 
   var finalHolding: Decimal?
   var finalCostBasis: Decimal?

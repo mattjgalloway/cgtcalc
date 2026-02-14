@@ -9,7 +9,7 @@
 import XCTest
 
 class Section104HoldingTests: XCTestCase {
-  func testProcessesAcquisitionsCorrectly() throws {
+  func testProcessesAcquisitionsCorrectly() {
     let sut = Section104Holding(logger: StubLogger())
 
     do {

@@ -9,21 +9,21 @@
 import XCTest
 
 class DescriptionTests: XCTestCase {
-  func testAssetResult() throws {
+  func testAssetResult() {
     let sut = AssetResult(asset: "Foo", disposalMatches: [], holding: Decimal.zero, costBasis: Decimal.zero)
     let description = sut.description
     let expected = "<AssetResult: asset=Foo, disposalMatches=[], holding=0, costBasis=0>"
     XCTAssertEqual(description, expected)
   }
 
-  func testTaxYear() throws {
+  func testTaxYear() {
     let sut = TaxYear(yearEnding: 2020)
     let description = sut.description
     let expected = "2019/2020"
     XCTAssertEqual(description, expected)
   }
 
-  func testTransaction() throws {
+  func testTransaction() {
     let sut = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
     let description = sut.description
     let expected =
@@ -31,7 +31,7 @@ class DescriptionTests: XCTestCase {
     XCTAssertEqual(description, expected)
   }
 
-  func testTransactionToMatch() throws {
+  func testTransactionToMatch() {
     let transaction = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
     let sut = TransactionToMatch(transaction: transaction)
     let description = sut.description
@@ -40,7 +40,7 @@ class DescriptionTests: XCTestCase {
     XCTAssertEqual(description, expected)
   }
 
-  func testMatchedTransaction() throws {
+  func testMatchedTransaction() {
     let transaction = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
     let sut = MatchedTransaction(
       transaction: transaction,
@@ -54,7 +54,7 @@ class DescriptionTests: XCTestCase {
     XCTAssertEqual(description, expected)
   }
 
-  func testDisposalMatch() throws {
+  func testDisposalMatch() {
     let acquisition = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "1234", "1.23", "12.5")
     let acquisitionSub = TransactionToMatch(transaction: acquisition)
     let disposal = ModelCreation.transaction(.Sell, "01/01/2020", "Foo", "1234", "1.29", "2")
@@ -70,7 +70,9 @@ class DescriptionTests: XCTestCase {
   }
 
   func testSection104HoldingState() throws {
-    let sut = Section104Holding.State(amount: Decimal(string: "1000")!, cost: Decimal(string: "2313.23")!)
+    let sut = try Section104Holding.State(
+      amount: XCTUnwrap(Decimal(string: "1000")),
+      cost: XCTUnwrap(Decimal(string: "2313.23")))
     let description = sut.description
     let expected = "<State: amount=1000, cost=2313.23, costBasis=2.31323>"
     XCTAssertEqual(description, expected)

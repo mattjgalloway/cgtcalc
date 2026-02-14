@@ -14,12 +14,12 @@ class DefaultParserTests: XCTestCase {
     let data = "BUY 15/08/2020 Foo 12.345 1.2345 12.5"
     let transaction = try sut.transaction(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Buy)
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
-    XCTAssertEqual(transaction!.amount, Decimal(12.345))
-    XCTAssertEqual(transaction!.price, Decimal(1.2345))
-    XCTAssertEqual(transaction!.expenses, Decimal(12.5))
+    XCTAssertEqual(transaction?.kind, .Buy)
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
+    XCTAssertEqual(transaction?.amount, Decimal(12.345))
+    XCTAssertEqual(transaction?.price, Decimal(1.2345))
+    XCTAssertEqual(transaction?.expenses, Decimal(12.5))
   }
 
   func testParseSellTransactionSuccess() throws {
@@ -27,12 +27,12 @@ class DefaultParserTests: XCTestCase {
     let data = "SELL 15/08/2020 Foo 12.345 1.2345 12.5"
     let transaction = try sut.transaction(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Sell)
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
-    XCTAssertEqual(transaction!.amount, Decimal(12.345))
-    XCTAssertEqual(transaction!.price, Decimal(1.2345))
-    XCTAssertEqual(transaction!.expenses, Decimal(12.5))
+    XCTAssertEqual(transaction?.kind, .Sell)
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
+    XCTAssertEqual(transaction?.amount, Decimal(12.345))
+    XCTAssertEqual(transaction?.price, Decimal(1.2345))
+    XCTAssertEqual(transaction?.expenses, Decimal(12.5))
   }
 
   func testParseStripsTrailingWhitespace() throws {
@@ -40,12 +40,12 @@ class DefaultParserTests: XCTestCase {
     let data = "BUY 15/08/2020 Foo 12.345 1.2345 12.5   \t\t   "
     let transaction = try sut.transaction(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Buy)
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
-    XCTAssertEqual(transaction!.amount, Decimal(12.345))
-    XCTAssertEqual(transaction!.price, Decimal(1.2345))
-    XCTAssertEqual(transaction!.expenses, Decimal(12.5))
+    XCTAssertEqual(transaction?.kind, .Buy)
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
+    XCTAssertEqual(transaction?.amount, Decimal(12.345))
+    XCTAssertEqual(transaction?.price, Decimal(1.2345))
+    XCTAssertEqual(transaction?.expenses, Decimal(12.5))
   }
 
   func testParseAllowsMultipleWhitespace() throws {
@@ -53,12 +53,12 @@ class DefaultParserTests: XCTestCase {
     let data = "BUY     15/08/2020    Foo   12.345  1.2345 12.5"
     let transaction = try sut.transaction(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Buy)
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
-    XCTAssertEqual(transaction!.amount, Decimal(12.345))
-    XCTAssertEqual(transaction!.price, Decimal(1.2345))
-    XCTAssertEqual(transaction!.expenses, Decimal(12.5))
+    XCTAssertEqual(transaction?.kind, .Buy)
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
+    XCTAssertEqual(transaction?.amount, Decimal(12.345))
+    XCTAssertEqual(transaction?.price, Decimal(1.2345))
+    XCTAssertEqual(transaction?.expenses, Decimal(12.5))
   }
 
   func testParseCapitalReturnEventSuccess() throws {
@@ -66,9 +66,9 @@ class DefaultParserTests: XCTestCase {
     let data = "CAPRETURN 15/08/2020 Foo 1.234 100"
     let transaction = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .CapitalReturn(Decimal(1.234), Decimal(100)))
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
+    XCTAssertEqual(transaction?.kind, .CapitalReturn(Decimal(1.234), Decimal(100)))
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
   }
 
   func testParseDividendEventSuccess() throws {
@@ -76,9 +76,9 @@ class DefaultParserTests: XCTestCase {
     let data = "DIVIDEND 15/08/2020 Foo 1.234 100"
     let transaction = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Dividend(Decimal(1.234), Decimal(100)))
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
+    XCTAssertEqual(transaction?.kind, .Dividend(Decimal(1.234), Decimal(100)))
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
   }
 
   func testParseSplitEventSuccess() throws {
@@ -86,9 +86,9 @@ class DefaultParserTests: XCTestCase {
     let data = "SPLIT 15/08/2020 Foo 10"
     let transaction = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Split(Decimal(10)))
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
+    XCTAssertEqual(transaction?.kind, .Split(Decimal(10)))
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
   }
 
   func testParseUnsplitEventSuccess() throws {
@@ -96,9 +96,9 @@ class DefaultParserTests: XCTestCase {
     let data = "UNSPLIT 15/08/2020 Foo 10"
     let transaction = try sut.assetEvent(fromData: Substring(data))
     XCTAssertNotNil(transaction)
-    XCTAssertEqual(transaction!.kind, .Unsplit(Decimal(10)))
-    XCTAssertEqual(transaction!.date, Date(timeIntervalSince1970: 1597449600))
-    XCTAssertEqual(transaction!.asset, "Foo")
+    XCTAssertEqual(transaction?.kind, .Unsplit(Decimal(10)))
+    XCTAssertEqual(transaction?.date, Date(timeIntervalSince1970: 1597449600))
+    XCTAssertEqual(transaction?.asset, "Foo")
   }
 
   func testParseCommentSuccess() throws {

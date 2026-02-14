@@ -18,7 +18,7 @@ class TaxYearTests: XCTestCase {
     return calendar.date(from: components)!
   }
 
-  func testDatesToTaxYearCorrect() throws {
+  func testDatesToTaxYearCorrect() {
     do {
       let date = self.dateFromComponents(year: 2015, month: 01, day: 01)
       let taxYear = TaxYear(containingDate: date)
@@ -50,7 +50,7 @@ class TaxYearTests: XCTestCase {
     }
   }
 
-  func testTaxYearStringCorrect() throws {
+  func testTaxYearStringCorrect() {
     do {
       let taxYear = TaxYear(yearEnding: 2019)
       XCTAssertEqual(taxYear.string, "2018/2019")
@@ -62,7 +62,7 @@ class TaxYearTests: XCTestCase {
     }
   }
 
-  func testTaxYearCompare() throws {
+  func testTaxYearCompare() {
     let taxYear1 = TaxYear(yearEnding: 2019)
     let taxYear2 = TaxYear(yearEnding: 2020)
     let taxYear3 = TaxYear(yearEnding: 2020)
@@ -72,7 +72,7 @@ class TaxYearTests: XCTestCase {
     XCTAssertEqual(taxYear2, taxYear3)
   }
 
-  func testTaxYearRatesAvailable() throws {
+  func testTaxYearRatesAvailable() {
     for year in 2014 ... 2026 {
       XCTAssertNotNil(TaxYear.rates[TaxYear(yearEnding: year)])
     }

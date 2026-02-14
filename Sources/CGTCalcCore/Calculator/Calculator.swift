@@ -54,8 +54,7 @@ public final class Calculator: Sendable {
             disposals: disposals,
             assetEvents: assetEvents)
           try self.preprocessAsset(withState: state)
-          let assetResult = try self.processAsset(withState: state)
-          return assetResult
+          return try self.processAsset(withState: state)
         }
       }
 

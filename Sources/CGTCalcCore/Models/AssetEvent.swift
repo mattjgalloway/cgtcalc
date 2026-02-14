@@ -37,7 +37,7 @@ public final class AssetEvent: Sendable {
      */
     case Unsplit(Decimal)
 
-    // Allowing for stripped enum (without the associated values)
+    /// Allowing for stripped enum (without the associated values)
     var `case`: Case {
       switch self {
       case .CapitalReturn:

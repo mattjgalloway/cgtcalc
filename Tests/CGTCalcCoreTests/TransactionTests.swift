@@ -13,9 +13,9 @@ class TransactionTests: XCTestCase {
     let transactionA = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let transactionB = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "20", "1.6", "10")
     let groupedTransaction = try Transaction.grouped([transactionA, transactionB])
-    XCTAssertEqual(groupedTransaction.amount, Decimal(string: "30")!)
-    XCTAssertEqual(groupedTransaction.price, Decimal(string: "1.4")!)
-    XCTAssertEqual(groupedTransaction.expenses, Decimal(string: "15")!)
+    XCTAssertEqual(groupedTransaction.amount, Decimal(string: "30"))
+    XCTAssertEqual(groupedTransaction.price, Decimal(string: "1.4"))
+    XCTAssertEqual(groupedTransaction.expenses, Decimal(string: "15"))
   }
 
   func testGroupedMultiple() throws {
@@ -23,9 +23,9 @@ class TransactionTests: XCTestCase {
     let transactionB = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "20", "1.6", "10")
     let transactionC = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "30", "1.8", "100")
     let groupedTransaction = try Transaction.grouped([transactionA, transactionB, transactionC])
-    XCTAssertEqual(groupedTransaction.amount, Decimal(string: "60")!)
-    XCTAssertEqual(groupedTransaction.price, Decimal(string: "1.6")!)
-    XCTAssertEqual(groupedTransaction.expenses, Decimal(string: "115")!)
+    XCTAssertEqual(groupedTransaction.amount, Decimal(string: "60"))
+    XCTAssertEqual(groupedTransaction.price, Decimal(string: "1.6"))
+    XCTAssertEqual(groupedTransaction.expenses, Decimal(string: "115"))
   }
 
   func testGroupedDifferentKind() throws {
@@ -50,7 +50,7 @@ class TransactionTests: XCTestCase {
     XCTAssertThrowsError(try Transaction.grouped([]))
   }
 
-  func testEquality() throws {
+  func testEquality() {
     let a = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let b = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let c = a
@@ -59,7 +59,7 @@ class TransactionTests: XCTestCase {
     XCTAssertEqual(a, c)
   }
 
-  func testHashable() throws {
+  func testHashable() {
     let a = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let b = ModelCreation.transaction(.Buy, "01/01/2020", "Foo", "10", "1", "5")
     let c = a

@@ -9,7 +9,7 @@
 import XCTest
 
 class DisposalMatchTests: XCTestCase {
-  func testMatchingDisposal() throws {
+  func testMatchingDisposal() {
     let acquisition = ModelCreation.transaction(.Buy, "15/08/2020", "Foo", "100", "2", "10")
     let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
@@ -33,8 +33,8 @@ class DisposalMatchTests: XCTestCase {
   func testSection104Disposal() throws {
     let disposal = ModelCreation.transaction(.Sell, "16/08/2020", "Foo", "100", "3", "20")
 
-    let disposalMatch = DisposalMatch(
-      kind: .Section104(Decimal(string: "100")!, Decimal(string: "2.5")!),
+    let disposalMatch = try DisposalMatch(
+      kind: .Section104(XCTUnwrap(Decimal(string: "100")), XCTUnwrap(Decimal(string: "2.5"))),
       disposal: TransactionToMatch(transaction: disposal).createMatchedTransaction(),
       restructureMultiplier: Decimal(1))
 
