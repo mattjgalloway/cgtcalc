@@ -51,6 +51,7 @@ Calculation: (10 * 4.6702 - 12.5) - ( (10 * 5.4065) ) = -20
 
 NONE
 
+
 # TRANSACTIONS
 
 28/08/2018 BOUGHT 10 of GB00B41YBW71 at £4.1565 with £12.5 expenses

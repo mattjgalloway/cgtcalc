@@ -149,7 +149,7 @@ public final class TextPresenter: Presenter {
 
   private func holdingsTable() -> String {
     guard self.result.holdings.count > 0 else {
-      return "NONE"
+      return "NONE\n"
     }
 
     return self.result.holdings.reduce(into: "") { result, holding in
@@ -159,7 +159,7 @@ public final class TextPresenter: Presenter {
 
   private func transactionsTable() -> String {
     guard self.result.input.transactions.count > 0 else {
-      return "NONE"
+      return "NONE\n"
     }
 
     return self.result.input.transactions.reduce(into: "") { result, transaction in
@@ -177,7 +177,7 @@ public final class TextPresenter: Presenter {
 
   private func assetEventsTable() -> String {
     guard self.result.input.assetEvents.count > 0 else {
-      return "NONE"
+      return "NONE\n"
     }
 
     return self.result.input.assetEvents.reduce(into: "") { result, assetEvent in

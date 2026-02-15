@@ -32,6 +32,7 @@ Calculation: (1000 * 4 - 10) - ( (1000 * 5 + 10) ) = -1020
 
 NONE
 
+
 # TRANSACTIONS
 
 28/10/2018 SOLD 1000 of STOCK at £4 with £10 expenses

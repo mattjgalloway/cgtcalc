@@ -27,6 +27,7 @@ Calculation: (10 * 24 - 0) - ( (10 * 20) ) = 40
 
 NONE
 
+
 # TRANSACTIONS
 
 01/04/2019 SOLD 10 of FOO at £24 with £0 expenses

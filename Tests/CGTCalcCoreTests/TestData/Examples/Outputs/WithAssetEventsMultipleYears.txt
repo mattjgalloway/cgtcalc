@@ -39,6 +39,7 @@ Calculation: (100 * 25 - 0) - ( (100 * 19.6) ) = 540
 
 NONE
 
+
 # TRANSACTIONS
 
 01/06/2020 SOLD 100 of GB00B3TYHH97 at £25 with £0 expenses

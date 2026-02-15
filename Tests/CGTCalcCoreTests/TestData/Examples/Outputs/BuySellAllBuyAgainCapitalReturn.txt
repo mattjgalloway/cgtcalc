@@ -39,6 +39,7 @@ Calculation: (40 * 197.12 - 12.5) - ( (40 * 196.95225) ) = -6
 
 NONE
 
+
 # TRANSACTIONS
 
 01/06/2019 SOLD 40 of GB00B3TYHH97 at £197.12 with £12.5 expenses

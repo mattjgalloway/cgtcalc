@@ -51,6 +51,7 @@ Calculation: (1 * 20000 - 0) - ( (1 * 1000 + 0) ) = 19000
 
 NONE
 
+
 # TRANSACTIONS
 
 01/01/2018 BOUGHT 1 of GB00B41YBW71 at £1000 with £0 expenses

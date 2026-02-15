@@ -27,6 +27,7 @@ Calculation: (40 * 6 - 0) - ( (40 * 5) ) = 40
 
 NONE
 
+
 # TRANSACTIONS
 
 01/04/2019 SOLD 40 of FOO at £6 with £0 expenses
