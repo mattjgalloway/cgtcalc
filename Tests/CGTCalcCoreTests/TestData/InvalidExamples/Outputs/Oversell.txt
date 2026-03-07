@@ -1,0 +1,1 @@
+Error calculating CGT: insufficientShares(asset: "TEST", date: 2019-06-01 00:00:00 +0000, requested: 50, matched: 0)

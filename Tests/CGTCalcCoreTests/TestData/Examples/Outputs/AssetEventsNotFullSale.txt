@@ -2,42 +2,42 @@
 
 Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
 ================================================================================================
-2019/2020   £28    £525       £12000      £0           £0             £0            £0          
-2020/2021   £57    £500       £12300      £0           £0             £0            £0          
+2019/2020   £25    £525       £12000      £0           £0             £0            £0          
+2020/2021   £64    £500       £12300      £0           £0             £0            £0          
 
 
 # TAX YEAR DETAILS
 
 ## TAX YEAR 2019/2020
 
-1 gains with total of 28.
+1 gains with total of 25.
 0 losses with total of 0.
 
-1) SOLD 5 of FOOBAR on 01/09/2019 for GAIN of £28
+1) SOLD 5 of FOOBAR on 01/09/2019 for GAIN of £25
 Matches with:
-  - SECTION 104: 10 at cost basis of £99.33333
-Calculation: (5 * 105 - 0) - ( (5 * 99.33333) ) = 28
+  - SECTION 104: 10 at cost basis of £100
+Calculation: (5 * 105 - 0) - ( (5 * 100) ) = 25
 
 ## TAX YEAR 2020/2021
 
-1 gains with total of 57.
+1 gains with total of 64.
 0 losses with total of 0.
 
-1) SOLD 5 of FOOBAR on 01/07/2020 for GAIN of £57
+1) SOLD 5 of FOOBAR on 01/07/2020 for GAIN of £64
 Matches with:
-  - SECTION 104: 25 at cost basis of £88.53333
-Calculation: (5 * 100 - 0) - ( (5 * 88.53333) ) = 57
+  - SECTION 104: 25 at cost basis of £87.2
+Calculation: (5 * 100 - 0) - ( (5 * 87.2) ) = 64
 
 
 # TAX RETURN INFORMATION
 
-2019/2020: Disposals = 1, proceeds = 525, allowable costs = 496, total gains = 28, total losses = 0
-2020/2021: Disposals = 1, proceeds = 500, allowable costs = 442, total gains = 57, total losses = 0
+2019/2020: Disposals = 1, proceeds = 525, allowable costs = 500, total gains = 25, total losses = 0
+2020/2021: Disposals = 1, proceeds = 500, allowable costs = 436, total gains = 64, total losses = 0
 
 
 # HOLDINGS
 
-FOOBAR: 20 units acquired at £88.53333 cost basis
+FOOBAR: 20 units acquired at £88.7 cost basis
 
 
 # TRANSACTIONS

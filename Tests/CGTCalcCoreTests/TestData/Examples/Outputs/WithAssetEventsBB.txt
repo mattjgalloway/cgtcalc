@@ -14,9 +14,9 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 
 1) SOLD 40 of GB00B3TYHH97 on 05/11/2019 for GAIN of £265
 Matches with:
-  - BED & BREAKFAST: 20 bought on 10/11/2019 at £190.9805 with offset of £15.81
+  - BED & BREAKFAST: 20 bought on 10/11/2019 at £190.19 with offset of £15.81
   - SECTION 104: 40 at cost basis of £183.47975
-Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.9805 + 2 + 15.81) + (20 * 183.47975) ) = 265
+Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.19 + 2 + 15.81) + (20 * 183.47975) ) = 265
 
 
 # TAX RETURN INFORMATION
@@ -26,7 +26,7 @@ Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.9805 + 2 + 15.81) + (20 * 183.47
 
 # HOLDINGS
 
-GB00B3TYHH97: 20 units acquired at £183.47975 cost basis
+GB00B3TYHH97: 20 units acquired at £184.27025 cost basis
 
 
 # TRANSACTIONS

@@ -1,0 +1,1 @@
+Error calculating CGT: invalidAssetEventAmount(asset: "TEST", date: 2019-03-01 00:00:00 +0000, type: CGTCalcCore.AssetEventType.capitalReturn, expected: 100, actual: 99)

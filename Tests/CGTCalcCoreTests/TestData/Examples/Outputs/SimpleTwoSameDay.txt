@@ -12,12 +12,12 @@ Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic
 0 gains with total of 0.
 2 losses with total of 40.
 
-1) SOLD 10 of BAR on 28/08/2018 for LOSS of £20
+1) SOLD 10 of FOO on 28/08/2018 for LOSS of £20
 Matches with:
   - SAME DAY: 10 bought on 28/08/2018 at £4.1565
 Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 
-2) SOLD 10 of FOO on 28/08/2018 for LOSS of £20
+2) SOLD 10 of BAR on 28/08/2018 for LOSS of £20
 Matches with:
   - SAME DAY: 10 bought on 28/08/2018 at £4.1565
 Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20

@@ -1,0 +1,139 @@
+import Foundation
+
+// MARK: - Tax Year
+
+public struct TaxYear: Codable, Comparable, Hashable {
+  public let startYear: Int // Year starting (e.g., 2019 for 2019/2020)
+
+  /// Creates a UK tax year from its starting calendar year.
+  /// - Parameter startYear: The year containing 6 April.
+  public init(startYear: Int) {
+    self.startYear = startYear
+  }
+
+  public var label: String {
+    "\(self.startYear)/\(self.startYear + 1)"
+  }
+
+  public var startDate: Date {
+    var components = DateComponents()
+    components.year = self.startYear
+    components.month = 4
+    components.day = 6
+    guard let date = UTC.calendar.date(from: components) else {
+      fatalError("Failed to create start date for tax year \(self.startYear)")
+    }
+    return date
+  }
+
+  public var endDate: Date {
+    var components = DateComponents()
+    components.year = self.startYear + 1
+    components.month = 4
+    components.day = 5
+    guard let date = UTC.calendar.date(from: components) else {
+      fatalError("Failed to create end date for tax year \(self.startYear)")
+    }
+    return date
+  }
+
+  /// Checks whether a date falls within this tax year.
+  /// - Parameter date: The date to test.
+  /// - Returns: `true` when the date is between 6 April and the following 5 April.
+  public func contains(_ date: Date) -> Bool {
+    date >= self.startDate && date <= self.endDate
+  }
+
+  /// Derives the UK tax year containing a given date.
+  /// - Parameter date: The date to convert.
+  /// - Returns: The tax year that contains the date.
+  public static func from(date: Date) -> TaxYear {
+    let components = UTC.calendar.dateComponents([.year, .month, .day], from: date)
+    guard let year = components.year else {
+      fatalError("Failed to extract year from date")
+    }
+
+    // If before April 6, use previous tax year
+    if let month = components.month, let day = components.day {
+      if month < 4 || (month == 4 && day < 6) {
+        return TaxYear(startYear: year - 1)
+      }
+    }
+    return TaxYear(startYear: year)
+  }
+
+  /// Compares tax years by their starting year.
+  /// - Parameters:
+  ///   - lhs: Left-hand tax year.
+  ///   - rhs: Right-hand tax year.
+  /// - Returns: `true` when `lhs` starts earlier than `rhs`.
+  public static func < (lhs: TaxYear, rhs: TaxYear) -> Bool {
+    lhs.startYear < rhs.startYear
+  }
+
+  public var specialCapitalGainsRateChangeLastOldRateDate: Date? {
+    guard self.startYear == 2024 else { return nil }
+
+    var components = DateComponents()
+    components.year = 2024
+    components.month = 10
+    components.day = 29
+    return UTC.calendar.date(from: components)
+  }
+
+  public var specialCapitalGainsRateChangeLabel: String? {
+    guard self.specialCapitalGainsRateChangeLastOldRateDate != nil else { return nil }
+    return "29th October"
+  }
+}
+
+// MARK: - Tax Rates
+
+public struct TaxRates: Sendable {
+  public let exemption: Decimal
+  public let basicRate: Decimal
+  public let higherRate: Decimal
+
+  /// Creates a CGT rate bundle for one tax year.
+  /// - Parameters:
+  ///   - exemption: Annual exempt amount.
+  ///   - basicRate: Basic-rate CGT percentage as a decimal.
+  ///   - higherRate: Higher-rate CGT percentage as a decimal.
+  public init(exemption: Decimal, basicRate: Decimal, higherRate: Decimal) {
+    self.exemption = exemption
+    self.basicRate = basicRate
+    self.higherRate = higherRate
+  }
+}
+
+// MARK: - Tax Rates Lookup
+
+public enum TaxRateLookup {
+  // UK CGT rates by tax year
+  // Source: HMRC https://www.gov.uk/government/publications/rates-and-allowances-for-capital-gains-tax/rates-and-allowances-for-capital-gains-tax
+  private static let rates: [Int: TaxRates] = [
+    2025: TaxRates(exemption: 3000, basicRate: 0.18, higherRate: 0.24), // 2025/2026
+    2024: TaxRates(exemption: 3000, basicRate: 0.10, higherRate: 0.20), // 2024/2025
+    2023: TaxRates(exemption: 6000, basicRate: 0.10, higherRate: 0.20), // 2023/2024
+    2022: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2022/2023
+    2021: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2021/2022
+    2020: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2020/2021
+    2019: TaxRates(exemption: 12000, basicRate: 0.10, higherRate: 0.20), // 2019/2020
+    2018: TaxRates(exemption: 11700, basicRate: 0.10, higherRate: 0.20), // 2018/2019
+    2017: TaxRates(exemption: 11300, basicRate: 0.10, higherRate: 0.20), // 2017/2018
+    2016: TaxRates(exemption: 11100, basicRate: 0.10, higherRate: 0.20), // 2016/2017
+    2015: TaxRates(exemption: 11100, basicRate: 0.18, higherRate: 0.28), // 2015/2016
+    2014: TaxRates(exemption: 11000, basicRate: 0.18, higherRate: 0.28), // 2014/2015
+    2013: TaxRates(exemption: 10900, basicRate: 0.18, higherRate: 0.28) // 2013/2014
+  ]
+
+  /// Returns the configured CGT rates for a tax year.
+  /// - Parameter year: The tax year to look up.
+  /// - Returns: The exemption and rate bundle for that year.
+  public static func rates(for year: TaxYear) -> TaxRates {
+    guard let rates = rates[year.startYear] else {
+      fatalError("Missing tax rates for year \(year.startYear). Please add rates to TaxRateLookup.")
+    }
+    return rates
+  }
+}
