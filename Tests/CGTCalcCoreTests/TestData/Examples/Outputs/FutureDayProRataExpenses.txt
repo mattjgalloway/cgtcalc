@@ -1,0 +1,50 @@
+# SUMMARY
+
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=================================================================================================
+2019/2020   £1100   £1360      £12000      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+2 gains with total of 1100.
+0 losses with total of 0.
+
+1) SOLD 70 of FEE on 10/01/2020 for GAIN of £578
+Matches with:
+  - BED & BREAKFAST: 12 bought on 20/01/2020 at £2
+  - BED & BREAKFAST: 28 bought on 20/01/2020 at £2
+  - SECTION 104: 100 at cost basis of £1
+Calculation: (70 * 10 - 0) - ( (12 * 2 + 12) + (28 * 2 + 0) + (30 * 1) ) = 578
+
+2) SOLD 60 of FEE on 20/01/2020 for GAIN of £522
+Matches with:
+  - SAME DAY: 18 bought on 20/01/2020 at £2
+  - SAME DAY: 42 bought on 20/01/2020 at £2
+Calculation: (60 * 11 - 0) - ( (18 * 2 + 18) + (42 * 2 + 0) ) = 522
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 2, proceeds = 1360, allowable costs = 260, total gains = 1100, total losses = 0
+
+
+# HOLDINGS
+
+FEE: 70 units acquired at £1 cost basis
+
+
+# TRANSACTIONS
+
+01/12/2019 BOUGHT 100 of FEE at £1 with £0 expenses
+10/01/2020 SOLD 70 of FEE at £10 with £0 expenses
+20/01/2020 BOUGHT 30 of FEE at £2 with £30 expenses
+20/01/2020 BOUGHT 70 of FEE at £2 with £0 expenses
+20/01/2020 SOLD 60 of FEE at £11 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

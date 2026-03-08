@@ -1,0 +1,40 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+================================================================================================
+2019/2020   £60    £100       £12000      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+1 gains with total of 60.
+0 losses with total of 0.
+
+1) SOLD 10 of D31 on 01/01/2020 for GAIN of £60
+Matches with:
+  - SECTION 104: 10 at cost basis of £4
+Calculation: (10 * 10 - 0) - ( (10 * 4) ) = 60
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 100, allowable costs = 40, total gains = 60, total losses = 0
+
+
+# HOLDINGS
+
+D31: 10 units acquired at £3 cost basis
+
+
+# TRANSACTIONS
+
+01/12/2019 BOUGHT 10 of D31 at £4 with £0 expenses
+01/01/2020 SOLD 10 of D31 at £10 with £0 expenses
+01/02/2020 BOUGHT 10 of D31 at £3 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

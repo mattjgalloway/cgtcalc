@@ -1,0 +1,54 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+================================================================================================
+2019/2020   £260   £350       £12000      £0           £0             £0            £0          
+2020/2021   £160   £240       £12300      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+1 gains with total of 260.
+0 losses with total of 0.
+
+1) SOLD 70 of CROSS on 25/03/2020 for GAIN of £260
+Matches with:
+  - BED & BREAKFAST: 20 bought on 10/04/2020 at £2
+  - SECTION 104: 100 at cost basis of £1
+Calculation: (70 * 5 - 0) - ( (20 * 2 + 0) + (50 * 1) ) = 260
+
+## TAX YEAR 2020/2021
+
+1 gains with total of 160.
+0 losses with total of 0.
+
+1) SOLD 40 of CROSS on 10/04/2020 for GAIN of £160
+Matches with:
+  - SAME DAY: 40 bought on 10/04/2020 at £2
+Calculation: (40 * 6 - 0) - ( (40 * 2 + 0) ) = 160
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 350, allowable costs = 90, total gains = 260, total losses = 0
+2020/2021: Disposals = 1, proceeds = 240, allowable costs = 80, total gains = 160, total losses = 0
+
+
+# HOLDINGS
+
+CROSS: 50 units acquired at £1 cost basis
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 100 of CROSS at £1 with £0 expenses
+25/03/2020 SOLD 70 of CROSS at £5 with £0 expenses
+10/04/2020 BOUGHT 60 of CROSS at £2 with £0 expenses
+10/04/2020 SOLD 40 of CROSS at £6 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

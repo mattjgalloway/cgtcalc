@@ -1,0 +1,47 @@
+# SUMMARY
+
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+=================================================================================================
+2019/2020   £1750   £2650      £12000      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+2 gains with total of 1750.
+0 losses with total of 0.
+
+1) SOLD 100 of SPLT on 01/01/2020 for GAIN of £550
+Matches with:
+  - BED & BREAKFAST: 50 bought on 20/01/2020 at £3 with restructure multiplier 2
+  - SECTION 104: 100 at cost basis of £4
+Calculation: (100 * 10 - 0) - ( (50 * 3 + 0) + (75 * 4) ) = 550
+
+2) SOLD 150 of SPLT on 20/01/2020 for GAIN of £1200
+Matches with:
+  - SAME DAY: 150 bought on 20/01/2020 at £3
+Calculation: (150 * 11 - 0) - ( (150 * 3 + 0) ) = 1200
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 2, proceeds = 2650, allowable costs = 900, total gains = 1750, total losses = 0
+
+
+# HOLDINGS
+
+SPLT: 50 units acquired at £2 cost basis
+
+
+# TRANSACTIONS
+
+01/12/2019 BOUGHT 100 of SPLT at £4 with £0 expenses
+01/01/2020 SOLD 100 of SPLT at £10 with £0 expenses
+20/01/2020 BOUGHT 200 of SPLT at £3 with £0 expenses
+20/01/2020 SOLD 150 of SPLT at £11 with £0 expenses
+
+
+# ASSET EVENTS
+
+10/01/2020 SPLT SPLIT by 2

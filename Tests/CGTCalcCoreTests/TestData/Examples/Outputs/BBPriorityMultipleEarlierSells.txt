@@ -1,0 +1,53 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
+================================================================================================
+2019/2020   £760   £1010      £12000      £0           £0             £0            £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+3 gains with total of 760.
+0 losses with total of 0.
+
+1) SOLD 60 of STOCK on 01/01/2020 for GAIN of £210
+Matches with:
+  - BED & BREAKFAST: 30 bought on 20/01/2020 at £2
+  - SECTION 104: 200 at cost basis of £1
+Calculation: (60 * 5 - 0) - ( (30 * 2 + 0) + (30 * 1) ) = 210
+
+2) SOLD 60 of STOCK on 05/01/2020 for GAIN of £300
+Matches with:
+  - SECTION 104: 170 at cost basis of £1
+Calculation: (60 * 6 - 0) - ( (60 * 1) ) = 300
+
+3) SOLD 50 of STOCK on 20/01/2020 for GAIN of £250
+Matches with:
+  - SAME DAY: 50 bought on 20/01/2020 at £2
+Calculation: (50 * 7 - 0) - ( (50 * 2 + 0) ) = 250
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 3, proceeds = 1010, allowable costs = 250, total gains = 760, total losses = 0
+
+
+# HOLDINGS
+
+STOCK: 110 units acquired at £1 cost basis
+
+
+# TRANSACTIONS
+
+01/12/2019 BOUGHT 200 of STOCK at £1 with £0 expenses
+01/01/2020 SOLD 60 of STOCK at £5 with £0 expenses
+05/01/2020 SOLD 60 of STOCK at £6 with £0 expenses
+20/01/2020 BOUGHT 80 of STOCK at £2 with £0 expenses
+20/01/2020 SOLD 50 of STOCK at £7 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE
