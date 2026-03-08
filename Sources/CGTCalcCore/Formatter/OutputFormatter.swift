@@ -219,13 +219,13 @@ public struct OutputFormatter {
 
     for summary in summaries.sorted(by: { $0.taxYear < $1.taxYear }) {
       let disposalsCount = summary.disposals.count
-      let totalProceeds = summary.disposals.reduce(Decimal(0)) { $0 + $1.sellTransaction.proceeds }
-
+      let totalProceeds = summary.disposals.reduce(Decimal(0)) { total, disposal in
+        total + TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
+      }
       let allowableCosts = summary.disposals.reduce(Decimal(0)) { total, disposal in
-        let bnbCost = disposal.bedAndBreakfastMatches.reduce(Decimal(0)) { $0 + $1.cost }
-        let s104Cost = disposal.section104Matches.reduce(Decimal(0)) { $0 + $1.cost }
-        let saleExpenses = disposal.sellTransaction.expenses
-        return total + bnbCost + s104Cost + saleExpenses
+        let roundedDisposalProceeds = TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
+        let reportedDisposalAllowableCost = roundedDisposalProceeds - disposal.gain
+        return total + reportedDisposalAllowableCost
       }
 
       let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
