@@ -2,6 +2,12 @@ import ArgumentParser
 import CGTCalcCore
 import Foundation
 
+private func writeStderr(_ message: String) {
+  let line = message.hasSuffix("\n") ? message : message + "\n"
+  guard let data = line.data(using: .utf8) else { return }
+  FileHandle.standardError.write(data)
+}
+
 @main
 struct CGTCalcCommand: ParsableCommand {
   static let VERSION = "0.2.0"
@@ -31,10 +37,10 @@ struct CGTCalcCommand: ParsableCommand {
         inputData = try InputParser.parse(fileURL: fileURL)
       }
     } catch let error as ParserError {
-      fputs("Error parsing input: \(error)\n", stderr)
+      writeStderr("Error parsing input: \(error)")
       throw ExitCode(1)
     } catch {
-      fputs("Error parsing input: \(error)\n", stderr)
+      writeStderr("Error parsing input: \(error)")
       throw ExitCode(1)
     }
 
@@ -43,7 +49,7 @@ struct CGTCalcCommand: ParsableCommand {
     do {
       result = try CGTEngine.calculate(inputData: inputData)
     } catch {
-      fputs("Error calculating CGT: \(error)\n", stderr)
+      writeStderr("Error calculating CGT: \(error)")
       throw ExitCode(1)
     }
 
@@ -56,7 +62,7 @@ struct CGTCalcCommand: ParsableCommand {
       do {
         try output.write(toFile: outputFile, atomically: true, encoding: String.Encoding.utf8)
       } catch {
-        fputs("Error writing output file: \(error)\n", stderr)
+        writeStderr("Error writing output file: \(error)")
         throw ExitCode(1)
       }
     } else {
