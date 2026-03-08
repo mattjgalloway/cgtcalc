@@ -20,10 +20,7 @@ public struct TaxYear: Codable, Comparable, Hashable {
     components.year = self.startYear
     components.month = 4
     components.day = 6
-    guard let date = UTC.calendar.date(from: components) else {
-      fatalError("Failed to create start date for tax year \(self.startYear)")
-    }
-    return date
+    return UTC.calendar.date(from: components)!
   }
 
   public var endDate: Date {
@@ -31,10 +28,7 @@ public struct TaxYear: Codable, Comparable, Hashable {
     components.year = self.startYear + 1
     components.month = 4
     components.day = 5
-    guard let date = UTC.calendar.date(from: components) else {
-      fatalError("Failed to create end date for tax year \(self.startYear)")
-    }
-    return date
+    return UTC.calendar.date(from: components)!
   }
 
   /// Checks whether a date falls within this tax year.
@@ -48,10 +42,8 @@ public struct TaxYear: Codable, Comparable, Hashable {
   /// - Parameter date: The date to convert.
   /// - Returns: The tax year that contains the date.
   public static func from(date: Date) -> TaxYear {
-    let components = UTC.calendar.dateComponents([.year, .month, .day], from: date)
-    guard let year = components.year else {
-      fatalError("Failed to extract year from date")
-    }
+    let components = UTC.calendar.dateComponents([.month, .day], from: date)
+    let year = UTC.calendar.component(.year, from: date)
 
     // If before April 6, use previous tax year
     if let month = components.month, let day = components.day {
@@ -103,6 +95,17 @@ public struct TaxRates: Sendable {
 // MARK: - Tax Rates Lookup
 
 public enum TaxRateLookup {
+  public enum LookupError: Error, LocalizedError {
+    case missingTaxRates(startYear: Int)
+
+    public var errorDescription: String? {
+      switch self {
+      case .missingTaxRates(let startYear):
+        "Missing tax rates for year \(startYear). Please add rates to TaxRateLookup."
+      }
+    }
+  }
+
   // UK CGT rates by tax year
   // Source: HMRC https://www.gov.uk/government/publications/rates-and-allowances-for-capital-gains-tax/rates-and-allowances-for-capital-gains-tax
   private static let rates: [Int: TaxRates] = [
@@ -124,9 +127,9 @@ public enum TaxRateLookup {
   /// Returns the configured CGT rates for a tax year.
   /// - Parameter year: The tax year to look up.
   /// - Returns: The exemption and rate bundle for that year.
-  public static func rates(for year: TaxYear) -> TaxRates {
+  public static func rates(for year: TaxYear) throws -> TaxRates {
     guard let rates = rates[year.startYear] else {
-      fatalError("Missing tax rates for year \(year.startYear). Please add rates to TaxRateLookup.")
+      throw LookupError.missingTaxRates(startYear: year.startYear)
     }
     return rates
   }

@@ -123,7 +123,7 @@ public enum CGTEngine {
         bedAndBreakfastMatches: bnbMatches))
     }
 
-    let summaryResult = TaxYearSummarizer.summarize(disposals: disposals)
+    let summaryResult = try TaxYearSummarizer.summarize(disposals: disposals)
     let summaries = summaryResult.summaries
 
     let assets = Set(buysByAsset.keys).union(eventsByAsset.keys).union(section104Holdings.keys)

@@ -2,8 +2,8 @@
 import XCTest
 
 final class TaxYearSummarizerTests: XCTestCase {
-  func testSummarizesNetGainWithinTaxYear() {
-    let result = TaxYearSummarizer.summarize(disposals: [
+  func testSummarizesNetGainWithinTaxYear() throws {
+    let result = try TaxYearSummarizer.summarize(disposals: [
       TestSupport.disposal(date: "01/06/2019", gain: 400),
       TestSupport.disposal(date: "01/08/2019", gain: -150)
     ])
@@ -17,8 +17,8 @@ final class TaxYearSummarizerTests: XCTestCase {
     XCTAssertEqual(summary.lossCarryForward, 0)
   }
 
-  func testCarriesForwardLossesOnlyWhenYearIsNetNegative() {
-    let result = TaxYearSummarizer.summarize(disposals: [
+  func testCarriesForwardLossesOnlyWhenYearIsNetNegative() throws {
+    let result = try TaxYearSummarizer.summarize(disposals: [
       TestSupport.disposal(date: "01/06/2019", gain: -1000),
       TestSupport.disposal(date: "01/06/2020", gain: 13000)
     ])
@@ -31,8 +31,8 @@ final class TaxYearSummarizerTests: XCTestCase {
     XCTAssertEqual(result.lossCarryForward, 300)
   }
 
-  func testAppliesLossCarryOnlyAboveExemption() {
-    let result = TaxYearSummarizer.summarize(disposals: [
+  func testAppliesLossCarryOnlyAboveExemption() throws {
+    let result = try TaxYearSummarizer.summarize(disposals: [
       TestSupport.disposal(date: "01/06/2019", gain: -5000),
       TestSupport.disposal(date: "01/06/2020", gain: 15000)
     ])
@@ -43,5 +43,17 @@ final class TaxYearSummarizerTests: XCTestCase {
     XCTAssertEqual(secondYear.taxableGain, 0)
     XCTAssertEqual(secondYear.lossCarryForward, 2300)
     XCTAssertEqual(result.lossCarryForward, 2300)
+  }
+
+  func testThrowsWhenTaxRatesAreMissingForYear() {
+    XCTAssertThrowsError(
+      try TaxYearSummarizer.summarize(disposals: [
+        TestSupport.disposal(date: "01/06/2012", gain: 100)
+      ])) { error in
+        guard case TaxRateLookup.LookupError.missingTaxRates(let startYear) = error else {
+          return XCTFail("Unexpected error: \(error)")
+        }
+        XCTAssertEqual(startYear, 2012)
+      }
   }
 }
