@@ -40,13 +40,16 @@
     private let bodyBoldFont = CTFontCreateWithName("Helvetica-Bold" as CFString, 10, nil)
     private let smallFont = CTFontCreateWithName("Helvetica" as CFString, 9, nil)
     private let monoFont = CTFontCreateWithName("Menlo-Regular" as CFString, 9.5, nil)
+    private let generatedAt: Date
     private let utcCalendar: Calendar = {
       var calendar = Calendar(identifier: .gregorian)
       calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .gmt
       return calendar
     }()
 
-    public init() {}
+    public init(generatedAt: Date = Date()) {
+      self.generatedAt = generatedAt
+    }
 
     public func render(_ result: CalculationResult) throws -> FormattedReport {
       guard let data = CFDataCreateMutable(nil, 0),
@@ -90,7 +93,7 @@
         y: 18,
         font: self.titleFont,
         color: CGColor(gray: 1, alpha: 1))
-      let generatedLine = "Generated \(DateParser.format(Date()))"
+      let generatedLine = "Generated \(DateParser.format(self.generatedAt))"
       layout.drawText(generatedLine, x: self.margin, y: 42, font: self.smallFont, color: CGColor(gray: 1, alpha: 0.85))
       layout.y = 72
     }

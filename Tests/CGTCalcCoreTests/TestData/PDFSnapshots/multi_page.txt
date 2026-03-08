@@ -1,0 +1,258 @@
+--- PAGE 1 ---
+Capital Gains Tax Report
+Generated 08/03/2026
+Summary
+Tax year Gain Proceeds Exemption Loss carry Taxable gain
+2023/2024 £395 £1200 £6000 £0 £0
+Tax Year Details
+Tax Year 2023/2024
+1 gains with total £395; 0 losses with total £0.
+1. SOLD 100 FOO on 01/06/2023 - GAIN £395
+Section 104: 200 units at average cost £8
+Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395
+Tax Return Information
+Values below are laid out for HMRC Self Assessment entry.
+Tax Year 2023/2024
+Disposals 1
+Proceeds 1200
+Allowable costs 805
+Total gains 395
+Total losses 0
+Holdings
+Asset Quantity Average cost basis
+FOO 100 £8
+Transactions
+01/07/2023 BOUGHT 1 of FOO at £10 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £11 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £12 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £13 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £14 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £10 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £11 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £12 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £13 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £14 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £10 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £11 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £12 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £13 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £14 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £10 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £11 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £12 with £1 expenses
+
+--- PAGE 2 ---
+Transactions (cont.)
+19/07/2023 BOUGHT 5 of FOO at £13 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £14 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £10 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £11 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £12 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £13 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £14 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £10 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £11 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £12 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £13 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £14 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £10 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £11 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £12 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £13 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £14 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £10 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £11 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £12 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £13 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £14 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £10 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £11 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £12 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £13 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £14 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £10 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £11 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £12 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £13 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £14 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £10 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £11 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £12 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £13 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £14 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £10 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £11 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £12 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £13 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £14 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £10 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £11 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £12 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £13 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £14 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £10 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £11 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £12 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £13 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £14 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £10 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £11 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £12 with £1 expenses
+
+--- PAGE 3 ---
+Transactions (cont.)
+18/07/2023 SOLD 4 of FOO at £13 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £14 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £10 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £11 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £12 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £13 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £14 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £10 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £11 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £12 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £13 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £14 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £10 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £11 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £12 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £13 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £14 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £10 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £11 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £12 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £13 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £14 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £10 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £11 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £12 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £13 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £14 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £10 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £11 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £12 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £13 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £14 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £10 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £11 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £12 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £13 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £14 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £10 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £11 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £12 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £13 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £14 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £10 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £11 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £12 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £13 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £14 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £10 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £11 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £12 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £13 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £14 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £10 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £11 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £12 with £1 expenses
+
+--- PAGE 4 ---
+Transactions (cont.)
+17/07/2023 BOUGHT 3 of FOO at £13 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £14 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £10 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £11 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £12 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £13 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £14 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £10 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £11 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £12 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £13 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £14 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £10 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £11 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £12 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £13 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £14 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £10 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £11 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £12 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £13 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £14 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £10 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £11 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £12 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £13 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £14 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £10 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £11 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £12 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £13 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £14 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £10 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £11 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £12 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £13 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £14 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £10 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £11 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £12 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £13 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £14 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £10 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £11 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £12 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £13 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £14 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £10 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £11 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £12 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £13 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £14 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £10 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £11 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £12 with £1 expenses
+
+--- PAGE 5 ---
+Transactions (cont.)
+16/07/2023 SOLD 2 of FOO at £13 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £14 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £10 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £11 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £12 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £13 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £14 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £10 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £11 with £1 expenses
+25/07/2023 BOUGHT 4 of FOO at £12 with £1 expenses
+26/07/2023 SOLD 5 of FOO at £13 with £1 expenses
+27/07/2023 BOUGHT 6 of FOO at £14 with £1 expenses
+28/07/2023 SOLD 7 of FOO at £10 with £1 expenses
+01/07/2023 BOUGHT 1 of FOO at £11 with £1 expenses
+02/07/2023 SOLD 2 of FOO at £12 with £1 expenses
+03/07/2023 BOUGHT 3 of FOO at £13 with £1 expenses
+04/07/2023 SOLD 4 of FOO at £14 with £1 expenses
+05/07/2023 BOUGHT 5 of FOO at £10 with £1 expenses
+06/07/2023 SOLD 6 of FOO at £11 with £1 expenses
+07/07/2023 BOUGHT 7 of FOO at £12 with £1 expenses
+08/07/2023 SOLD 1 of FOO at £13 with £1 expenses
+09/07/2023 BOUGHT 2 of FOO at £14 with £1 expenses
+10/07/2023 SOLD 3 of FOO at £10 with £1 expenses
+11/07/2023 BOUGHT 4 of FOO at £11 with £1 expenses
+12/07/2023 SOLD 5 of FOO at £12 with £1 expenses
+13/07/2023 BOUGHT 6 of FOO at £13 with £1 expenses
+14/07/2023 SOLD 7 of FOO at £14 with £1 expenses
+15/07/2023 BOUGHT 1 of FOO at £10 with £1 expenses
+16/07/2023 SOLD 2 of FOO at £11 with £1 expenses
+17/07/2023 BOUGHT 3 of FOO at £12 with £1 expenses
+18/07/2023 SOLD 4 of FOO at £13 with £1 expenses
+19/07/2023 BOUGHT 5 of FOO at £14 with £1 expenses
+20/07/2023 SOLD 6 of FOO at £10 with £1 expenses
+21/07/2023 BOUGHT 7 of FOO at £11 with £1 expenses
+22/07/2023 SOLD 1 of FOO at £12 with £1 expenses
+23/07/2023 BOUGHT 2 of FOO at £13 with £1 expenses
+24/07/2023 SOLD 3 of FOO at £14 with £1 expenses
+Asset Events
+NONE

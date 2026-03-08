@@ -1,0 +1,28 @@
+--- PAGE 1 ---
+Capital Gains Tax Report
+Generated 08/03/2026
+Summary
+Tax year Gain Proceeds Exemption Loss carry Taxable gain
+2023/2024 £395 £1200 £6000 £0 £0
+Tax Year Details
+Tax Year 2023/2024
+1 gains with total £395; 0 losses with total £0.
+1. SOLD 100 FOO on 01/06/2023 - GAIN £395
+Section 104: 200 units at average cost £8
+Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395
+Tax Return Information
+Values below are laid out for HMRC Self Assessment entry.
+Tax Year 2023/2024
+Disposals 1
+Proceeds 1200
+Allowable costs 805
+Total gains 395
+Total losses 0
+Holdings
+Asset Quantity Average cost basis
+FOO 100 £8
+Transactions
+01/05/2023 BOUGHT 200 of FOO at £8 with £2 expenses
+01/06/2023 SOLD 100 of FOO at £12 with £3 expenses
+Asset Events
+NONE
