@@ -100,11 +100,9 @@ And will output the following:
 ```
 # SUMMARY
 
-Tax year    Gain    Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
-======================================================================================
-2019/2020   £1140   £12000      £0           £0             £0            £0
-
-
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain
+====================================================================
+2019/2020   £1140   £9340      £12000      £0           £0
 # TAX YEAR DETAILS
 
 ## TAX YEAR 2019/2020

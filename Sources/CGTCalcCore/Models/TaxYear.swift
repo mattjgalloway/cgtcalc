@@ -91,18 +91,12 @@ public struct TaxYear: Codable, Comparable, Hashable {
 
 public struct TaxRates: Sendable {
   public let exemption: Decimal
-  public let basicRate: Decimal
-  public let higherRate: Decimal
 
   /// Creates a CGT rate bundle for one tax year.
   /// - Parameters:
   ///   - exemption: Annual exempt amount.
-  ///   - basicRate: Basic-rate CGT percentage as a decimal.
-  ///   - higherRate: Higher-rate CGT percentage as a decimal.
-  public init(exemption: Decimal, basicRate: Decimal, higherRate: Decimal) {
+  public init(exemption: Decimal) {
     self.exemption = exemption
-    self.basicRate = basicRate
-    self.higherRate = higherRate
   }
 }
 
@@ -112,19 +106,19 @@ public enum TaxRateLookup {
   // UK CGT rates by tax year
   // Source: HMRC https://www.gov.uk/government/publications/rates-and-allowances-for-capital-gains-tax/rates-and-allowances-for-capital-gains-tax
   private static let rates: [Int: TaxRates] = [
-    2025: TaxRates(exemption: 3000, basicRate: 0.18, higherRate: 0.24), // 2025/2026
-    2024: TaxRates(exemption: 3000, basicRate: 0.10, higherRate: 0.20), // 2024/2025
-    2023: TaxRates(exemption: 6000, basicRate: 0.10, higherRate: 0.20), // 2023/2024
-    2022: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2022/2023
-    2021: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2021/2022
-    2020: TaxRates(exemption: 12300, basicRate: 0.10, higherRate: 0.20), // 2020/2021
-    2019: TaxRates(exemption: 12000, basicRate: 0.10, higherRate: 0.20), // 2019/2020
-    2018: TaxRates(exemption: 11700, basicRate: 0.10, higherRate: 0.20), // 2018/2019
-    2017: TaxRates(exemption: 11300, basicRate: 0.10, higherRate: 0.20), // 2017/2018
-    2016: TaxRates(exemption: 11100, basicRate: 0.10, higherRate: 0.20), // 2016/2017
-    2015: TaxRates(exemption: 11100, basicRate: 0.18, higherRate: 0.28), // 2015/2016
-    2014: TaxRates(exemption: 11000, basicRate: 0.18, higherRate: 0.28), // 2014/2015
-    2013: TaxRates(exemption: 10900, basicRate: 0.18, higherRate: 0.28) // 2013/2014
+    2025: TaxRates(exemption: 3000), // 2025/2026
+    2024: TaxRates(exemption: 3000), // 2024/2025
+    2023: TaxRates(exemption: 6000), // 2023/2024
+    2022: TaxRates(exemption: 12300), // 2022/2023
+    2021: TaxRates(exemption: 12300), // 2021/2022
+    2020: TaxRates(exemption: 12300), // 2020/2021
+    2019: TaxRates(exemption: 12000), // 2019/2020
+    2018: TaxRates(exemption: 11700), // 2018/2019
+    2017: TaxRates(exemption: 11300), // 2017/2018
+    2016: TaxRates(exemption: 11100), // 2016/2017
+    2015: TaxRates(exemption: 11100), // 2015/2016
+    2014: TaxRates(exemption: 11000), // 2014/2015
+    2013: TaxRates(exemption: 10900) // 2013/2014
   ]
 
   /// Returns the configured CGT rates for a tax year.

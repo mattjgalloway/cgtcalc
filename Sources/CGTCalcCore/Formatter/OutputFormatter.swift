@@ -52,18 +52,13 @@ public struct OutputFormatter {
         let exemption = self.formatCurrency(summary.exemption)
         let lossCarry = self.formatCurrency(summary.lossCarryForward)
         let taxable = self.formatCurrency(summary.taxableGain)
-        let rates = TaxRateLookup.rates(for: summary.taxYear)
-        let taxBasic = self.formatCurrency(self.calculateTax(summary.taxableGain, rate: rates.basicRate))
-        let taxHigher = self.formatCurrency(self.calculateTax(summary.taxableGain, rate: rates.higherRate))
         let row = [
           summary.taxYear.label,
           gain,
           proceeds,
           exemption,
           lossCarry,
-          taxable,
-          taxBasic,
-          taxHigher
+          taxable
         ]
         output.append(row)
       }
@@ -74,9 +69,7 @@ public struct OutputFormatter {
       "Proceeds",
       "Exemption",
       "Loss carry",
-      "Taxable gain",
-      "Tax (basic)",
-      "Tax (higher)"
+      "Taxable gain"
     ]
     let initialMaxWidths = headerRow.map(\.count)
     let maxWidths = rows.reduce(into: initialMaxWidths) { result, row in
@@ -334,14 +327,5 @@ public struct OutputFormatter {
   /// - Returns: A string prefixed with `£`.
   private func formatCurrency(_ value: Decimal) -> String {
     "£" + value.rounded(to: 2).string
-  }
-
-  /// Calculates tax for a taxable gain at a supplied rate.
-  /// - Parameters:
-  ///   - gain: The taxable gain amount.
-  ///   - rate: The CGT rate to apply.
-  /// - Returns: Tax due at that rate before any presentation formatting.
-  private func calculateTax(_ gain: Decimal, rate: Decimal) -> Decimal {
-    gain * rate
   }
 }

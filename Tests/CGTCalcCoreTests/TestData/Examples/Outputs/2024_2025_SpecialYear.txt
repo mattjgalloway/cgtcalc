@@ -1,8 +1,8 @@
 # SUMMARY
 
-Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain   Tax (basic)   Tax (higher)
-=================================================================================================
-2024/2025   £5920   £36000     £3000       £0           £2920          £292          £584        
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain
+====================================================================
+2024/2025   £5920   £36000     £3000       £0           £2920       
 
 
 # TAX YEAR DETAILS
