@@ -48,7 +48,8 @@ Owns:
 - `CAPRETURN` and `DIVIDEND` support with current semantics
 - grouped same-day distribution amount validation
 - oversell rejection with explicit errors
-- stable text report output and golden fixture verification
+- stable report output via `TextReportFormatter` (all platforms) and `PDFReportFormatter` (macOS)
+- golden fixture verification and formatter-focused tests
 
 ## Intentional Non-Coverage
 
@@ -65,5 +66,5 @@ The team currently treats these as out of scope:
 
 - strengthen invalid-input fixture coverage
 - expand formatter-focused output tests
-- improve special-year summary tax presentation clarity
+- improve special-year tax-return presentation clarity
 - keep documentation and tests tightly synchronized with behavior

@@ -13,6 +13,7 @@ The project currently provides:
 - grouped same-day validation for distribution amounts
 - explicit oversell errors
 - deterministic report output with tax-year summaries, disposal detail, tax-return info, holdings, and input-order transaction/event sections
+- pluggable report formatting (`text` on all platforms, `pdf` on macOS)
 
 ## Current Priorities
 
@@ -47,7 +48,7 @@ This project intentionally does not currently cover:
 
 - Expand invalid-input fixtures for parser and calculator failures.
 - Add more output-focused tests for tax-return detail and holdings edge cases.
-- Improve treatment and presentation of special-year rate-change scenarios in summary tax columns.
+- Improve treatment and presentation of special-year rate-change scenarios in tax-return information.
 
 ### Medium Value
 

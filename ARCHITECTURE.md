@@ -18,7 +18,8 @@ cgtcalc-swift2/
 │   ├── CGTCalcCore/
 │   └── cgtcalc/
 └── Tests/
-    └── CGTCalcCoreTests/
+    ├── CGTCalcCoreTests/
+    └── cgtcalcTests/
 ```
 
 ## Core Components
@@ -48,16 +49,24 @@ cgtcalc-swift2/
 
 ### Formatter
 
-`OutputFormatter`:
-- single-mode report renderer (no verbose path)
+`ReportFormatter`:
+- formatter abstraction used by the CLI for selectable output modes
+
+`TextReportFormatter`:
+- default text report renderer
 - renders summary, tax-year details, tax-return info, holdings, transactions, and asset events
 - preserves input order in rendered transactions/events
+
+`PDFReportFormatter` (macOS-only):
+- renders a styled PDF report with the same high-level sections as text output
+- receives calculation results directly (not text-as-PDF conversion)
 
 ### CLI
 
 `cgtcalc` executable:
 - reads file or stdin (`-`)
 - runs parse + calculate + format
+- supports formatter selection via `--format` (`text` on all platforms, `pdf` on macOS)
 - writes to stdout or optional output file
 
 ## Domain Model Highlights
@@ -107,7 +116,7 @@ flowchart TD
   L --> M["Final Holdings Replay"]
   K --> N["CalculationResult"]
   M --> N
-  N --> O["OutputFormatter"]
+  N --> O["ReportFormatter (Text or PDF)"]
   O --> P["Rendered Report"]
 ```
 
@@ -171,6 +180,7 @@ Layered test suite:
 - engine smoke tests
 - golden end-to-end example tests
 - golden end-to-end invalid-input tests
+- CLI formatter tests (`Tests/cgtcalcTests`) for formatter behavior
 
 Principle:
 - test behavior at the narrowest useful seam first
@@ -194,5 +204,5 @@ Intentional boundaries:
 
 - richer invalid-input fixture coverage and clearer error-stability guarantees
 - deeper formatter test coverage for tax-return detail edge cases
-- clearer special-year rate-change treatment in summary tax presentation
+- clearer special-year rate-change treatment in tax-return presentation
 - continued parser/calculator boundary refinement for validation ownership

@@ -37,6 +37,7 @@ Currently there is no support for:
 ## Platforms
 
 The library and console app both run on macOS and Linux.
+Text output works on both platforms. PDF output is currently available on macOS only.
 
 ## Usage
 
@@ -47,6 +48,7 @@ Using `cgtcalc` is simple. All you need to do is the following:
   3. Run `swift run cgtcalc data.txt`.
 
 That's pretty much it. You'll then see output on your console showing the calculations and a summary for all tax years that have tax events in them.
+By default the output format is text. You can select another formatter using `--format`.
 For PDF output, use `--format pdf --output-file report.pdf` (available on macOS only).
 
 Full usage can be found by running with `-h`:
@@ -166,9 +168,11 @@ The test that controls these tests can be found here: [Tests/CGTCalcCoreTests/Ex
 
 First the test looks for all the [input data files](Tests/CGTCalcCoreTests/TestData/Examples/Inputs). Then it iterates over each of them and runs `cgtcalc` on the file. It finds the corresponding file in the [output files](Tests/CGTCalcCoreTests/TestData/Examples/Outputs) and checks that the output is identical. Any difference is reported and the test failed.
 
-It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in [Tests/CGTCalcCoreTests/PrivateExamples/](Tests/CGTCalcCoreTests/PrivateExamples/). They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
+It is also possible to have private tests which according to `.gitignore` will not be added to the repo. These live in [Tests/CGTCalcCoreTests/TestData/PrivateExamples/](Tests/CGTCalcCoreTests/TestData/PrivateExamples/). They can be used to have additional tests just on your local checkout. You might want to use this to put your inputs/outputs used for Self Assessment. Then each year when you update the software, you can check that nothing has changed.
 
 Finally, if you want to re-record the tests, then you can set `record` to `true` when calling `runTests` in `testExamples` and `testPrivateExamples`. Note that if the output file doesn't exist then the output is recorded even if record mode is off.
+
+There is also a CLI-level formatter test target at [Tests/cgtcalcTests/](Tests/cgtcalcTests/) which covers report-formatting behavior (including PDF formatting on macOS).
 
 ## Donate
 
