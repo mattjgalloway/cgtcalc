@@ -13,7 +13,7 @@ struct CGTCalcCommand: ParsableCommand {
   enum OutputFormat: String, ExpressibleByArgument {
     case text
     #if os(macOS)
-    case pdf
+      case pdf
     #endif
   }
 
@@ -68,8 +68,8 @@ struct CGTCalcCommand: ParsableCommand {
     case .text:
       formatter = TextReportFormatter()
     #if os(macOS)
-    case .pdf:
-      formatter = PDFReportFormatter()
+      case .pdf:
+        formatter = PDFReportFormatter()
     #endif
     }
 
@@ -82,7 +82,7 @@ struct CGTCalcCommand: ParsableCommand {
     }
 
     switch rendered {
-    case let .text(output):
+    case .text(let output):
       if let outputFile {
         do {
           try output.write(toFile: outputFile, atomically: true, encoding: .utf8)
@@ -93,7 +93,7 @@ struct CGTCalcCommand: ParsableCommand {
       } else {
         print(output)
       }
-    case let .binary(data):
+    case .binary(let data):
       guard let outputFile else {
         throw ValidationError("`--format \(self.format.rawValue)` requires `--output-file <path>`.")
       }

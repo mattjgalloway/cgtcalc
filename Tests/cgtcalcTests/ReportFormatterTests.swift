@@ -1,7 +1,7 @@
+@testable import cgtcalc
 import CGTCalcCore
 import Foundation
 import XCTest
-@testable import cgtcalc
 
 final class ReportFormatterTests: XCTestCase {
   func testTextReportFormatterRendersText() throws {
@@ -9,7 +9,7 @@ final class ReportFormatterTests: XCTestCase {
     let rendered = try TextReportFormatter().render(result)
 
     switch rendered {
-    case let .text(output):
+    case .text(let output):
       XCTAssertTrue(output.contains("# SUMMARY"))
       XCTAssertTrue(output.contains("TAX RETURN INFORMATION"))
     case .binary:
@@ -18,41 +18,49 @@ final class ReportFormatterTests: XCTestCase {
   }
 
   #if os(macOS)
-  func testPDFReportFormatterRendersPDFDataWithExpectedSections() throws {
-    let result = self.makeResult(transactionCount: 160)
-    let rendered = try PDFReportFormatter().render(result)
+    func testPDFReportFormatterRendersPDFDataWithExpectedSections() throws {
+      let result = self.makeResult(transactionCount: 160)
+      let rendered = try PDFReportFormatter().render(result)
 
-    switch rendered {
-    case let .binary(data):
-      XCTAssertTrue(data.starts(with: Data("%PDF".utf8)))
-      XCTAssertGreaterThan(data.count, 1_000)
-    case .text:
-      XCTFail("Expected PDF binary output")
+      switch rendered {
+      case .binary(let data):
+        XCTAssertTrue(data.starts(with: Data("%PDF".utf8)))
+        XCTAssertGreaterThan(data.count, 1000)
+      case .text:
+        XCTFail("Expected PDF binary output")
+      }
     }
-  }
 
-  func testPDFTaxReturnEntryMatchesExpectedHMRCValues() {
-    let result = self.makeResult()
-    let summary = try! XCTUnwrap(result.taxYearSummaries.first)
-    let entry = PDFReportFormatter().taxReturnEntry(for: summary)
+    func testPDFTaxReturnEntryMatchesExpectedHMRCValues() throws {
+      let result = self.makeResult()
+      let summary = try XCTUnwrap(result.taxYearSummaries.first)
+      let entry = PDFReportFormatter().taxReturnEntry(for: summary)
 
-    XCTAssertEqual(entry.rows.map(\.label), ["Disposals", "Proceeds", "Allowable costs", "Total gains", "Total losses"])
-    XCTAssertEqual(entry.rows.map(\.value), ["1", "1200", "805", "395", "0"])
-    XCTAssertNil(entry.specialLine)
-  }
+      XCTAssertEqual(
+        entry.rows.map(\.label),
+        ["Disposals", "Proceeds", "Allowable costs", "Total gains", "Total losses"])
+      XCTAssertEqual(entry.rows.map(\.value), ["1", "1200", "805", "395", "0"])
+      XCTAssertNil(entry.specialLine)
+    }
 
-  func testPDFDetailedCalculationLineIncludesCostComponents() {
-    let result = self.makeResult()
-    let disposal = try! XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
-    let line = PDFReportFormatter().detailedCalculationLine(for: disposal)
-    XCTAssertEqual(line, "Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395")
-  }
+    func testPDFDetailedCalculationLineIncludesCostComponents() throws {
+      let result = self.makeResult()
+      let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+      let line = PDFReportFormatter().detailedCalculationLine(for: disposal)
+      XCTAssertEqual(line, "Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395")
+    }
   #endif
 
   private func makeResult(transactionCount: Int = 2) -> CalculationResult {
     let taxYear = TaxYear(startYear: 2023)
     let buy = Transaction(type: .buy, date: self.date("01/05/2023"), asset: "FOO", quantity: 200, price: 8, expenses: 2)
-    let sell = Transaction(type: .sell, date: self.date("01/06/2023"), asset: "FOO", quantity: 100, price: 12, expenses: 3)
+    let sell = Transaction(
+      type: .sell,
+      date: self.date("01/06/2023"),
+      asset: "FOO",
+      quantity: 100,
+      price: 12,
+      expenses: 3)
     let disposal = Disposal(
       sellTransaction: sell,
       taxYear: taxYear,
@@ -77,11 +85,10 @@ final class ReportFormatterTests: XCTestCase {
       taxableGain: 0,
       lossCarryForward: 0)
 
-    let txs: [Transaction]
-    if transactionCount <= 2 {
-      txs = [buy, sell]
+    let txs: [Transaction] = if transactionCount <= 2 {
+      [buy, sell]
     } else {
-      txs = (0..<transactionCount).map { index in
+      (0 ..< transactionCount).map { index in
         let type: TransactionType = index.isMultiple(of: 2) ? .buy : .sell
         let day = 1 + (index % 28)
         return Transaction(
