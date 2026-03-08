@@ -197,4 +197,73 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[1].buyDateQuantity, 28, accuracy: 0.00001)
     XCTAssertEqual(matches[1].cost, 112, accuracy: 0.00001)
   }
+
+  func testAdjustedQuantityIgnoresNonRestructureEvents() {
+    let sellDate = TestSupport.date("01/06/2019")
+    let rebuy = TestSupport.buy("10/06/2019", "TEST", 200, 5, 0)
+    let events = [
+      TestSupport.capReturn("05/06/2019", "TEST", 200, 10),
+      TestSupport.dividend("06/06/2019", "TEST", 200, 10)
+    ]
+
+    let adjustedQuantity = BedAndBreakfastMatcher.adjustedQuantity(
+      for: rebuy,
+      relativeTo: sellDate,
+      sortedEvents: events)
+
+    XCTAssertEqual(adjustedQuantity, 200)
+  }
+
+  func testEventAdjustmentExcludesEventsAfterEndDate() {
+    let buy = TestSupport.buy("01/06/2019", "TEST", 100, 10, 0)
+    let endDate = TestSupport.date("15/06/2019")
+    let events = [
+      TestSupport.dividend("10/06/2019", "TEST", 100, 20),
+      TestSupport.capReturn("20/06/2019", "TEST", 100, 10)
+    ]
+
+    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+      for: buy,
+      through: endDate,
+      sortedEvents: events,
+      matchedBuyQuantity: 100)
+
+    XCTAssertEqual(adjustment, 20, accuracy: 0.00001)
+  }
+
+  func testSameDayBuyOrderingUsesTimestampBeforeSourceOrder() throws {
+    let sell = TestSupport.sell("01/06/2019", "TEST", 100, 12, 0)
+    let dayStart = TestSupport.date("01/06/2019")
+    let earlierTime = dayStart
+    let laterTime = try XCTUnwrap(UTC.calendar.date(byAdding: .hour, value: 1, to: dayStart))
+
+    let buyLater = Transaction(
+      sourceOrder: 0,
+      type: .buy,
+      date: laterTime,
+      asset: "TEST",
+      quantity: 50,
+      price: 10,
+      expenses: 0)
+    let buyEarlier = Transaction(
+      sourceOrder: 1,
+      type: .buy,
+      date: earlierTime,
+      asset: "TEST",
+      quantity: 50,
+      price: 10,
+      expenses: 0)
+
+    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+      for: sell,
+      from: [buyLater, buyEarlier],
+      usedBuyQuantities: [:],
+      sortedEvents: [],
+      allSells: [sell])
+
+    XCTAssertEqual(quantityUsed, 100, accuracy: 0.00001)
+    XCTAssertEqual(matches.count, 2)
+    XCTAssertEqual(matches[0].buyTransaction.id, buyEarlier.id)
+    XCTAssertEqual(matches[1].buyTransaction.id, buyLater.id)
+  }
 }

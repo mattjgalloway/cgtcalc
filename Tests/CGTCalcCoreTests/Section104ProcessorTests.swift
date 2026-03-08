@@ -176,4 +176,49 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(holding.pool.count, 1)
     XCTAssertEqual(holding.pool[0].quantity, 1)
   }
+
+  func testApplyRestructureEventsIgnoresNonRestructureEventTypes() {
+    let initialHolding = Section104Holding(
+      quantity: 100,
+      costBasis: 500,
+      pool: [
+        Section104Match(
+          transactionId: UUID(),
+          quantity: 100,
+          cost: 500,
+          date: TestSupport.date("01/01/2019"),
+          poolQuantity: 100,
+          poolCost: 500)
+      ])
+    let events = [
+      TestSupport.capReturn("02/01/2019", "TEST", 100, 10),
+      TestSupport.dividend("03/01/2019", "TEST", 100, 20)
+    ]
+
+    let updated = Section104Processor.applyRestructureEvents(events, to: initialHolding)
+
+    XCTAssertEqual(updated.quantity, 100)
+    XCTAssertEqual(updated.costBasis, 500)
+    XCTAssertEqual(updated.pool.count, 1)
+    XCTAssertEqual(updated.pool[0].quantity, 100)
+    XCTAssertEqual(updated.pool[0].poolQuantity, 100)
+  }
+
+  func testActionsUseUUIDTieBreakForSameDateEventsWithoutSourceOrder() {
+    let sameDate = TestSupport.date("01/03/2019")
+    let eventA = AssetEvent(type: .capitalReturn, date: sameDate, asset: "TEST", amount: 100, value: 10)
+    let eventB = AssetEvent(type: .dividend, date: sameDate, asset: "TEST", amount: 100, value: 20)
+
+    let actions = Section104Processor.actions(
+      buys: [],
+      events: [eventA, eventB],
+      after: Date.distantPast,
+      through: sameDate)
+
+    XCTAssertEqual(actions.count, 2)
+
+    let expectedFirstID = min(eventA.id.uuidString, eventB.id.uuidString)
+    guard case .event(let firstEvent) = actions[0] else { return XCTFail("Expected event first") }
+    XCTAssertEqual(firstEvent.id.uuidString, expectedFirstID)
+  }
 }
