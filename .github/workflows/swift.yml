@@ -22,7 +22,9 @@ jobs:
     - name: Upload code coverage to Codecov
       uses: codecov/codecov-action@v5
     - name: Upload test results to Codecov
-      uses: codecov/test-results-action@v1
+      uses: codecov/codecov-action@v5
+      with:
+        report_type: test_results
   
   test-linux:
     runs-on: ubuntu-latest
