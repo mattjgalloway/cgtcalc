@@ -1,17 +1,16 @@
-import CGTCalcCore
 import Foundation
 
-enum FormattedReport {
+public enum FormattedReport {
   case text(String)
   case binary(Data)
 }
 
-protocol ReportFormatter {
+public protocol ReportFormatter {
   func render(_ result: CalculationResult) throws -> FormattedReport
 }
 
 extension TextReportFormatter: ReportFormatter {
-  func render(_ result: CalculationResult) throws -> FormattedReport {
+  public func render(_ result: CalculationResult) throws -> FormattedReport {
     .text(self.format(result))
   }
 }

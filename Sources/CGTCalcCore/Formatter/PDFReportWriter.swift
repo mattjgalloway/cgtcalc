@@ -1,5 +1,4 @@
 #if os(macOS)
-  import CGTCalcCore
   import CoreGraphics
   import CoreText
   import Foundation
@@ -15,7 +14,7 @@
     }
   }
 
-  struct PDFReportFormatter: ReportFormatter {
+  public struct PDFReportFormatter: ReportFormatter {
     struct TaxReturnEntry {
       let rows: [(label: String, value: String)]
       let specialLine: String?
@@ -47,7 +46,9 @@
       return calendar
     }()
 
-    func render(_ result: CalculationResult) throws -> FormattedReport {
+    public init() {}
+
+    public func render(_ result: CalculationResult) throws -> FormattedReport {
       guard let data = CFDataCreateMutable(nil, 0),
             let consumer = CGDataConsumer(data: data)
       else {

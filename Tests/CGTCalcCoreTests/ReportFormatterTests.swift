@@ -1,5 +1,4 @@
-@testable import cgtcalc
-import CGTCalcCore
+@testable import CGTCalcCore
 import Foundation
 import XCTest
 
