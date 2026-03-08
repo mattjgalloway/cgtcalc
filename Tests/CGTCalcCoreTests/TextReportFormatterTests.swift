@@ -1,7 +1,7 @@
 @testable import CGTCalcCore
 import XCTest
 
-final class OutputFormatterTests: XCTestCase {
+final class TextReportFormatterTests: XCTestCase {
   func testFormats2024_2025SpecialRateChangeLine() {
     let firstDisposal = TestSupport.disposal(
       asset: "TEST",
@@ -34,7 +34,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: [],
       lossCarryForward: 0)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     XCTAssertTrue(output.contains(
       "    > Gains to (and inc.) 29th October = 100, gains after 29th October = 200"))
@@ -67,7 +67,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: assetEvents,
       lossCarryForward: 0)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     let transactionsSection = output.components(separatedBy: "# TRANSACTIONS\n\n")[1]
       .components(separatedBy: "\n\n# ASSET EVENTS")[0]
@@ -118,7 +118,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: [],
       lossCarryForward: 0)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     XCTAssertTrue(output.contains(
       "  - BED & BREAKFAST: 20 bought on 10/11/2019 at £190.19 with restructure multiplier 2 with offset of £15.81"))
@@ -158,7 +158,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: [],
       lossCarryForward: 0)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     XCTAssertTrue(output.contains("  - SAME DAY: 10 bought on 01/06/2020 at £12\n"))
   }
@@ -202,7 +202,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: [],
       lossCarryForward: 0)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     XCTAssertTrue(output.contains(
       "Calculation: (100 * 20 - 0) - ( (30 * 12 + 0) + (70 * 10) ) = 940"))
@@ -239,7 +239,7 @@ final class OutputFormatterTests: XCTestCase {
       assetEvents: [],
       lossCarryForward: 5)
 
-    let output = OutputFormatter().format(result)
+    let output = TextReportFormatter().format(result)
 
     XCTAssertTrue(output.contains("1 gains with total of 0."))
     XCTAssertTrue(output.contains("1 losses with total of 5."))

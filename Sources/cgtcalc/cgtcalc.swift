@@ -10,6 +10,13 @@ private func writeStderr(_ message: String) {
 
 @main
 struct CGTCalcCommand: ParsableCommand {
+  enum OutputFormat: String, ExpressibleByArgument {
+    case text
+    #if os(macOS)
+    case pdf
+    #endif
+  }
+
   static let VERSION = "0.2.0"
 
   static let configuration = CommandConfiguration(
@@ -22,6 +29,9 @@ struct CGTCalcCommand: ParsableCommand {
 
   @Option(name: .shortAndLong, help: "Output file")
   var outputFile: String?
+
+  @Option(name: .shortAndLong, help: "Output format")
+  var format: OutputFormat = .text
 
   /// Parses input, runs the calculator, and writes the formatted report to stdout or a file.
   mutating func run() throws {
@@ -53,20 +63,46 @@ struct CGTCalcCommand: ParsableCommand {
       throw ExitCode(1)
     }
 
-    // Format output
-    let formatter = OutputFormatter()
-    let output = formatter.format(result)
+    let formatter: any ReportFormatter
+    switch self.format {
+    case .text:
+      formatter = TextReportFormatter()
+    #if os(macOS)
+    case .pdf:
+      formatter = PDFReportFormatter()
+    #endif
+    }
 
-    // Write output
-    if let outputFile {
+    let rendered: FormattedReport
+    do {
+      rendered = try formatter.render(result)
+    } catch {
+      writeStderr("Error formatting output: \(error)")
+      throw ExitCode(1)
+    }
+
+    switch rendered {
+    case let .text(output):
+      if let outputFile {
+        do {
+          try output.write(toFile: outputFile, atomically: true, encoding: .utf8)
+        } catch {
+          writeStderr("Error writing output file: \(error)")
+          throw ExitCode(1)
+        }
+      } else {
+        print(output)
+      }
+    case let .binary(data):
+      guard let outputFile else {
+        throw ValidationError("`--format \(self.format.rawValue)` requires `--output-file <path>`.")
+      }
       do {
-        try output.write(toFile: outputFile, atomically: true, encoding: String.Encoding.utf8)
+        try data.write(to: URL(fileURLWithPath: outputFile), options: .atomic)
       } catch {
         writeStderr("Error writing output file: \(error)")
         throw ExitCode(1)
       }
-    } else {
-      print(output)
     }
   }
 }

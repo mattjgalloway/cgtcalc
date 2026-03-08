@@ -101,7 +101,7 @@ final class ExamplesTests: XCTestCase {
   private func runStandard(content: String) throws -> String {
     let data = try InputParser.parse(content: content)
     let result = try CGTEngine.calculate(inputData: data)
-    return OutputFormatter().format(result)
+    return TextReportFormatter().format(result)
   }
 
   /// Mirrors CLI parse/calculate/format behavior for invalid fixture expectations.
@@ -120,7 +120,7 @@ final class ExamplesTests: XCTestCase {
       return "Error calculating CGT: \(error)\n"
     }
 
-    return OutputFormatter().format(result)
+    return TextReportFormatter().format(result)
   }
 
   /// Resolves fixture directories for standard, invalid, and private suites.

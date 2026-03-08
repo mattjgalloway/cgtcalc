@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Output Formatter
 
-public struct OutputFormatter {
+public struct TextReportFormatter {
   public init() {}
 
   /// Renders a full text report for a calculation result.

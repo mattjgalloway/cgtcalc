@@ -47,17 +47,19 @@ Using `cgtcalc` is simple. All you need to do is the following:
   3. Run `swift run cgtcalc data.txt`.
 
 That's pretty much it. You'll then see output on your console showing the calculations and a summary for all tax years that have tax events in them.
+For PDF output, use `--format pdf --output-file report.pdf` (available on macOS only).
 
 Full usage can be found by running with `-h`:
 ```
-USAGE: cgtcalc <filename> [--output-file <output-file>]
+USAGE: cgtcalc <filename> [--output-file <output-file>] [--format <format>]
 
 ARGUMENTS:
-  <filename>              The input data filename
+  <filename>              The input data filename (use '-' for stdin)
 
 OPTIONS:
   -o, --output-file <output-file>
                           Output file
+  -f, --format <format>   Output format (text or pdf on macOS, text only on Linux)
   --version               Show the version.
   -h, --help              Show help information.
 ```
