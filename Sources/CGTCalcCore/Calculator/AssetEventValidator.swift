@@ -39,7 +39,18 @@ enum AssetEventValidator {
           }
 
         case .event(let event):
-          if let ratio = event.restructureRatio {
+          let ratio: (oldUnits: Decimal, newUnits: Decimal)? = switch event.kind {
+          case .split(let multiplier):
+            (oldUnits: 1, newUnits: multiplier)
+          case .unsplit(let multiplier):
+            (oldUnits: multiplier, newUnits: 1)
+          case .restruct(let oldUnits, let newUnits):
+            (oldUnits: oldUnits, newUnits: newUnits)
+          case .capitalReturn, .dividend:
+            nil
+          }
+
+          if let ratio {
             holding.quantity = holding.quantity * ratio.newUnits / ratio.oldUnits
             holding.pool = holding.pool.map { entry in
               PoolEntry(
@@ -66,9 +77,17 @@ enum AssetEventValidator {
     }
 
     let totalDividendAmount = events
-      .filter { $0.type == .dividend }
+      .filter { event in
+        if case .dividend = event.kind {
+          return true
+        }
+        return false
+      }
       .reduce(Decimal(0)) { partial, event in
-        partial + (event.distribution?.amount ?? 0)
+        if case .dividend(let amount, _) = event.kind {
+          return partial + amount
+        }
+        return partial
       }
     if totalDividendAmount > 0 {
       try self.validateDistributionAmount(
@@ -80,9 +99,17 @@ enum AssetEventValidator {
     }
 
     let totalCapitalReturnAmount = events
-      .filter { $0.type == .capitalReturn }
+      .filter { event in
+        if case .capitalReturn = event.kind {
+          return true
+        }
+        return false
+      }
       .reduce(Decimal(0)) { partial, event in
-        partial + (event.distribution?.amount ?? 0)
+        if case .capitalReturn(let amount, _) = event.kind {
+          return partial + amount
+        }
+        return partial
       }
     if totalCapitalReturnAmount > 0 {
       let expectedQuantity = holding.pool
@@ -224,7 +251,12 @@ enum AssetEventValidator {
       case .transaction:
         false
       case .event(let event):
-        event.type == .capitalReturn || event.type == .dividend
+        switch event.kind {
+        case .capitalReturn, .dividend:
+          true
+        case .split, .unsplit, .restruct:
+          false
+        }
       }
     }
   }

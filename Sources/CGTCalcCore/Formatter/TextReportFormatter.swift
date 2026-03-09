@@ -305,25 +305,17 @@ public struct TextReportFormatter {
     for event in events {
       let dateStr = DateParser.format(event.date)
 
-      switch event.type {
-      case .split:
-        let multiplier = event.splitOrUnsplitMultiplier ?? 0
+      switch event.kind {
+      case .split(let multiplier):
         output += "\(dateStr) \(event.asset) SPLIT by \(multiplier)\n"
-      case .unsplit:
-        let multiplier = event.splitOrUnsplitMultiplier ?? 0
+      case .unsplit(let multiplier):
         output += "\(dateStr) \(event.asset) UNSPLIT by \(multiplier)\n"
-      case .restruct:
-        if let ratio = event.restructureRatio {
-          output += "\(dateStr) \(event.asset) RESTRUCT by \(ratio.oldUnits):\(ratio.newUnits)\n"
-        }
-      case .capitalReturn:
-        if let distribution = event.distribution {
-          output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(distribution.amount) for \(self.formatCurrency(distribution.value))\n"
-        }
-      case .dividend:
-        if let distribution = event.distribution {
-          output += "\(dateStr) \(event.asset) DIVIDEND on \(distribution.amount) for \(self.formatCurrency(distribution.value))\n"
-        }
+      case .restruct(let oldUnits, let newUnits):
+        output += "\(dateStr) \(event.asset) RESTRUCT by \(oldUnits):\(newUnits)\n"
+      case .capitalReturn(let amount, let value):
+        output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(amount) for \(self.formatCurrency(value))\n"
+      case .dividend(let amount, let value):
+        output += "\(dateStr) \(event.asset) DIVIDEND on \(amount) for \(self.formatCurrency(value))\n"
       }
     }
 

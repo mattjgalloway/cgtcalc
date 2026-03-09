@@ -35,7 +35,11 @@ final class ModelCoverageTests: XCTestCase {
     guard case .assetEvent(let event) = decoded[1] else {
       return XCTFail("Expected asset event")
     }
-    XCTAssertEqual(event.type, .capitalReturn)
+    if case .capitalReturn = event.kind {
+      XCTAssertTrue(true)
+    } else {
+      XCTFail("Expected capital return")
+    }
     XCTAssertEqual(event.asset, "TEST")
   }
 

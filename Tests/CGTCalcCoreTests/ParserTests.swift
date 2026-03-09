@@ -43,41 +43,56 @@ final class ParserTests: XCTestCase {
     XCTAssertEqual(data.count, 5)
 
     if case .assetEvent(let e) = data[0] {
-      XCTAssertEqual(e.type, .capitalReturn)
-      XCTAssertEqual(e.distribution?.amount, 100)
-      XCTAssertEqual(e.distribution?.value, 50)
+      if case .capitalReturn(let amount, let value) = e.kind {
+        XCTAssertEqual(amount, 100)
+        XCTAssertEqual(value, 50)
+      } else {
+        XCTFail("Expected capital return")
+      }
       XCTAssertEqual(e.sourceOrder, 0)
     } else {
       XCTFail("Expected asset event")
     }
 
     if case .assetEvent(let e) = data[1] {
-      XCTAssertEqual(e.type, .dividend)
-      XCTAssertEqual(e.distribution?.amount, 50)
-      XCTAssertEqual(e.distribution?.value, 25)
+      if case .dividend(let amount, let value) = e.kind {
+        XCTAssertEqual(amount, 50)
+        XCTAssertEqual(value, 25)
+      } else {
+        XCTFail("Expected dividend")
+      }
       XCTAssertEqual(e.sourceOrder, 1)
     } else {
       XCTFail("Expected asset event")
     }
 
     if case .assetEvent(let e) = data[2] {
-      XCTAssertEqual(e.type, .split)
-      XCTAssertEqual(e.splitOrUnsplitMultiplier, 2)
+      if case .split(let multiplier) = e.kind {
+        XCTAssertEqual(multiplier, 2)
+      } else {
+        XCTFail("Expected split")
+      }
     } else {
       XCTFail("Expected asset event")
     }
 
     if case .assetEvent(let e) = data[3] {
-      XCTAssertEqual(e.type, .unsplit)
-      XCTAssertEqual(e.splitOrUnsplitMultiplier, Decimal(string: "0.5"))
+      if case .unsplit(let multiplier) = e.kind {
+        XCTAssertEqual(multiplier, Decimal(string: "0.5"))
+      } else {
+        XCTFail("Expected unsplit")
+      }
     } else {
       XCTFail("Expected asset event")
     }
 
     if case .assetEvent(let e) = data[4] {
-      XCTAssertEqual(e.type, .restruct)
-      XCTAssertEqual(e.restructureRatio?.oldUnits, 3)
-      XCTAssertEqual(e.restructureRatio?.newUnits, 7)
+      if case .restruct(let oldUnits, let newUnits) = e.kind {
+        XCTAssertEqual(oldUnits, 3)
+        XCTAssertEqual(newUnits, 7)
+      } else {
+        XCTFail("Expected restruct")
+      }
     } else {
       XCTFail("Expected asset event")
     }

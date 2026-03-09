@@ -118,7 +118,19 @@ public enum InputData: Codable {
       try container.encode(t.type.rawValue, forKey: .type)
       try container.encode(t, forKey: .data)
     case .assetEvent(let e):
-      try container.encode(e.type.rawValue, forKey: .type)
+      let type = switch e.kind {
+      case .capitalReturn:
+        AssetEventType.capitalReturn.rawValue
+      case .dividend:
+        AssetEventType.dividend.rawValue
+      case .split:
+        AssetEventType.split.rawValue
+      case .unsplit:
+        AssetEventType.unsplit.rawValue
+      case .restruct:
+        AssetEventType.restruct.rawValue
+      }
+      try container.encode(type, forKey: .type)
       try container.encode(e, forKey: .data)
     }
   }

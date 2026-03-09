@@ -99,7 +99,18 @@ enum BedAndBreakfastMatcher {
     var adjustedQuantity = buyDateQuantity ?? buy.quantity
 
     for event in self.restructureEvents(in: sortedEvents, after: sellDate, through: buy.date) {
-      if let ratio = event.restructureRatio {
+      let ratio: (oldUnits: Decimal, newUnits: Decimal)? = switch event.kind {
+      case .split(let multiplier):
+        (oldUnits: 1, newUnits: multiplier)
+      case .unsplit(let multiplier):
+        (oldUnits: multiplier, newUnits: 1)
+      case .restruct(let oldUnits, let newUnits):
+        (oldUnits: oldUnits, newUnits: newUnits)
+      case .capitalReturn, .dividend:
+        nil
+      }
+
+      if let ratio {
         adjustedQuantity = adjustedQuantity * ratio.oldUnits / ratio.newUnits
       }
     }
@@ -127,16 +138,25 @@ enum BedAndBreakfastMatcher {
       if let endDate, event.date > endDate {
         return false
       }
-      return event.type == .capitalReturn || event.type == .dividend
+      return switch event.kind {
+      case .capitalReturn, .dividend:
+        true
+      case .split, .unsplit, .restruct:
+        false
+      }
     }
 
     return relevantEvents.reduce(Decimal(0)) { total, event in
-      guard let distribution = event.distribution else { return total }
-      let quantityRatio = matchedBuyQuantity / distribution.amount
-      if event.type == .capitalReturn {
-        return total - (distribution.value * quantityRatio)
+      switch event.kind {
+      case .capitalReturn(let amount, let value):
+        let quantityRatio = matchedBuyQuantity / amount
+        return total - (value * quantityRatio)
+      case .dividend(let amount, let value):
+        let quantityRatio = matchedBuyQuantity / amount
+        return total + (value * quantityRatio)
+      case .split, .unsplit, .restruct:
+        return total
       }
-      return total + (distribution.value * quantityRatio)
     }
   }
 
@@ -156,7 +176,12 @@ enum BedAndBreakfastMatcher {
       if let endDate, event.date > endDate {
         return false
       }
-      return event.isRestructure
+      return switch event.kind {
+      case .split, .unsplit, .restruct:
+        true
+      case .capitalReturn, .dividend:
+        false
+      }
     }
   }
 

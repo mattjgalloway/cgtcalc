@@ -374,22 +374,17 @@
 
       let lines = events.map { event in
         let date = DateParser.format(event.date)
-        switch event.type {
-        case .split:
-          let multiplier = event.splitOrUnsplitMultiplier ?? 0
+        switch event.kind {
+        case .split(let multiplier):
           return "\(date) \(event.asset) SPLIT by \(self.decimalString(multiplier))"
-        case .unsplit:
-          let multiplier = event.splitOrUnsplitMultiplier ?? 0
+        case .unsplit(let multiplier):
           return "\(date) \(event.asset) UNSPLIT by \(self.decimalString(multiplier))"
-        case .restruct:
-          guard let ratio = event.restructureRatio else { return "\(date) \(event.asset) RESTRUCT" }
-          return "\(date) \(event.asset) RESTRUCT by \(self.decimalString(ratio.oldUnits)):\(self.decimalString(ratio.newUnits))"
-        case .capitalReturn:
-          guard let distribution = event.distribution else { return "\(date) \(event.asset) CAPITAL RETURN" }
-          return "\(date) \(event.asset) CAPITAL RETURN on \(self.decimalString(distribution.amount)) for \(self.currency(distribution.value))"
-        case .dividend:
-          guard let distribution = event.distribution else { return "\(date) \(event.asset) DIVIDEND" }
-          return "\(date) \(event.asset) DIVIDEND on \(self.decimalString(distribution.amount)) for \(self.currency(distribution.value))"
+        case .restruct(let oldUnits, let newUnits):
+          return "\(date) \(event.asset) RESTRUCT by \(self.decimalString(oldUnits)):\(self.decimalString(newUnits))"
+        case .capitalReturn(let amount, let value):
+          return "\(date) \(event.asset) CAPITAL RETURN on \(self.decimalString(amount)) for \(self.currency(value))"
+        case .dividend(let amount, let value):
+          return "\(date) \(event.asset) DIVIDEND on \(self.decimalString(amount)) for \(self.currency(value))"
         }
       }
       self.drawMonospaceLines(lines, sectionTitle: "Asset Events", layout: &layout)
