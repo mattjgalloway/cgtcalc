@@ -99,7 +99,7 @@ public enum InputData: Codable {
     case "BUY", "SELL":
       let transaction = try container.decode(Transaction.self, forKey: .data)
       self = .transaction(transaction)
-    case "CAPRETURN", "DIVIDEND", "SPLIT", "UNSPLIT":
+    case "CAPRETURN", "DIVIDEND", "SPLIT", "UNSPLIT", "RESTRUCT":
       let event = try container.decode(AssetEvent.self, forKey: .data)
       self = .assetEvent(event)
     default:

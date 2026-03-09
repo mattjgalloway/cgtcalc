@@ -307,13 +307,23 @@ public struct TextReportFormatter {
 
       switch event.type {
       case .split:
-        output += "\(dateStr) \(event.asset) SPLIT by \(event.amount)\n"
+        let multiplier = event.splitOrUnsplitMultiplier ?? 0
+        output += "\(dateStr) \(event.asset) SPLIT by \(multiplier)\n"
       case .unsplit:
-        output += "\(dateStr) \(event.asset) UNSPLIT by \(event.amount)\n"
+        let multiplier = event.splitOrUnsplitMultiplier ?? 0
+        output += "\(dateStr) \(event.asset) UNSPLIT by \(multiplier)\n"
+      case .restruct:
+        if let ratio = event.restructureRatio {
+          output += "\(dateStr) \(event.asset) RESTRUCT by \(ratio.oldUnits):\(ratio.newUnits)\n"
+        }
       case .capitalReturn:
-        output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(event.amount) for \(self.formatCurrency(event.value))\n"
+        if let distribution = event.distribution {
+          output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(distribution.amount) for \(self.formatCurrency(distribution.value))\n"
+        }
       case .dividend:
-        output += "\(dateStr) \(event.asset) DIVIDEND on \(event.amount) for \(self.formatCurrency(event.value))\n"
+        if let distribution = event.distribution {
+          output += "\(dateStr) \(event.asset) DIVIDEND on \(distribution.amount) for \(self.formatCurrency(distribution.value))\n"
+        }
       }
     }
 

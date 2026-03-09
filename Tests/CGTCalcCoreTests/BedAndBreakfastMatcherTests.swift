@@ -55,7 +55,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
   func testAdjustsRebuyQuantityAcrossSplit() {
     let sellDate = TestSupport.date("01/06/2019")
     let rebuy = TestSupport.buy("10/06/2019", "TEST", 200, 5, 0)
-    let split = AssetEvent(type: .split, date: TestSupport.date("05/06/2019"), asset: "TEST", amount: 2, value: 0)
+    let split = AssetEvent(type: .split, date: TestSupport.date("05/06/2019"), asset: "TEST", multiplier: 2)
 
     let adjustedQuantity = BedAndBreakfastMatcher.adjustedQuantity(
       for: rebuy,
@@ -212,6 +212,23 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       sortedEvents: events)
 
     XCTAssertEqual(adjustedQuantity, 200)
+  }
+
+  func testAdjustedQuantityAcrossRestructRatio() {
+    let sellDate = TestSupport.date("01/06/2019")
+    let rebuy = TestSupport.buy("10/06/2019", "TEST", 70, 5, 0)
+    let restruct = AssetEvent(
+      date: TestSupport.date("05/06/2019"),
+      asset: "TEST",
+      oldUnits: 3,
+      newUnits: 7)
+
+    let adjustedQuantity = BedAndBreakfastMatcher.adjustedQuantity(
+      for: rebuy,
+      relativeTo: sellDate,
+      sortedEvents: [restruct])
+
+    XCTAssertEqual(adjustedQuantity, 30, accuracy: 0.00001)
   }
 
   func testEventAdjustmentExcludesEventsAfterEndDate() {

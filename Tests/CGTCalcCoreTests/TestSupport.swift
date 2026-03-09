@@ -58,8 +58,8 @@ struct TestSupport {
       type: .capitalReturn,
       date: self.date(date),
       asset: asset,
-      amount: amount,
-      value: value)
+      distributionAmount: amount,
+      distributionValue: value)
   }
 
   static func dividend(
@@ -74,8 +74,8 @@ struct TestSupport {
       type: .dividend,
       date: self.date(date),
       asset: asset,
-      amount: amount,
-      value: value)
+      distributionAmount: amount,
+      distributionValue: value)
   }
 
   static func disposal(

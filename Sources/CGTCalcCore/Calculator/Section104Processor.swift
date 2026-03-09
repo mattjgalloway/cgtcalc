@@ -135,20 +135,22 @@ enum Section104Processor {
   /// - Returns: The adjusted holding.
   static func applyAssetEvent(_ event: AssetEvent, to holding: Section104Holding) -> Section104Holding {
     switch event.type {
-    case .split, .unsplit:
+    case .split, .unsplit, .restruct:
       return self.applyRestructureEvents([event], to: holding)
     case .capitalReturn:
+      guard let distribution = event.distribution else { return holding }
       var adjustedHolding = holding
-      adjustedHolding.costBasis = max(0, adjustedHolding.costBasis - event.value)
+      adjustedHolding.costBasis = max(0, adjustedHolding.costBasis - distribution.value)
       return adjustedHolding
     case .dividend:
+      guard let distribution = event.distribution else { return holding }
       var adjustedHolding = holding
-      adjustedHolding.costBasis += event.value
+      adjustedHolding.costBasis += distribution.value
       return adjustedHolding
     }
   }
 
-  /// Applies one or more split or reverse-split events to a Section 104 holding and its pool provenance.
+  /// Applies one or more restructure events to a Section 104 holding and its pool provenance.
   /// - Parameters:
   ///   - events: Restructure events to apply in order.
   ///   - holding: The holding to update.
@@ -157,35 +159,19 @@ enum Section104Processor {
     var adjustedHolding = holding
 
     for event in events {
-      switch event.type {
-      case .split:
-        adjustedHolding.quantity *= event.amount
+      if let ratio = event.restructureRatio {
+        adjustedHolding.quantity = adjustedHolding.quantity * ratio.newUnits / ratio.oldUnits
         for i in 0 ..< adjustedHolding.pool.count {
           let match = adjustedHolding.pool[i]
           adjustedHolding.pool[i] = Section104Match(
             transactionId: match.transactionId,
             sourceOrder: match.sourceOrder,
-            quantity: match.quantity * event.amount,
+            quantity: match.quantity * ratio.newUnits / ratio.oldUnits,
             cost: match.cost,
             date: match.date,
-            poolQuantity: match.poolQuantity * event.amount,
+            poolQuantity: match.poolQuantity * ratio.newUnits / ratio.oldUnits,
             poolCost: match.poolCost)
         }
-      case .unsplit:
-        adjustedHolding.quantity /= event.amount
-        for i in 0 ..< adjustedHolding.pool.count {
-          let match = adjustedHolding.pool[i]
-          adjustedHolding.pool[i] = Section104Match(
-            transactionId: match.transactionId,
-            sourceOrder: match.sourceOrder,
-            quantity: match.quantity / event.amount,
-            cost: match.cost,
-            date: match.date,
-            poolQuantity: match.poolQuantity / event.amount,
-            poolCost: match.poolCost)
-        }
-      case .capitalReturn, .dividend:
-        break
       }
     }
 

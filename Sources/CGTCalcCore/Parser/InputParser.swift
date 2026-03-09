@@ -117,7 +117,7 @@ public enum InputParser {
       let event = try parseAssetEvent(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .assetEvent(event)
 
-    case "SPLIT", "UNSPLIT":
+    case "SPLIT", "UNSPLIT", "RESTRUCT":
       guard fields.count >= 4 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 4, got: fields.count)
       }
@@ -156,7 +156,7 @@ public enum InputParser {
       expenses: expenses)
   }
 
-  /// Parses a CAPRETURN, DIVIDEND, SPLIT, or UNSPLIT row into an asset-event model.
+  /// Parses a CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, or RESTRUCT row into an asset-event model.
   /// - Parameters:
   ///   - fields: Tokenized input fields.
   ///   - lineNumber: Source line number for diagnostics.
@@ -170,6 +170,8 @@ public enum InputParser {
       .dividend
     case "SPLIT":
       .split
+    case "RESTRUCT":
+      .restruct
     default:
       .unsplit
     }
@@ -183,13 +185,38 @@ public enum InputParser {
       let value = try parseDecimal(fields[4], lineNumber: lineNumber)
       try self.validatePositive(amount, field: "amount", lineNumber: lineNumber)
       try self.validateNonNegative(value, field: "value", lineNumber: lineNumber)
-      return AssetEvent(sourceOrder: sourceOrder, type: type, date: date, asset: asset, amount: amount, value: value)
+      return AssetEvent(
+        sourceOrder: sourceOrder,
+        type: type,
+        date: date,
+        asset: asset,
+        distributionAmount: amount,
+        distributionValue: value)
 
     case .split, .unsplit:
       let multiplier = try parseDecimal(fields[3], lineNumber: lineNumber)
       try self.validatePositive(multiplier, field: "multiplier", lineNumber: lineNumber)
-      return AssetEvent(sourceOrder: sourceOrder, type: type, date: date, asset: asset, amount: multiplier, value: 0)
+      return AssetEvent(sourceOrder: sourceOrder, type: type, date: date, asset: asset, multiplier: multiplier)
+
+    case .restruct:
+      let (oldUnits, newUnits) = try self.parseRestructureRatio(fields[3], lineNumber: lineNumber)
+      return AssetEvent(sourceOrder: sourceOrder, date: date, asset: asset, oldUnits: oldUnits, newUnits: newUnits)
     }
+  }
+
+  /// Parses an exact ratio in `<OLD>:<NEW>` form for RESTRUCT.
+  private static func parseRestructureRatio(_ ratio: String,
+                                            lineNumber: Int) throws -> (oldUnits: Decimal, newUnits: Decimal)
+  {
+    let components = ratio.split(separator: ":", omittingEmptySubsequences: false)
+    guard components.count == 2 else {
+      throw ParserError.invalidField(line: lineNumber, field: "ratio", reason: "must be in OLD:NEW format")
+    }
+    let oldUnits = try self.parseDecimal(String(components[0]), lineNumber: lineNumber)
+    let newUnits = try self.parseDecimal(String(components[1]), lineNumber: lineNumber)
+    try self.validatePositive(oldUnits, field: "ratio old units", lineNumber: lineNumber)
+    try self.validatePositive(newUnits, field: "ratio new units", lineNumber: lineNumber)
+    return (oldUnits, newUnits)
   }
 
   /// Parses a decimal field after stripping optional pound signs and thousands separators.

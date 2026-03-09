@@ -8,7 +8,7 @@ The project currently provides:
 - same-day disposal merging for same asset/date before rounding
 - same-day and 30-day-after matching
 - Section 104 pooled matching for remaining quantity
-- `SPLIT` and `UNSPLIT` handling in both B&B and Section 104 paths
+- `SPLIT`, `UNSPLIT`, and exact-ratio `RESTRUCT` handling in both B&B and Section 104 paths
 - `CAPRETURN` and `DIVIDEND` cost-basis adjustments
 - grouped same-day validation for distribution amounts
 - explicit oversell errors

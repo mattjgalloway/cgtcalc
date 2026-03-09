@@ -39,27 +39,15 @@ enum AssetEventValidator {
           }
 
         case .event(let event):
-          switch event.type {
-          case .split:
-            holding.quantity *= event.amount
+          if let ratio = event.restructureRatio {
+            holding.quantity = holding.quantity * ratio.newUnits / ratio.oldUnits
             holding.pool = holding.pool.map { entry in
               PoolEntry(
                 transactionId: entry.transactionId,
                 sourceOrder: entry.sourceOrder,
-                quantity: entry.quantity * event.amount,
+                quantity: entry.quantity * ratio.newUnits / ratio.oldUnits,
                 date: entry.date)
             }
-          case .unsplit:
-            holding.quantity /= event.amount
-            holding.pool = holding.pool.map { entry in
-              PoolEntry(
-                transactionId: entry.transactionId,
-                sourceOrder: entry.sourceOrder,
-                quantity: entry.quantity / event.amount,
-                date: entry.date)
-            }
-          case .dividend, .capitalReturn:
-            break
           }
         }
       }
@@ -79,7 +67,9 @@ enum AssetEventValidator {
 
     let totalDividendAmount = events
       .filter { $0.type == .dividend }
-      .reduce(Decimal(0)) { $0 + $1.amount }
+      .reduce(Decimal(0)) { partial, event in
+        partial + (event.distribution?.amount ?? 0)
+      }
     if totalDividendAmount > 0 {
       try self.validateDistributionAmount(
         asset: events[0].asset,
@@ -91,7 +81,9 @@ enum AssetEventValidator {
 
     let totalCapitalReturnAmount = events
       .filter { $0.type == .capitalReturn }
-      .reduce(Decimal(0)) { $0 + $1.amount }
+      .reduce(Decimal(0)) { partial, event in
+        partial + (event.distribution?.amount ?? 0)
+      }
     if totalCapitalReturnAmount > 0 {
       let expectedQuantity = holding.pool
         .filter { entry in

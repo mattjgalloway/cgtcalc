@@ -44,7 +44,7 @@ Owns:
 - same-day matching and same-day disposal merging
 - 30-day-after matching
 - Section 104 pooled matching
-- `SPLIT` / `UNSPLIT` support across matching paths
+- `SPLIT` / `UNSPLIT` / `RESTRUCT` support across matching paths
 - `CAPRETURN` and `DIVIDEND` support with current semantics
 - grouped same-day distribution amount validation
 - oversell rejection with explicit errors

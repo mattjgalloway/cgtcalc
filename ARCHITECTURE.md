@@ -72,7 +72,7 @@ cgtcalc-swift2/
 ## Domain Model Highlights
 
 - `Transaction`: `BUY`/`SELL` with date, asset, quantity, price, expenses
-- `AssetEvent`: `CAPRETURN`, `DIVIDEND`, `SPLIT`, `UNSPLIT`
+- `AssetEvent`: `CAPRETURN`, `DIVIDEND`, `SPLIT`, `UNSPLIT`, `RESTRUCT`
 - `Disposal`: effective sell, rounded gain/loss, B&B matches, Section 104 matches
 - `Section104Holding`: pooled quantity/cost and provenance entries
 - `TaxYear`: UK tax-year boundary model and label logic

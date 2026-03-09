@@ -204,10 +204,47 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(updated.pool[0].poolQuantity, 100)
   }
 
+  func testApplyRestructureEventsSupportsExactRatioRestruct() {
+    let initialHolding = Section104Holding(
+      quantity: 30,
+      costBasis: 300,
+      pool: [
+        Section104Match(
+          transactionId: UUID(),
+          quantity: 30,
+          cost: 300,
+          date: TestSupport.date("01/01/2019"),
+          poolQuantity: 30,
+          poolCost: 300)
+      ])
+    let restruct = AssetEvent(
+      date: TestSupport.date("02/01/2019"),
+      asset: "TEST",
+      oldUnits: 3,
+      newUnits: 7)
+
+    let updated = Section104Processor.applyRestructureEvents([restruct], to: initialHolding)
+
+    XCTAssertEqual(updated.quantity, 70, accuracy: 0.00001)
+    XCTAssertEqual(updated.costBasis, 300, accuracy: 0.00001)
+    XCTAssertEqual(updated.pool[0].quantity, 70, accuracy: 0.00001)
+    XCTAssertEqual(updated.pool[0].poolQuantity, 70, accuracy: 0.00001)
+  }
+
   func testActionsUseUUIDTieBreakForSameDateEventsWithoutSourceOrder() {
     let sameDate = TestSupport.date("01/03/2019")
-    let eventA = AssetEvent(type: .capitalReturn, date: sameDate, asset: "TEST", amount: 100, value: 10)
-    let eventB = AssetEvent(type: .dividend, date: sameDate, asset: "TEST", amount: 100, value: 20)
+    let eventA = AssetEvent(
+      type: .capitalReturn,
+      date: sameDate,
+      asset: "TEST",
+      distributionAmount: 100,
+      distributionValue: 10)
+    let eventB = AssetEvent(
+      type: .dividend,
+      date: sameDate,
+      asset: "TEST",
+      distributionAmount: 100,
+      distributionValue: 20)
 
     let actions = Section104Processor.actions(
       buys: [],

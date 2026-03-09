@@ -99,13 +99,8 @@ enum BedAndBreakfastMatcher {
     var adjustedQuantity = buyDateQuantity ?? buy.quantity
 
     for event in self.restructureEvents(in: sortedEvents, after: sellDate, through: buy.date) {
-      switch event.type {
-      case .split:
-        adjustedQuantity /= event.amount
-      case .unsplit:
-        adjustedQuantity *= event.amount
-      case .capitalReturn, .dividend:
-        break
+      if let ratio = event.restructureRatio {
+        adjustedQuantity = adjustedQuantity * ratio.oldUnits / ratio.newUnits
       }
     }
 
@@ -136,24 +131,21 @@ enum BedAndBreakfastMatcher {
     }
 
     return relevantEvents.reduce(Decimal(0)) { total, event in
-      let quantityRatio = matchedBuyQuantity / event.amount
-      switch event.type {
-      case .capitalReturn:
-        return total - (event.value * quantityRatio)
-      case .dividend:
-        return total + (event.value * quantityRatio)
-      case .split, .unsplit:
-        return total
+      guard let distribution = event.distribution else { return total }
+      let quantityRatio = matchedBuyQuantity / distribution.amount
+      if event.type == .capitalReturn {
+        return total - (distribution.value * quantityRatio)
       }
+      return total + (distribution.value * quantityRatio)
     }
   }
 
-  /// Filters split and reverse-split events between two dates for restructure-aware quantity adjustment.
+  /// Filters restructure events between two dates for quantity-basis adjustment.
   /// - Parameters:
   ///   - events: Asset events to scan.
   ///   - startDate: Exclusive lower bound for event dates.
   ///   - endDate: Optional inclusive upper bound for event dates.
-  /// - Returns: Relevant split and unsplit events in their existing order.
+  /// - Returns: Relevant restructure events in their existing order.
   static func restructureEvents(
     in events: [AssetEvent],
     after startDate: Date,
@@ -164,7 +156,7 @@ enum BedAndBreakfastMatcher {
       if let endDate, event.date > endDate {
         return false
       }
-      return event.type == .split || event.type == .unsplit
+      return event.isRestructure
     }
   }
 

@@ -145,10 +145,20 @@ import XCTest
 
       let asset = "EVENT-ASSET"
       let events: [AssetEvent] = [
-        AssetEvent(type: .split, date: TestSupport.date("01/01/2025"), asset: asset, amount: 2, value: 0),
-        AssetEvent(type: .unsplit, date: TestSupport.date("02/01/2025"), asset: asset, amount: 2, value: 0),
-        AssetEvent(type: .capitalReturn, date: TestSupport.date("03/01/2025"), asset: asset, amount: 10, value: 5),
-        AssetEvent(type: .dividend, date: TestSupport.date("04/01/2025"), asset: asset, amount: 10, value: 6)
+        AssetEvent(type: .split, date: TestSupport.date("01/01/2025"), asset: asset, multiplier: 2),
+        AssetEvent(type: .unsplit, date: TestSupport.date("02/01/2025"), asset: asset, multiplier: 2),
+        AssetEvent(
+          type: .capitalReturn,
+          date: TestSupport.date("03/01/2025"),
+          asset: asset,
+          distributionAmount: 10,
+          distributionValue: 5),
+        AssetEvent(
+          type: .dividend,
+          date: TestSupport.date("04/01/2025"),
+          asset: asset,
+          distributionAmount: 10,
+          distributionValue: 6)
       ]
 
       let result = CalculationResult(

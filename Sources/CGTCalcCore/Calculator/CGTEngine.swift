@@ -23,7 +23,7 @@ public enum CGTEngine {
   /// Runs the CGT engine on transactions and asset events.
   /// - Parameters:
   ///   - transactions: Buy and sell rows for all assets.
-  ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, and UNSPLIT rows for all assets.
+  ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, and RESTRUCT rows for all assets.
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
     let sortedTransactions = transactions.sorted { $0.date < $1.date }

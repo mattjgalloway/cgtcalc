@@ -36,15 +36,16 @@ final class ParserTests: XCTestCase {
     DIVIDEND 01/02/2020 TEST 50 25.0
     SPLIT 01/03/2020 TEST 2
     UNSPLIT 01/04/2020 TEST 0.5
+    RESTRUCT 01/05/2020 TEST 3:7
     """
 
     let data = try InputParser.parse(content: input)
-    XCTAssertEqual(data.count, 4)
+    XCTAssertEqual(data.count, 5)
 
     if case .assetEvent(let e) = data[0] {
       XCTAssertEqual(e.type, .capitalReturn)
-      XCTAssertEqual(e.amount, 100)
-      XCTAssertEqual(e.value, 50)
+      XCTAssertEqual(e.distribution?.amount, 100)
+      XCTAssertEqual(e.distribution?.value, 50)
       XCTAssertEqual(e.sourceOrder, 0)
     } else {
       XCTFail("Expected asset event")
@@ -52,8 +53,8 @@ final class ParserTests: XCTestCase {
 
     if case .assetEvent(let e) = data[1] {
       XCTAssertEqual(e.type, .dividend)
-      XCTAssertEqual(e.amount, 50)
-      XCTAssertEqual(e.value, 25)
+      XCTAssertEqual(e.distribution?.amount, 50)
+      XCTAssertEqual(e.distribution?.value, 25)
       XCTAssertEqual(e.sourceOrder, 1)
     } else {
       XCTFail("Expected asset event")
@@ -61,14 +62,22 @@ final class ParserTests: XCTestCase {
 
     if case .assetEvent(let e) = data[2] {
       XCTAssertEqual(e.type, .split)
-      XCTAssertEqual(e.amount, 2)
+      XCTAssertEqual(e.splitOrUnsplitMultiplier, 2)
     } else {
       XCTFail("Expected asset event")
     }
 
     if case .assetEvent(let e) = data[3] {
       XCTAssertEqual(e.type, .unsplit)
-      XCTAssertEqual(e.amount, Decimal(string: "0.5"))
+      XCTAssertEqual(e.splitOrUnsplitMultiplier, Decimal(string: "0.5"))
+    } else {
+      XCTFail("Expected asset event")
+    }
+
+    if case .assetEvent(let e) = data[4] {
+      XCTAssertEqual(e.type, .restruct)
+      XCTAssertEqual(e.restructureRatio?.oldUnits, 3)
+      XCTAssertEqual(e.restructureRatio?.newUnits, 7)
     } else {
       XCTFail("Expected asset event")
     }
@@ -144,6 +153,21 @@ final class ParserTests: XCTestCase {
       XCTAssertEqual(line, 1)
       XCTAssertEqual(field, "multiplier")
       XCTAssertEqual(reason, "must be greater than zero")
+    }
+  }
+
+  func testParseRejectsInvalidRestructureRatio() {
+    let input = """
+    RESTRUCT 01/03/2020 TEST 3-7
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.invalidField(let line, let field, let reason) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(field, "ratio")
+      XCTAssertEqual(reason, "must be in OLD:NEW format")
     }
   }
 
