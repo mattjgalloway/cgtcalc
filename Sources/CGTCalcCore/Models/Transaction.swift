@@ -2,14 +2,14 @@ import Foundation
 
 // MARK: - Transaction Types
 
-public enum TransactionType: String, Codable {
+public enum TransactionType: String {
   case buy = "BUY"
   case sell = "SELL"
 }
 
 // MARK: - Transaction
 
-public struct Transaction: Identifiable, Codable {
+public struct Transaction: Identifiable {
   public let id: UUID
   public let sourceOrder: Int?
   public let type: TransactionType
@@ -66,7 +66,7 @@ public struct Transaction: Identifiable, Codable {
 
 // MARK: - Input Data
 
-public enum InputData: Codable {
+public enum InputData {
   case transaction(Transaction)
   case assetEvent(AssetEvent)
 
@@ -84,54 +84,4 @@ public enum InputData: Codable {
     }
   }
 
-  private enum CodingKeys: String, CodingKey {
-    case type
-    case data
-  }
-
-  /// Decodes a tagged input row into a transaction or asset-event case.
-  /// - Parameter decoder: Decoder positioned at an `InputData` payload.
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    let type = try container.decode(String.self, forKey: .type)
-
-    switch type {
-    case "BUY", "SELL":
-      let transaction = try container.decode(Transaction.self, forKey: .data)
-      self = .transaction(transaction)
-    case "CAPRETURN", "DIVIDEND", "SPLIT", "UNSPLIT", "RESTRUCT":
-      let event = try container.decode(AssetEvent.self, forKey: .data)
-      self = .assetEvent(event)
-    default:
-      throw DecodingError.dataCorrupted(
-        DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unknown type: \(type)"))
-    }
-  }
-
-  /// Encodes an `InputData` case using the persisted row type plus payload.
-  /// - Parameter encoder: Destination encoder.
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-
-    switch self {
-    case .transaction(let t):
-      try container.encode(t.type.rawValue, forKey: .type)
-      try container.encode(t, forKey: .data)
-    case .assetEvent(let e):
-      let type = switch e.kind {
-      case .capitalReturn:
-        AssetEventType.capitalReturn.rawValue
-      case .dividend:
-        AssetEventType.dividend.rawValue
-      case .split:
-        AssetEventType.split.rawValue
-      case .unsplit:
-        AssetEventType.unsplit.rawValue
-      case .restruct:
-        AssetEventType.restruct.rawValue
-      }
-      try container.encode(type, forKey: .type)
-      try container.encode(e, forKey: .data)
-    }
-  }
 }
