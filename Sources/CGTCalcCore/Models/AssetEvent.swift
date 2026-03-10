@@ -17,7 +17,6 @@ public struct AssetEvent {
     case split(multiplier: Decimal)
     case unsplit(multiplier: Decimal)
     case restruct(oldUnits: Decimal, newUnits: Decimal)
-
   }
 
   let id: UUID

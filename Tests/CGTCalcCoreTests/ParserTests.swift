@@ -118,7 +118,6 @@ final class ParserTests: XCTestCase {
     XCTAssertThrowsError(try InputParser.parse(content: input))
   }
 
-
   func testParseRejectsNonPaddedDate() {
     let input = """
     BUY 1/1/2020 TEST 100 10.0 5

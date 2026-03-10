@@ -83,5 +83,4 @@ public enum InputData {
     case .assetEvent(let e): e.asset
     }
   }
-
 }
