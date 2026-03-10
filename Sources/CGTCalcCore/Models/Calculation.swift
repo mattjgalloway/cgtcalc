@@ -17,7 +17,7 @@ public enum CalculationError: Error, LocalizedError {
   }
 }
 
-public struct Section104Holding: Codable {
+public struct Section104Holding {
   public var quantity: Decimal
   public var costBasis: Decimal
   public var pool: [Section104Match]
@@ -43,7 +43,7 @@ public struct Section104Holding: Codable {
   }
 }
 
-public struct Section104Match: Codable, Identifiable {
+public struct Section104Match: Identifiable {
   public let id: UUID
   public let transactionId: UUID
   public let sourceOrder: Int?
@@ -97,7 +97,7 @@ public struct Section104Match: Codable, Identifiable {
 
 // MARK: - Bed and Breakfast Match
 
-public struct BedAndBreakfastMatch: Codable, Identifiable {
+public struct BedAndBreakfastMatch: Identifiable {
   public let id: UUID
   public let buyTransaction: Transaction
   public let quantity: Decimal
@@ -137,7 +137,7 @@ public struct BedAndBreakfastMatch: Codable, Identifiable {
 
 // MARK: - Disposal
 
-public struct Disposal: Codable, Identifiable {
+public struct Disposal: Identifiable {
   public let id: UUID
   public let sellTransaction: Transaction
   public let taxYear: TaxYear
@@ -180,7 +180,7 @@ public struct Disposal: Codable, Identifiable {
 
 // MARK: - Tax Year Summary
 
-public struct TaxYearSummary: Codable {
+public struct TaxYearSummary {
   public let taxYear: TaxYear
   public let disposals: [Disposal]
   public let totalGain: Decimal
@@ -223,7 +223,7 @@ public struct TaxYearSummary: Codable {
 
 // MARK: - Calculation Result
 
-public struct CalculationResult: Codable {
+public struct CalculationResult {
   public let taxYearSummaries: [TaxYearSummary]
   public let transactions: [Transaction]
   public let assetEvents: [AssetEvent]

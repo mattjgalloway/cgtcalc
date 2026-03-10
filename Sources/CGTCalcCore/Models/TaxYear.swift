@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Tax Year
 
-public struct TaxYear: Codable, Comparable, Hashable {
+public struct TaxYear: Comparable, Hashable {
   public let startYear: Int // Year starting (e.g., 2019 for 2019/2020)
 
   /// Creates a UK tax year from its starting calendar year.

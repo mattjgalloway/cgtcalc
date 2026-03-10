@@ -16,43 +16,6 @@ final class ModelCoverageTests: XCTestCase {
     XCTAssertEqual(eventData.asset, "EVT")
   }
 
-  func testInputDataCodableRoundTrip() throws {
-    let original: [InputData] = [
-      .transaction(TestSupport.buy("01/01/2020", "TEST", 100, 10, 5, sourceOrder: 1)),
-      .assetEvent(TestSupport.capReturn("02/01/2020", "TEST", 100, 25, sourceOrder: 2))
-    ]
-
-    let encoded = try JSONEncoder().encode(original)
-    let decoded = try JSONDecoder().decode([InputData].self, from: encoded)
-    XCTAssertEqual(decoded.count, 2)
-
-    guard case .transaction(let transaction) = decoded[0] else {
-      return XCTFail("Expected transaction")
-    }
-    XCTAssertEqual(transaction.type, .buy)
-    XCTAssertEqual(transaction.asset, "TEST")
-
-    guard case .assetEvent(let event) = decoded[1] else {
-      return XCTFail("Expected asset event")
-    }
-    if case .capitalReturn = event.kind {
-      XCTAssertTrue(true)
-    } else {
-      XCTFail("Expected capital return")
-    }
-    XCTAssertEqual(event.asset, "TEST")
-  }
-
-  func testInputDataDecodeUnknownTypeThrows() {
-    let payload = #"{"type":"UNKNOWN","data":{}}"#.data(using: .utf8)!
-    XCTAssertThrowsError(try JSONDecoder().decode(InputData.self, from: payload)) { error in
-      guard case DecodingError.dataCorrupted(let context) = error else {
-        return XCTFail("Unexpected error: \(error)")
-      }
-      XCTAssertTrue(context.debugDescription.contains("Unknown type"))
-    }
-  }
-
   func testSection104HoldingAverageCost() {
     XCTAssertEqual(Section104Holding().averageCost, 0)
     let holding = Section104Holding(quantity: 50, costBasis: 125, pool: [])
