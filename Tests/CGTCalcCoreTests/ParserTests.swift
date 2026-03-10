@@ -118,6 +118,20 @@ final class ParserTests: XCTestCase {
     XCTAssertThrowsError(try InputParser.parse(content: input))
   }
 
+
+  func testParseRejectsNonPaddedDate() {
+    let input = """
+    BUY 1/1/2020 TEST 100 10.0 5
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.invalidDate(let invalidDate) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(invalidDate, "1/1/2020")
+    }
+  }
+
   func testParseInvalidNumber() {
     let input = """
     BUY 01/01/2020 TEST not_a_number 10.0 5

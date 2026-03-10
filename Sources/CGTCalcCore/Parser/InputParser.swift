@@ -19,6 +19,9 @@ public enum DateParser {
     guard let date = formatter.date(from: string) else {
       throw ParserError.invalidDate(string)
     }
+    guard self.format(date) == string else {
+      throw ParserError.invalidDate(string)
+    }
     return date
   }
 
