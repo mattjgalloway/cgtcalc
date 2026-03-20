@@ -113,6 +113,20 @@ public enum InputParser {
       let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .transaction(transaction)
 
+    case "SPOUSEIN":
+      guard fields.count >= 5 else {
+        throw ParserError.insufficientFields(line: lineNumber, expected: 5, got: fields.count)
+      }
+      let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
+      return .transaction(transaction)
+
+    case "SPOUSEOUT":
+      guard fields.count >= 4 else {
+        throw ParserError.insufficientFields(line: lineNumber, expected: 4, got: fields.count)
+      }
+      let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
+      return .transaction(transaction)
+
     case "CAPRETURN", "DIVIDEND":
       guard fields.count >= 5 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 5, got: fields.count)
@@ -132,18 +146,45 @@ public enum InputParser {
     }
   }
 
-  /// Parses a BUY or SELL row into a transaction model.
+  /// Parses a transaction row into a transaction model.
+  /// Supported forms:
+  /// - BUY/SELL: `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>`
+  /// - SPOUSEIN: `<DATE> <ASSET> <AMOUNT> <PRICE>`
+  /// - SPOUSEOUT: `<DATE> <ASSET> <AMOUNT>`
   /// - Parameters:
   ///   - fields: Tokenized input fields.
   ///   - lineNumber: Source line number for diagnostics.
   ///   - sourceOrder: Zero-based order among parsed rows.
   /// - Returns: A populated transaction.
   private static func parseTransaction(fields: [String], lineNumber: Int, sourceOrder: Int) throws -> Transaction {
+    let transactionType: TransactionType = switch fields[0] {
+    case "BUY":
+      .buy
+    case "SELL":
+      .sell
+    case "SPOUSEIN":
+      .spouseIn
+    default:
+      .spouseOut
+    }
+
     let date = try DateParser.parse(fields[1])
     let asset = fields[2]
     let quantity = try parseDecimal(fields[3], lineNumber: lineNumber)
-    let price = try parseDecimal(fields[4], lineNumber: lineNumber)
-    let expenses = try parseDecimal(fields[5], lineNumber: lineNumber)
+    let price: Decimal
+    let expenses: Decimal
+
+    switch transactionType {
+    case .buy, .sell:
+      price = try self.parseDecimal(fields[4], lineNumber: lineNumber)
+      expenses = try self.parseDecimal(fields[5], lineNumber: lineNumber)
+    case .spouseIn:
+      price = try self.parseDecimal(fields[4], lineNumber: lineNumber)
+      expenses = 0
+    case .spouseOut:
+      price = 0
+      expenses = 0
+    }
 
     try self.validatePositive(quantity, field: "quantity", lineNumber: lineNumber)
     try self.validateNonNegative(price, field: "price", lineNumber: lineNumber)
@@ -151,7 +192,7 @@ public enum InputParser {
 
     return Transaction(
       sourceOrder: sourceOrder,
-      type: fields[0] == "BUY" ? .buy : .sell,
+      type: transactionType,
       date: date,
       asset: asset,
       quantity: quantity,

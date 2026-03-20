@@ -26,6 +26,12 @@ public struct TextReportFormatter {
     output += "\n\n# HOLDINGS\n\n"
     output += self.formatHoldings(result.holdings)
 
+    // Spouse transfers out
+    if !result.spouseTransfersOut.isEmpty {
+      output += "\n\n# SPOUSE TRANSFERS OUT\n\n"
+      output += self.formatSpouseTransfersOut(result.spouseTransfersOut)
+    }
+
     // Transactions
     output += "\n\n# TRANSACTIONS\n\n"
     output += self.formatTransactions(result.transactions)
@@ -269,6 +275,23 @@ public struct TextReportFormatter {
     return output
   }
 
+  /// Formats `SPOUSEOUT` transfers with the computed no-gain/no-loss cost basis used.
+  /// - Parameter spouseTransfersOut: Transfer rows costed by disposal identification ordering.
+  /// - Returns: The rendered spouse transfer section body.
+  private func formatSpouseTransfersOut(_ spouseTransfersOut: [SpouseTransferOut]) -> String {
+    guard !spouseTransfersOut.isEmpty else {
+      return "NONE\n"
+    }
+
+    var output = ""
+    for transfer in spouseTransfersOut {
+      let tx = transfer.transaction
+      let dateStr = DateParser.format(tx.date)
+      output += "\(dateStr) SPOUSEOUT \(tx.quantity) of \(tx.asset) at transferred cost basis £\(transfer.costBasis.rounded(to: 2).string) (£\(transfer.averageCost.rounded(to: 5).string) per unit)\n"
+    }
+    return output
+  }
+
   // MARK: - Transactions
 
   /// Formats input transactions in their original input order.
@@ -283,8 +306,17 @@ public struct TextReportFormatter {
 
     for transaction in transactions {
       let dateStr = DateParser.format(transaction.date)
-      let typeStr = transaction.type == .buy ? "BOUGHT" : "SOLD"
-      output += "\(dateStr) \(typeStr) \(transaction.quantity) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses\n"
+      let line = switch transaction.type {
+      case .buy:
+        "\(dateStr) BOUGHT \(transaction.quantity) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses"
+      case .sell:
+        "\(dateStr) SOLD \(transaction.quantity) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses"
+      case .spouseIn:
+        "\(dateStr) SPOUSEIN \(transaction.quantity) of \(transaction.asset) at £\(transaction.price)"
+      case .spouseOut:
+        "\(dateStr) SPOUSEOUT \(transaction.quantity) of \(transaction.asset)"
+      }
+      output += line + "\n"
     }
 
     return output

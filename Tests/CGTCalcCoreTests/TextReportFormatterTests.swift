@@ -245,4 +245,23 @@ final class TextReportFormatterTests: XCTestCase {
     XCTAssertTrue(output.contains("1 losses with total of 5."))
     XCTAssertTrue(output.contains("for GAIN of £0"))
   }
+
+  func testFormatsSpouseTransfersOutSectionWhenPresent() {
+    let transferTx = TestSupport.spouseOut("01/02/2024", "FUND", 40)
+    let transfer = SpouseTransferOut(transaction: transferTx, costBasis: 420.25)
+    let result = CalculationResult(
+      taxYearSummaries: [],
+      transactions: [transferTx, TestSupport.spouseIn("03/02/2024", "FUND", 10, 10.5)],
+      assetEvents: [],
+      lossCarryForward: 0,
+      spouseTransfersOut: [transfer])
+
+    let output = TextReportFormatter().format(result)
+
+    XCTAssertTrue(output.contains("# SPOUSE TRANSFERS OUT"))
+    XCTAssertTrue(output.contains(
+      "01/02/2024 SPOUSEOUT 40 of FUND at transferred cost basis £420.25 (£10.50625 per unit)"))
+    XCTAssertTrue(output.contains("01/02/2024 SPOUSEOUT 40 of FUND"))
+    XCTAssertTrue(output.contains("03/02/2024 SPOUSEIN 10 of FUND at £10.5"))
+  }
 }

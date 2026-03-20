@@ -80,11 +80,19 @@ The full list of kinds of data are as follows:
 |-------------|--------------|-----------------|------------|
 | `BUY`       | Transaction  | Buy transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
 | `SELL`      | Transaction  | Sell transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
+| `SPOUSEIN`  | Transaction  | No-gain/no-loss transfer in from spouse/civil partner (manual cost basis input) | `<DATE> <ASSET> <AMOUNT> <PRICE>` |
+| `SPOUSEOUT` | Transaction  | No-gain/no-loss transfer out to spouse/civil partner (costed using normal share-identification ordering) | `<DATE> <ASSET> <AMOUNT>` |
 | `CAPRETURN` | Asset event  | Capital return / equalisation event which reduces allowable cost | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
 | `DIVIDEND`  | Asset event  | Accumulation distribution which increases allowable cost | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
 | `SPLIT`     | Asset event  | Stock split     | `<DATE> <ASSET> <MULTIPLIER>` |
 | `UNSPLIT`   | Asset event  | Stock un-split  | `<DATE> <ASSET> <MULTIPLIER>` |
 | `RESTRUCT`  | Asset event  | Exact-ratio share restructure using old:new units | `<DATE> <ASSET> <OLD>:<NEW>` |
+
+Notes for spouse transfers:
+
+- `SPOUSEOUT` does not take price or expenses. The calculator derives transferred allowable cost using normal share-identification ordering (same day, then following 30 days, then Section 104 fallback) and reports it in a dedicated `SPOUSE TRANSFERS OUT` section.
+- `SPOUSEIN` should use the per-unit cost basis manually transcribed from the transfer-out calculation run for the other person.
+- This tool calculates one person at a time; use separate input files/runs for each spouse/civil partner.
 
 ## Example
 

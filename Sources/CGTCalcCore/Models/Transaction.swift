@@ -5,6 +5,25 @@ import Foundation
 public enum TransactionType: String {
   case buy = "BUY"
   case sell = "SELL"
+  case spouseIn = "SPOUSEIN"
+  case spouseOut = "SPOUSEOUT"
+
+  public var isAcquisition: Bool {
+    switch self {
+    case .buy, .spouseIn:
+      true
+    case .sell, .spouseOut:
+      false
+    }
+  }
+
+  public var isTaxableDisposal: Bool {
+    self == .sell
+  }
+
+  public var isSpouseTransferOut: Bool {
+    self == .spouseOut
+  }
 }
 
 // MARK: - Transaction

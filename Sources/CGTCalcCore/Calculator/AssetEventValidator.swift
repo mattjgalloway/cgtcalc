@@ -26,14 +26,14 @@ enum AssetEventValidator {
         switch action {
         case .transaction(let transaction):
           switch transaction.type {
-          case .buy:
+          case .buy, .spouseIn:
             holding.quantity += transaction.quantity
             holding.pool.append(PoolEntry(
               transactionId: transaction.id,
               sourceOrder: transaction.sourceOrder,
               quantity: transaction.quantity,
               date: transaction.date))
-          case .sell:
+          case .sell, .spouseOut:
             holding.quantity = max(0, holding.quantity - transaction.quantity)
             holding.pool = self.depletingPool(holding.pool, by: transaction.quantity)
           }
@@ -240,7 +240,12 @@ enum AssetEventValidator {
     var typeRank: Int {
       switch self {
       case .transaction(let transaction):
-        transaction.type == .buy ? 0 : 1
+        switch transaction.type {
+        case .buy, .spouseIn:
+          0
+        case .sell, .spouseOut:
+          1
+        }
       case .event:
         2
       }

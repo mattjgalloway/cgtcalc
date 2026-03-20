@@ -194,4 +194,93 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(holding.quantity, 60, accuracy: 0.00001)
     XCTAssertEqual(holding.costBasis, 60, accuracy: 0.00001)
   }
+
+  func testSpouseOutUsesSection104CostBasisAndDoesNotCreateDisposal() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 40)
+    ], assetEvents: [])
+
+    XCTAssertTrue(result.taxYearSummaries.isEmpty)
+    XCTAssertEqual(result.spouseTransfersOut.count, 1)
+    XCTAssertEqual(result.spouseTransfersOut[0].transaction.quantity, 40, accuracy: 0.00001)
+    XCTAssertEqual(result.spouseTransfersOut[0].costBasis, 400, accuracy: 0.00001)
+    XCTAssertEqual(result.spouseTransfersOut[0].averageCost, 10, accuracy: 0.00001)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 60, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 600, accuracy: 0.00001)
+  }
+
+  func testSpouseInAddsToPoolForFutureDisposalMatching() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 40),
+      TestSupport.spouseIn("01/03/2020", "TEST", 20, 10),
+      TestSupport.sell("01/04/2020", "TEST", 30, 12, 0)
+    ], assetEvents: [])
+
+    let summary = try XCTUnwrap(result.taxYearSummaries.first)
+    let disposal = try XCTUnwrap(summary.disposals.first)
+    XCTAssertEqual(disposal.gain, 60, accuracy: 1)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 50, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 500, accuracy: 0.00001)
+  }
+
+  func testSpouseOutUsesSameDayAcquisitionPriorityBeforeSection104Pool() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
+      TestSupport.buy("01/02/2020", "TEST", 10, 100, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 10)
+    ], assetEvents: [])
+
+    XCTAssertEqual(result.spouseTransfersOut.count, 1)
+    XCTAssertEqual(result.spouseTransfersOut[0].costBasis, 1000, accuracy: 0.00001)
+    XCTAssertEqual(result.spouseTransfersOut[0].averageCost, 100, accuracy: 0.00001)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 100, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 100, accuracy: 0.00001)
+  }
+
+  func testSpouseOutUsesThirtyDayAcquisitionPriorityBeforeSection104Pool() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 40),
+      TestSupport.buy("15/02/2020", "TEST", 40, 100, 0)
+    ], assetEvents: [])
+
+    XCTAssertEqual(result.spouseTransfersOut.count, 1)
+    XCTAssertEqual(result.spouseTransfersOut[0].costBasis, 4000, accuracy: 0.00001)
+    XCTAssertEqual(result.spouseTransfersOut[0].averageCost, 100, accuracy: 0.00001)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 100, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 100, accuracy: 0.00001)
+  }
+
+  func testSpouseOutRespectsFutureBuyReservedForLaterSameDaySell() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
+      TestSupport.spouseOut("10/01/2020", "TEST", 70),
+      TestSupport.buy("20/01/2020", "TEST", 60, 1.5, 0),
+      TestSupport.sell("20/01/2020", "TEST", 50, 3, 0)
+    ], assetEvents: [])
+
+    XCTAssertEqual(result.spouseTransfersOut.count, 1)
+    XCTAssertEqual(result.spouseTransfersOut[0].costBasis, 75, accuracy: 0.00001)
+    XCTAssertEqual(result.spouseTransfersOut[0].averageCost, 75.0 / 70.0, accuracy: 0.00001)
+
+    let summary = try XCTUnwrap(result.taxYearSummaries.first)
+    let disposal = try XCTUnwrap(summary.disposals.first)
+    XCTAssertEqual(disposal.gain, 75, accuracy: 1)
+    XCTAssertEqual(disposal.bedAndBreakfastMatches.count, 1)
+    XCTAssertEqual(disposal.bedAndBreakfastMatches[0].buyDateQuantity, 50, accuracy: 0.00001)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 40, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 40, accuracy: 0.00001)
+  }
 }

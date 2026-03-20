@@ -197,6 +197,25 @@ import XCTest
       XCTAssertFalse(snapshot.contains("\(veryLongAsset)0"))
     }
 
+    func testPDFSnapshotIncludesSpouseTransfersOutSectionWhenPresent() throws {
+      let transferTx = TestSupport.spouseOut("01/02/2024", "FUND", 40)
+      let transfer = SpouseTransferOut(transaction: transferTx, costBasis: 420.25)
+      let result = CalculationResult(
+        taxYearSummaries: [],
+        transactions: [transferTx],
+        assetEvents: [],
+        lossCarryForward: 0,
+        holdings: [:],
+        spouseTransfersOut: [transfer])
+
+      let snapshot = try self.extractPDFSnapshotText(from: self.renderPDF(result))
+
+      XCTAssertTrue(snapshot.contains("Spouse Transfers Out"))
+      XCTAssertTrue(snapshot.contains("01/02/2024 SPOUSEOUT 40 of FUND"))
+      XCTAssertTrue(snapshot.contains("transferred cost basis £420.25"))
+      XCTAssertTrue(snapshot.contains("per unit"))
+    }
+
     func testPDFSnapshotWithVeryLargeDisposalUsesUnboxedFallback() throws {
       let hugeAsset = String(repeating: "EXTREMELY-LONG-ASSET-NAME-", count: 50)
       let sell = Transaction(

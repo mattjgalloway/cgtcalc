@@ -1,0 +1,46 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
+===================================================================
+2019/2020   £60    £360       £12000      £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+1 gains with total of 60.
+0 losses with total of 0.
+
+1) SOLD 30 of STOCK on 01/04/2020 for GAIN of £60
+Matches with:
+  - SECTION 104: 80 at cost basis of £10
+Calculation: (30 * 12 - 0) - ( (30 * 10) ) = 60
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 360, allowable costs = 300, total gains = 60, total losses = 0
+
+
+# HOLDINGS
+
+STOCK: 50 units acquired at £10 cost basis
+
+
+# SPOUSE TRANSFERS OUT
+
+01/02/2020 SPOUSEOUT 40 of STOCK at transferred cost basis £400 (£10 per unit)
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 100 of STOCK at £10 with £0 expenses
+01/02/2020 SPOUSEOUT 40 of STOCK
+01/03/2020 SPOUSEIN 20 of STOCK at £10
+01/04/2020 SOLD 30 of STOCK at £12 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

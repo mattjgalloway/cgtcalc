@@ -75,6 +75,7 @@
       self.drawTaxYearDetails(result.taxYearSummaries, layout: &layout)
       self.drawTaxReturnInformation(result.taxYearSummaries, layout: &layout)
       self.drawHoldings(result.holdings, layout: &layout)
+      self.drawSpouseTransfersOut(result.spouseTransfersOut, layout: &layout)
       self.drawTransactions(result.transactions, layout: &layout)
       self.drawAssetEvents(result.assetEvents, layout: &layout)
 
@@ -349,6 +350,17 @@
       self.drawTable(header: header, rows: rows, widthRatios: widths, layout: &layout)
     }
 
+    private func drawSpouseTransfersOut(_ spouseTransfersOut: [SpouseTransferOut], layout: inout PDFLayout) {
+      guard !spouseTransfersOut.isEmpty else { return }
+      self.drawSectionHeader("Spouse Transfers Out", layout: &layout)
+
+      let lines = spouseTransfersOut.map { transfer in
+        let tx = transfer.transaction
+        return "\(DateParser.format(tx.date)) SPOUSEOUT \(self.decimalString(tx.quantity)) of \(tx.asset) at transferred cost basis \(self.currency(self.rounded(transfer.costBasis, scale: 2))) (\(self.currency(self.rounded(transfer.averageCost, scale: 5))) per unit)"
+      }
+      self.drawMonospaceLines(lines, sectionTitle: "Spouse Transfers Out", layout: &layout)
+    }
+
     private func drawTransactions(_ transactions: [Transaction], layout: inout PDFLayout) {
       self.drawSectionHeader("Transactions", layout: &layout)
       if transactions.isEmpty {
@@ -358,8 +370,16 @@
       }
 
       let lines = transactions.map { tx in
-        let type = tx.type == .buy ? "BOUGHT" : "SOLD"
-        return "\(DateParser.format(tx.date)) \(type) \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price)) with \(self.currency(tx.expenses)) expenses"
+        switch tx.type {
+        case .buy:
+          "\(DateParser.format(tx.date)) BOUGHT \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price)) with \(self.currency(tx.expenses)) expenses"
+        case .sell:
+          "\(DateParser.format(tx.date)) SOLD \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price)) with \(self.currency(tx.expenses)) expenses"
+        case .spouseIn:
+          "\(DateParser.format(tx.date)) SPOUSEIN \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price))"
+        case .spouseOut:
+          "\(DateParser.format(tx.date)) SPOUSEOUT \(self.decimalString(tx.quantity)) of \(tx.asset)"
+        }
       }
       self.drawMonospaceLines(lines, sectionTitle: "Transactions", layout: &layout)
     }

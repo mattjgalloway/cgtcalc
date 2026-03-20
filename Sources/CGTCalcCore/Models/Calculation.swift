@@ -221,6 +221,34 @@ public struct TaxYearSummary {
   }
 }
 
+// MARK: - Spouse Transfer
+
+public struct SpouseTransferOut: Identifiable {
+  public let id: UUID
+  public let transaction: Transaction
+  public let costBasis: Decimal
+
+  /// Creates a spouse/civil-partner transfer-out record costed using disposal identification rules.
+  /// - Parameters:
+  ///   - id: Stable identifier for encoding.
+  ///   - transaction: The source `SPOUSEOUT` transaction.
+  ///   - costBasis: Total transferred allowable cost.
+  public init(
+    id: UUID = UUID(),
+    transaction: Transaction,
+    costBasis: Decimal)
+  {
+    self.id = id
+    self.transaction = transaction
+    self.costBasis = costBasis
+  }
+
+  public var averageCost: Decimal {
+    guard self.transaction.quantity > 0 else { return 0 }
+    return self.costBasis / self.transaction.quantity
+  }
+}
+
 // MARK: - Calculation Result
 
 public struct CalculationResult {
@@ -229,6 +257,7 @@ public struct CalculationResult {
   public let assetEvents: [AssetEvent]
   public let lossCarryForward: Decimal
   public let holdings: [String: Section104Holding]
+  public let spouseTransfersOut: [SpouseTransferOut]
 
   /// Creates the full calculator output model.
   /// - Parameters:
@@ -242,12 +271,14 @@ public struct CalculationResult {
     transactions: [Transaction],
     assetEvents: [AssetEvent],
     lossCarryForward: Decimal,
-    holdings: [String: Section104Holding] = [:])
+    holdings: [String: Section104Holding] = [:],
+    spouseTransfersOut: [SpouseTransferOut] = [])
   {
     self.taxYearSummaries = taxYearSummaries
     self.transactions = transactions
     self.assetEvents = assetEvents
     self.lossCarryForward = lossCarryForward
     self.holdings = holdings
+    self.spouseTransfersOut = spouseTransfersOut
   }
 }

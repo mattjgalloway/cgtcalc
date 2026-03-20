@@ -46,6 +46,40 @@ struct TestSupport {
       expenses: expenses)
   }
 
+  static func spouseIn(
+    _ date: String,
+    _ asset: String,
+    _ quantity: Decimal,
+    _ price: Decimal,
+    _ expenses: Decimal = 0,
+    sourceOrder: Int? = nil) -> Transaction
+  {
+    Transaction(
+      sourceOrder: sourceOrder,
+      type: .spouseIn,
+      date: self.date(date),
+      asset: asset,
+      quantity: quantity,
+      price: price,
+      expenses: expenses)
+  }
+
+  static func spouseOut(
+    _ date: String,
+    _ asset: String,
+    _ quantity: Decimal,
+    sourceOrder: Int? = nil) -> Transaction
+  {
+    Transaction(
+      sourceOrder: sourceOrder,
+      type: .spouseOut,
+      date: self.date(date),
+      asset: asset,
+      quantity: quantity,
+      price: 0,
+      expenses: 0)
+  }
+
   static func capReturn(
     _ date: String,
     _ asset: String,

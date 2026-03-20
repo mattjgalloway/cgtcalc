@@ -30,6 +30,36 @@ final class ParserTests: XCTestCase {
     }
   }
 
+  func testParseSpouseTransferTransactions() throws {
+    let input = """
+    SPOUSEIN 01/01/2020 TEST 100 10.0
+    SPOUSEOUT 01/02/2020 TEST 50
+    """
+
+    let data = try InputParser.parse(content: input)
+    XCTAssertEqual(data.count, 2)
+
+    if case .transaction(let t) = data[0] {
+      XCTAssertEqual(t.type, .spouseIn)
+      XCTAssertEqual(t.asset, "TEST")
+      XCTAssertEqual(t.quantity, 100)
+      XCTAssertEqual(t.price, 10)
+      XCTAssertEqual(t.sourceOrder, 0)
+    } else {
+      XCTFail("Expected transaction")
+    }
+
+    if case .transaction(let t) = data[1] {
+      XCTAssertEqual(t.type, .spouseOut)
+      XCTAssertEqual(t.quantity, 50)
+      XCTAssertEqual(t.price, 0)
+      XCTAssertEqual(t.expenses, 0)
+      XCTAssertEqual(t.sourceOrder, 1)
+    } else {
+      XCTFail("Expected transaction")
+    }
+  }
+
   func testParseAssetEvents() throws {
     let input = """
     CAPRETURN 01/01/2020 TEST 100 50.0
@@ -166,6 +196,36 @@ final class ParserTests: XCTestCase {
       XCTAssertEqual(line, 1)
       XCTAssertEqual(field, "expenses")
       XCTAssertEqual(reason, "must not be negative")
+    }
+  }
+
+  func testParseRejectsInsufficientFieldsForSpouseIn() {
+    let input = """
+    SPOUSEIN 01/01/2020 TEST 100
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.insufficientFields(let line, let expected, let got) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(expected, 5)
+      XCTAssertEqual(got, 4)
+    }
+  }
+
+  func testParseRejectsInsufficientFieldsForSpouseOut() {
+    let input = """
+    SPOUSEOUT 01/01/2020 TEST
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.insufficientFields(let line, let expected, let got) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(expected, 4)
+      XCTAssertEqual(got, 3)
     }
   }
 

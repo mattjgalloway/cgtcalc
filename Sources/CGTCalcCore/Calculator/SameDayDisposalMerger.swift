@@ -52,6 +52,7 @@ enum SameDayDisposalMerger {
         let firstSell = group.sells[0]
 
         return Transaction(
+          sourceOrder: firstSell.sourceOrder,
           type: .sell,
           date: firstSell.date,
           asset: firstSell.asset,
