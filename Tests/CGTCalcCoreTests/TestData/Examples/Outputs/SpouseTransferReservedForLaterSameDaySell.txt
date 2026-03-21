@@ -1,0 +1,46 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
+===================================================================
+2019/2020   £75    £150       £12000      £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2019/2020
+
+1 gains with total of 75.
+0 losses with total of 0.
+
+1) SOLD 50 of TEST on 20/01/2020 for GAIN of £75
+Matches with:
+  - SAME DAY: 50 bought on 20/01/2020 at £1.5
+Calculation: (50 * 3 - 0) - ( (50 * 1.5 + 0) ) = 75
+
+
+# TAX RETURN INFORMATION
+
+2019/2020: Disposals = 1, proceeds = 150, allowable costs = 75, total gains = 75, total losses = 0
+
+
+# HOLDINGS
+
+TEST: 40 units acquired at £1 cost basis
+
+
+# SPOUSE TRANSFERS OUT
+
+10/01/2020 SPOUSEOUT 70 of TEST at transferred cost basis £75 (£1.07143 per unit)
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 100 of TEST at £1 with £0 expenses
+10/01/2020 SPOUSEOUT 70 of TEST
+20/01/2020 BOUGHT 60 of TEST at £1.5 with £0 expenses
+20/01/2020 SOLD 50 of TEST at £3 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

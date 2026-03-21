@@ -283,4 +283,24 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(holding.quantity, 40, accuracy: 0.00001)
     XCTAssertEqual(holding.costBasis, 40, accuracy: 0.00001)
   }
+
+  func testPostBuyDividendIsNotDoubleCountedAcrossThirtyDayAndLaterSection104Disposals() throws {
+    let result = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
+      TestSupport.sell("01/06/2020", "TEST", 50, 20, 0),
+      TestSupport.buy("10/06/2020", "TEST", 50, 12, 0),
+      TestSupport.sell("20/06/2020", "TEST", 50, 25, 0)
+    ], assetEvents: [
+      TestSupport.dividend("30/06/2020", "TEST", 50, 100)
+    ])
+
+    let summary = try XCTUnwrap(result.taxYearSummaries.first)
+    XCTAssertEqual(summary.disposals.count, 2)
+    XCTAssertEqual(summary.disposals[0].gain, 400, accuracy: 1)
+    XCTAssertEqual(summary.disposals[1].gain, 750, accuracy: 1)
+
+    let holding = try XCTUnwrap(result.holdings["TEST"])
+    XCTAssertEqual(holding.quantity, 50, accuracy: 0.00001)
+    XCTAssertEqual(holding.costBasis, 600, accuracy: 0.00001)
+  }
 }

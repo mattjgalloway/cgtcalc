@@ -11,7 +11,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [sameDayBuy],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(matches.count, 1)
     XCTAssertEqual(quantityUsed, 50)
@@ -29,7 +29,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(matches.count, 1)
     XCTAssertEqual(quantityUsed, 50)
@@ -46,7 +46,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertTrue(matches.isEmpty)
     XCTAssertEqual(quantityUsed, 0)
@@ -78,7 +78,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [:],
       sortedEvents: events,
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(matches.count, 1)
     XCTAssertEqual(quantityUsed, 20)
@@ -98,7 +98,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [:],
       sortedEvents: events,
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(quantityUsed, 20)
     XCTAssertEqual(matches.count, 1)
@@ -116,7 +116,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [firstSell, secondSell])
+      allOutbounds: [firstSell, secondSell])
 
     XCTAssertEqual(firstQuantityUsed, 106)
     XCTAssertEqual(firstMatches.count, 1)
@@ -127,7 +127,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [rebuy],
       usedBuyQuantities: [rebuy.id: firstMatches[0].buyDateQuantity],
       sortedEvents: [],
-      allSells: [firstSell, secondSell])
+      allOutbounds: [firstSell, secondSell])
 
     XCTAssertEqual(secondQuantityUsed, 1)
     XCTAssertEqual(secondMatches.count, 1)
@@ -144,7 +144,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [cheapBuy, expensiveBuy],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(quantityUsed, 10, accuracy: 0.00001)
     XCTAssertEqual(matches.count, 2)
@@ -165,7 +165,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [sameDayBuyForEarlySell, buyOnFutureSellDay],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [earlySell, futureSell])
+      allOutbounds: [earlySell, futureSell])
 
     XCTAssertEqual(quantityUsed, 15, accuracy: 0.00001)
     XCTAssertEqual(matches.count, 2)
@@ -186,7 +186,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [futureDayBuyA, futureDayBuyB],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [earlySell, futureSell])
+      allOutbounds: [earlySell, futureSell])
 
     XCTAssertEqual(quantityUsed, 40, accuracy: 0.00001)
     XCTAssertEqual(matches.count, 2)
@@ -276,7 +276,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       from: [buyLater, buyEarlier],
       usedBuyQuantities: [:],
       sortedEvents: [],
-      allSells: [sell])
+      allOutbounds: [sell])
 
     XCTAssertEqual(quantityUsed, 100, accuracy: 0.00001)
     XCTAssertEqual(matches.count, 2)

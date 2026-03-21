@@ -76,7 +76,7 @@ public enum CGTEngine {
           from: allBnbBuys,
           usedBuyQuantities: usedBuyQuantities,
           sortedEvents: assetEvents,
-          allSells: assetOutbounds)
+          allOutbounds: assetOutbounds)
 
         for match in bnbMatches {
           usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity
@@ -144,7 +144,7 @@ public enum CGTEngine {
           from: allBnbBuys,
           usedBuyQuantities: usedBuyQuantities,
           sortedEvents: assetEvents,
-          allSells: assetOutbounds)
+          allOutbounds: assetOutbounds)
 
         for match in bnbMatches {
           usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity

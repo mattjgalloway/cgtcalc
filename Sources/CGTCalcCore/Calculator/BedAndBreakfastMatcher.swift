@@ -9,13 +9,14 @@ enum BedAndBreakfastMatcher {
   ///   - buys: Candidate buys for the same asset.
   ///   - usedBuyQuantities: Buy-date quantities already consumed by earlier matches.
   ///   - sortedEvents: Asset events for the same asset in chronological order.
+  ///   - allOutbounds: All outbound transactions for the asset (taxable sells and spouse transfers out).
   /// - Returns: The matched rebuys and total quantity matched on the sell-date basis.
   static func findMatches(
     for sell: Transaction,
     from buys: [Transaction],
     usedBuyQuantities: [UUID: Decimal],
     sortedEvents: [AssetEvent],
-    allSells: [Transaction]) -> ([BedAndBreakfastMatch], Decimal)
+    allOutbounds: [Transaction]) -> ([BedAndBreakfastMatch], Decimal)
   {
     var bnbMatches: [BedAndBreakfastMatch] = []
     var totalQuantityMatched: Decimal = 0
@@ -40,7 +41,8 @@ enum BedAndBreakfastMatcher {
         remainingToMatch: remainingToMatch,
         usedBuyQuantities: usedBuyQuantities,
         sellDate: sellDate,
-        sortedEvents: sortedEvents)
+        sortedEvents: sortedEvents,
+        allOutbounds: allOutbounds)
       guard groupResult.quantityMatched > 0 else { continue }
       bnbMatches.append(contentsOf: groupResult.matches)
       totalQuantityMatched += groupResult.quantityMatched
@@ -54,12 +56,12 @@ enum BedAndBreakfastMatcher {
         !UTC.calendar.isDate(buy.date, inSameDayAs: sellDate)
     }.sorted { $0.date < $1.date }
 
-    let sellsByDay = Dictionary(grouping: allSells, by: { UTC.calendar.startOfDay(for: $0.date) })
+    let outboundsByDay = Dictionary(grouping: allOutbounds, by: { UTC.calendar.startOfDay(for: $0.date) })
 
     for buyGroup in self.groupedBuysByDay(windowBuys) {
       guard remainingToMatch > 0 else { break }
       let buyDay = UTC.calendar.startOfDay(for: buyGroup[0].date)
-      let sameDaySellQuantity = sellsByDay[buyDay, default: []]
+      let sameDaySellQuantity = outboundsByDay[buyDay, default: []]
         .reduce(Decimal(0)) { total, sameDaySell in
           total + sameDaySell.quantity
         }
@@ -73,7 +75,8 @@ enum BedAndBreakfastMatcher {
         usedBuyQuantities: usedBuyQuantities,
         reservedBuyDateQuantities: reservedByBuyID,
         sellDate: sellDate,
-        sortedEvents: sortedEvents)
+        sortedEvents: sortedEvents,
+        allOutbounds: allOutbounds)
       guard groupResult.quantityMatched > 0 else { continue }
       bnbMatches.append(contentsOf: groupResult.matches)
       totalQuantityMatched += groupResult.quantityMatched
@@ -207,7 +210,8 @@ enum BedAndBreakfastMatcher {
     usedBuyQuantities: [UUID: Decimal],
     reservedBuyDateQuantities: [UUID: Decimal] = [:],
     sellDate: Date,
-    sortedEvents: [AssetEvent]) -> (matches: [BedAndBreakfastMatch], quantityMatched: Decimal)
+    sortedEvents: [AssetEvent],
+    allOutbounds: [Transaction]) -> (matches: [BedAndBreakfastMatch], quantityMatched: Decimal)
   {
     struct AvailableBuy {
       let buy: Transaction
@@ -254,9 +258,15 @@ enum BedAndBreakfastMatcher {
 
       let buyDateMatchQty = availableBuy.buyDateQuantityRemaining * matchQuantity / availableBuy
         .adjustedRemainingQuantity
+      let nextOutboundDate = allOutbounds
+        .filter { outbound in
+          outbound.asset == availableBuy.buy.asset && outbound.date > availableBuy.buy.date
+        }
+        .map(\.date)
+        .min()
       let eventAdjustment = self.eventAdjustment(
         for: availableBuy.buy,
-        through: nil,
+        through: nextOutboundDate,
         sortedEvents: sortedEvents,
         matchedBuyQuantity: buyDateMatchQty)
       let actualCost = (availableBuy.buy.totalCost / availableBuy.adjustedTotalQuantity * matchQuantity) +
