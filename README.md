@@ -23,6 +23,10 @@ Currently the calculator supports the following acquisition-to-disposal matching
 2. Bed & breakfast trades where you purchase an asset within 30 days of selling the same asset.
 3. Section 104 holding.
 
+Important assumption:
+
+- 30-day matching currently assumes the disposer is UK resident at the time of the later acquisition.
+
 The calculator specifically only deals with shares where acquisitions and disposals are all on or after 6th April 2008 when the latest rules came into effect.
 
 It also supports handling of equalisation payments (capital return) for funds where those amounts should be subtracted from allowable cost, and accumulation distributions (dividend rows) where those amounts should increase allowable cost.
