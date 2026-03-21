@@ -109,6 +109,7 @@ public enum TaxRateLookup {
   // UK CGT rates by tax year
   // Source: HMRC https://www.gov.uk/government/publications/rates-and-allowances-for-capital-gains-tax/rates-and-allowances-for-capital-gains-tax
   private static let rates: [Int: TaxRates] = [
+    2026: TaxRates(exemption: 3000), // 2026/2027
     2025: TaxRates(exemption: 3000), // 2025/2026
     2024: TaxRates(exemption: 3000), // 2024/2025
     2023: TaxRates(exemption: 6000), // 2023/2024

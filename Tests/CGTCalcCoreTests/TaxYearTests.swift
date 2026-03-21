@@ -94,4 +94,9 @@ final class TaxYearTests: XCTestCase {
     let expected = try self.date("05/04/2020")
     XCTAssertEqual(taxYear.endDate, expected)
   }
+
+  func testTaxRatesInclude2026_2027() throws {
+    let rates = try TaxRateLookup.rates(for: TaxYear(startYear: 2026))
+    XCTAssertEqual(rates.exemption, 3000)
+  }
 }
