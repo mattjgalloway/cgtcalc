@@ -48,6 +48,7 @@ If an input requires share identification beyond:
 3. Section 104 pooling
 
 the calculator currently does not implement HMRC's further "later acquisitions" fallback stage. In those cases the engine will fail with an `insufficientShares` calculation error.
+the calculator currently does not implement HMRC's further "later acquisitions" fallback stage. In those cases the engine raises an `unsupportedLaterAcquisitionIdentification` calculation error.
 
 ## Platforms
 

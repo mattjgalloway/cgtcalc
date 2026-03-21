@@ -104,6 +104,17 @@ public enum CGTEngine {
 
         let totalMatchedQuantity = bnbQuantityUsed + section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
         guard totalMatchedQuantity == sell.quantity else {
+          if let firstLaterAcquisitionDate = self.firstLaterAcquisitionDateForUnsupportedFallback(
+            outboundDate: sell.date,
+            buys: assetBuys)
+          {
+            throw CalculationError.unsupportedLaterAcquisitionIdentification(
+              asset: asset,
+              date: sell.date,
+              requested: sell.quantity,
+              matched: totalMatchedQuantity,
+              firstLaterAcquisitionDate: firstLaterAcquisitionDate)
+          }
           throw CalculationError.insufficientShares(
             asset: asset,
             date: sell.date,
@@ -168,6 +179,17 @@ public enum CGTEngine {
           holding: holding)
         let matchedQuantity = bnbQuantityUsed + section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
         guard matchedQuantity == outbound.quantity else {
+          if let firstLaterAcquisitionDate = self.firstLaterAcquisitionDateForUnsupportedFallback(
+            outboundDate: outbound.date,
+            buys: assetBuys)
+          {
+            throw CalculationError.unsupportedLaterAcquisitionIdentification(
+              asset: asset,
+              date: outbound.date,
+              requested: outbound.quantity,
+              matched: matchedQuantity,
+              firstLaterAcquisitionDate: firstLaterAcquisitionDate)
+          }
           throw CalculationError.insufficientShares(
             asset: asset,
             date: outbound.date,
@@ -226,5 +248,18 @@ public enum CGTEngine {
 
   private static func spouseTransferSortsBefore(_ lhs: SpouseTransferOut, _ rhs: SpouseTransferOut) -> Bool {
     self.transactionSortsBefore(lhs.transaction, rhs.transaction)
+  }
+
+  private static func firstLaterAcquisitionDateForUnsupportedFallback(
+    outboundDate: Date,
+    buys: [Transaction]) -> Date?
+  {
+    guard let day30 = UTC.calendar.date(byAdding: .day, value: 30, to: outboundDate) else {
+      return nil
+    }
+    return buys
+      .map(\.date)
+      .filter { $0 > day30 }
+      .min()
   }
 }

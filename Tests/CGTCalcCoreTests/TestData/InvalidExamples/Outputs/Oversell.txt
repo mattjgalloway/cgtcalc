@@ -1,1 +1,1 @@
-Error calculating CGT: insufficientShares(asset: "TEST", date: 2019-06-01 00:00:00 +0000, requested: 50, matched: 0)
+Error calculating CGT: Insufficient shares for TEST on 01/06/2019: tried to sell 50, but only 0 could be matched

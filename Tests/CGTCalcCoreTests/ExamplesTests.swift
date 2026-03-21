@@ -106,18 +106,25 @@ final class ExamplesTests: XCTestCase {
 
   /// Mirrors CLI parse/calculate/format behavior for invalid fixture expectations.
   private func runLikeCLI(content: String) -> String {
+    func formatError(_ error: Error) -> String {
+      if let localized = error as? LocalizedError, let description = localized.errorDescription {
+        return description
+      }
+      return String(describing: error)
+    }
+
     let inputData: [InputData]
     do {
       inputData = try InputParser.parse(content: content)
     } catch {
-      return "Error parsing input: \(error)\n"
+      return "Error parsing input: \(formatError(error))\n"
     }
 
     let result: CalculationResult
     do {
       result = try CGTEngine.calculate(inputData: inputData)
     } catch {
-      return "Error calculating CGT: \(error)\n"
+      return "Error calculating CGT: \(formatError(error))\n"
     }
 
     return TextReportFormatter().format(result)

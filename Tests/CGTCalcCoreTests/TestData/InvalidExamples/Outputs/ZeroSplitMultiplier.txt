@@ -1,1 +1,1 @@
-Error parsing input: invalidField(line: 1, field: "multiplier", reason: "must be greater than zero")
+Error parsing input: Line 1: Invalid multiplier: must be greater than zero

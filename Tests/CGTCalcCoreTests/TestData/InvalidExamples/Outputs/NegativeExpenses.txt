@@ -1,1 +1,1 @@
-Error parsing input: invalidField(line: 1, field: "expenses", reason: "must not be negative")
+Error parsing input: Line 1: Invalid expenses: must not be negative

@@ -8,6 +8,13 @@ private func writeStderr(_ message: String) {
   FileHandle.standardError.write(data)
 }
 
+private func formatError(_ error: Error) -> String {
+  if let localized = error as? LocalizedError, let description = localized.errorDescription {
+    return description
+  }
+  return String(describing: error)
+}
+
 @main
 struct CGTCalcCommand: ParsableCommand {
   enum OutputFormat: String, ExpressibleByArgument {
@@ -47,10 +54,10 @@ struct CGTCalcCommand: ParsableCommand {
         inputData = try InputParser.parse(fileURL: fileURL)
       }
     } catch let error as ParserError {
-      writeStderr("Error parsing input: \(error)")
+      writeStderr("Error parsing input: \(formatError(error))")
       throw ExitCode(1)
     } catch {
-      writeStderr("Error parsing input: \(error)")
+      writeStderr("Error parsing input: \(formatError(error))")
       throw ExitCode(1)
     }
 
@@ -59,7 +66,7 @@ struct CGTCalcCommand: ParsableCommand {
     do {
       result = try CGTEngine.calculate(inputData: inputData)
     } catch {
-      writeStderr("Error calculating CGT: \(error)")
+      writeStderr("Error calculating CGT: \(formatError(error))")
       throw ExitCode(1)
     }
 
@@ -77,7 +84,7 @@ struct CGTCalcCommand: ParsableCommand {
     do {
       rendered = try formatter.render(result)
     } catch {
-      writeStderr("Error formatting output: \(error)")
+      writeStderr("Error formatting output: \(formatError(error))")
       throw ExitCode(1)
     }
 
@@ -87,7 +94,7 @@ struct CGTCalcCommand: ParsableCommand {
         do {
           try output.write(toFile: outputFile, atomically: true, encoding: .utf8)
         } catch {
-          writeStderr("Error writing output file: \(error)")
+          writeStderr("Error writing output file: \(formatError(error))")
           throw ExitCode(1)
         }
       } else {
@@ -100,7 +107,7 @@ struct CGTCalcCommand: ParsableCommand {
       do {
         try data.write(to: URL(fileURLWithPath: outputFile), options: .atomic)
       } catch {
-        writeStderr("Error writing output file: \(error)")
+        writeStderr("Error writing output file: \(formatError(error))")
         throw ExitCode(1)
       }
     }

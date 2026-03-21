@@ -1,0 +1,1 @@
+Error calculating CGT: Unsupported share-identification case for TEST on 01/01/2020: matched 0 of 10 using same-day/30-day/Section 104 rules, and found later acquisitions from 15/02/2020. HMRC's later-acquisition fallback stage is not currently implemented.

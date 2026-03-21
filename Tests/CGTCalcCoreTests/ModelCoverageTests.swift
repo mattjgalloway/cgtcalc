@@ -83,6 +83,16 @@ final class ModelCoverageTests: XCTestCase {
       insufficient.errorDescription,
       "Insufficient shares for ABC on 01/01/2020: tried to sell 10, but only 3 could be matched")
 
+    let unsupportedFallback = CalculationError.unsupportedLaterAcquisitionIdentification(
+      asset: "ABC",
+      date: TestSupport.date("01/01/2020"),
+      requested: 10,
+      matched: 3,
+      firstLaterAcquisitionDate: TestSupport.date("15/02/2020"))
+    XCTAssertEqual(
+      unsupportedFallback.errorDescription,
+      "Unsupported share-identification case for ABC on 01/01/2020: matched 3 of 10 using same-day/30-day/Section 104 rules, and found later acquisitions from 15/02/2020. HMRC's later-acquisition fallback stage is not currently implemented.")
+
     let invalidAmount = CalculationError.invalidAssetEventAmount(
       asset: "ABC",
       date: TestSupport.date("02/01/2020"),

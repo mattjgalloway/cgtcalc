@@ -4,6 +4,12 @@ import Foundation
 
 public enum CalculationError: Error, LocalizedError {
   case insufficientShares(asset: String, date: Date, requested: Decimal, matched: Decimal)
+  case unsupportedLaterAcquisitionIdentification(
+    asset: String,
+    date: Date,
+    requested: Decimal,
+    matched: Decimal,
+    firstLaterAcquisitionDate: Date)
   case invalidAssetEventAmount(asset: String, date: Date, type: AssetEventType, expected: Decimal, actual: Decimal)
 
   /// Human-readable explanation for a calculation failure.
@@ -11,6 +17,13 @@ public enum CalculationError: Error, LocalizedError {
     switch self {
     case .insufficientShares(let asset, let date, let requested, let matched):
       "Insufficient shares for \(asset) on \(DateParser.format(date)): tried to sell \(requested), but only \(matched) could be matched"
+    case .unsupportedLaterAcquisitionIdentification(
+      let asset,
+      let date,
+      let requested,
+      let matched,
+      let firstLaterAcquisitionDate):
+      "Unsupported share-identification case for \(asset) on \(DateParser.format(date)): matched \(matched) of \(requested) using same-day/30-day/Section 104 rules, and found later acquisitions from \(DateParser.format(firstLaterAcquisitionDate)). HMRC's later-acquisition fallback stage is not currently implemented."
     case .invalidAssetEventAmount(let asset, let date, let type, let expected, let actual):
       "Invalid \(type.rawValue) amount for \(asset) on \(DateParser.format(date)): expected \(expected), got \(actual)"
     }

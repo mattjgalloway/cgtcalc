@@ -126,6 +126,31 @@ final class CalculatorTests: XCTestCase {
     }
   }
 
+  func testUnsupportedLaterAcquisitionFallbackThrowsSpecificError() {
+    XCTAssertThrowsError(try CGTEngine.calculate(
+      transactions: [
+        TestSupport.sell("01/01/2020", "TEST", 10, 10, 0),
+        TestSupport.buy("15/02/2020", "TEST", 10, 3, 0)
+      ],
+      assetEvents: []))
+    { error in
+      guard case CalculationError.unsupportedLaterAcquisitionIdentification(
+        let asset,
+        let date,
+        let requested,
+        let matched,
+        let firstLaterAcquisitionDate) = error
+      else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(asset, "TEST")
+      XCTAssertEqual(DateParser.format(date), "01/01/2020")
+      XCTAssertEqual(requested, 10)
+      XCTAssertEqual(matched, 0)
+      XCTAssertEqual(DateParser.format(firstLaterAcquisitionDate), "15/02/2020")
+    }
+  }
+
   func testExampleFromReadme() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("05/12/2019", "GB00B41YBW71", 500, 4.7012, 2),
