@@ -10,3 +10,6 @@ xcuserdata/
 
 # Private samplex
 /Samples/
+
+# Local QA/review notes
+/CGT_REVIEW_FINDINGS_*.md
