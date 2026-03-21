@@ -17,7 +17,7 @@ There are other excellent calculators out there, such as [CGTCalculator](http://
 
 ## What does it support?
 
-Currently the calculator supports the full range of matches of acquisitions to disposals for the current capital gains tax system, namely supporting matching based on the following rules in this order:
+Currently the calculator supports the following acquisition-to-disposal matching rules, in this order:
 
 1. Same day trades.
 2. Bed & breakfast trades where you purchase an asset within 30 days of selling the same asset.
@@ -32,7 +32,18 @@ It also supports handling of equalisation payments (capital return) for funds wh
 Currently there is no support for:
 
 1. Transactions before 6th April 2008.
-2. Anything not represented by the supported input row types documented below.
+2. The additional HMRC identification fallback where, if same-day + 30-day + Section 104 still do not fully identify a disposal, the remainder is matched with later acquisitions beyond the 30-day window.
+3. Anything not represented by the supported input row types documented below.
+
+### Unsupported Identification Cases
+
+If an input requires share identification beyond:
+
+1. same-day acquisitions
+2. acquisitions in the following 30 days
+3. Section 104 pooling
+
+the calculator currently does not implement HMRC's further "later acquisitions" fallback stage. In those cases the engine will fail with an `insufficientShares` calculation error.
 
 ## Platforms
 
