@@ -39,5 +39,9 @@ let package = Package(
     .testTarget(
       name: "CGTCalcCorePublicAPITests",
       dependencies: ["CGTCalcCore"],
-      path: "Tests/CGTCalcCorePublicAPITests")
+      path: "Tests/CGTCalcCorePublicAPITests"),
+    .testTarget(
+      name: "cgtcalcTests",
+      dependencies: ["cgtcalc"],
+      path: "Tests/cgtcalcTests")
   ])
