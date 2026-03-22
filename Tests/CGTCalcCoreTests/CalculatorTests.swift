@@ -17,6 +17,42 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(transaction.proceeds, 1000.0)
   }
 
+  func testEngineOutputIsDeterministicWhenSourceOrderIsOmitted() throws {
+    func makeTransactions() -> [Transaction] {
+      [
+        Transaction(
+          type: .buy,
+          date: TestSupport.date("01/01/2020"),
+          asset: "TEST",
+          quantity: 10,
+          price: 1,
+          expenses: 0),
+        Transaction(
+          type: .buy,
+          date: TestSupport.date("01/01/2020"),
+          asset: "TEST",
+          quantity: 10,
+          price: 2,
+          expenses: 0),
+        Transaction(
+          type: .sell,
+          date: TestSupport.date("01/01/2020"),
+          asset: "TEST",
+          quantity: 10,
+          price: 3,
+          expenses: 0)
+      ]
+    }
+
+    let firstResult = try CGTEngine.calculate(transactions: makeTransactions(), assetEvents: [])
+    let baseline = TextReportFormatter().format(firstResult)
+
+    for _ in 0 ..< 20 {
+      let result = try CGTEngine.calculate(transactions: makeTransactions(), assetEvents: [])
+      XCTAssertEqual(TextReportFormatter().format(result), baseline)
+    }
+  }
+
   func testSection104PartialSell() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("01/01/2019", "TEST", 100, 10.0, 0),

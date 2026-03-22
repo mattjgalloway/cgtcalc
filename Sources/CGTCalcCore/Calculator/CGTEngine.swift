@@ -26,8 +26,10 @@ public enum CGTEngine {
   ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, and RESTRUCT rows for all assets.
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
-    let sortedTransactions = transactions.sorted(by: self.transactionSortsBefore)
-    let sortedEvents = assetEvents.sorted { $0.date < $1.date }
+    let normalizedTransactions = self.normalizingSourceOrder(transactions)
+    let normalizedEvents = self.normalizingSourceOrder(assetEvents)
+    let sortedTransactions = normalizedTransactions.sorted(by: self.transactionSortsBefore)
+    let sortedEvents = normalizedEvents.sorted(by: self.assetEventSortsBefore)
     let buys = sortedTransactions.filter(\.type.isAcquisition)
     let sells = SameDayDisposalMerger.merge(sortedTransactions.filter(\.type.isTaxableDisposal))
     let spouseOuts = sortedTransactions.filter(\.type.isSpouseTransferOut)
@@ -35,7 +37,7 @@ public enum CGTEngine {
     let sellsByAsset = Dictionary(grouping: sells, by: \.asset)
     let spouseOutsByAsset = Dictionary(grouping: spouseOuts, by: \.asset)
     let eventsByAsset = Dictionary(grouping: sortedEvents, by: \.asset)
-    let transactionsByAsset = Dictionary(grouping: transactions, by: \.asset)
+    let transactionsByAsset = Dictionary(grouping: normalizedTransactions, by: \.asset)
     let allOutbounds = (sells + spouseOuts).sorted(by: self.transactionSortsBefore)
     let outboundsByAsset = Dictionary(grouping: allOutbounds, by: \.asset)
 
@@ -229,8 +231,8 @@ public enum CGTEngine {
 
     return CalculationResult(
       taxYearSummaries: summaries,
-      transactions: transactions,
-      assetEvents: assetEvents,
+      transactions: normalizedTransactions,
+      assetEvents: normalizedEvents,
       lossCarryForward: summaryResult.lossCarryForward,
       holdings: finalHoldings,
       spouseTransfersOut: spouseTransfersOut.sorted(by: self.spouseTransferSortsBefore))
@@ -248,6 +250,49 @@ public enum CGTEngine {
 
   private static func spouseTransferSortsBefore(_ lhs: SpouseTransferOut, _ rhs: SpouseTransferOut) -> Bool {
     self.transactionSortsBefore(lhs.transaction, rhs.transaction)
+  }
+
+  private static func assetEventSortsBefore(_ lhs: AssetEvent, _ rhs: AssetEvent) -> Bool {
+    if lhs.date != rhs.date {
+      return lhs.date < rhs.date
+    }
+    if lhs.sourceOrder != rhs.sourceOrder {
+      return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
+    }
+    return lhs.id.uuidString < rhs.id.uuidString
+  }
+
+  /// Ensures transactions without explicit source order still get a deterministic tie-breaker.
+  private static func normalizingSourceOrder(_ transactions: [Transaction]) -> [Transaction] {
+    var nextSourceOrder = (transactions.compactMap(\.sourceOrder).max() ?? -1) + 1
+    return transactions.map { transaction in
+      guard transaction.sourceOrder == nil else { return transaction }
+      defer { nextSourceOrder += 1 }
+      return Transaction(
+        id: transaction.id,
+        sourceOrder: nextSourceOrder,
+        type: transaction.type,
+        date: transaction.date,
+        asset: transaction.asset,
+        quantity: transaction.quantity,
+        price: transaction.price,
+        expenses: transaction.expenses)
+    }
+  }
+
+  /// Ensures asset events without explicit source order still get a deterministic tie-breaker.
+  private static func normalizingSourceOrder(_ assetEvents: [AssetEvent]) -> [AssetEvent] {
+    var nextSourceOrder = (assetEvents.compactMap(\.sourceOrder).max() ?? -1) + 1
+    return assetEvents.map { event in
+      guard event.sourceOrder == nil else { return event }
+      defer { nextSourceOrder += 1 }
+      return AssetEvent(
+        id: event.id,
+        sourceOrder: nextSourceOrder,
+        date: event.date,
+        asset: event.asset,
+        kind: event.kind)
+    }
   }
 
   private static func firstLaterAcquisitionDateForUnsupportedFallback(
