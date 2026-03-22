@@ -11,7 +11,7 @@ public enum AssetEventType: String, CaseIterable, Sendable {
 }
 
 public struct AssetEvent {
-  enum Kind {
+  public enum Kind {
     case capitalReturn(amount: Decimal, value: Decimal)
     case dividend(amount: Decimal, value: Decimal)
     case split(multiplier: Decimal)
@@ -19,14 +19,14 @@ public struct AssetEvent {
     case restruct(oldUnits: Decimal, newUnits: Decimal)
   }
 
-  let id: UUID
-  let sourceOrder: Int?
-  let date: Date
-  let asset: String
-  let kind: Kind
+  public let id: UUID
+  public let sourceOrder: Int?
+  public let date: Date
+  public let asset: String
+  public let kind: Kind
 
   /// Creates an asset event from shared metadata plus specific kind payload.
-  init(
+  public init(
     id: UUID = UUID(),
     sourceOrder: Int? = nil,
     date: Date,
@@ -48,7 +48,7 @@ public struct AssetEvent {
   ///   - date: Effective date of the restructure.
   ///   - asset: Asset identifier.
   ///   - multiplier: Share-count multiplier for the restructure.
-  init(
+  public init(
     id: UUID = UUID(),
     sourceOrder: Int? = nil,
     type: AssetEventType,
@@ -74,7 +74,7 @@ public struct AssetEvent {
   ///   - asset: Asset identifier.
   ///   - oldUnits: Existing units in the ratio.
   ///   - newUnits: Replacement units in the ratio.
-  init(
+  public init(
     id: UUID = UUID(),
     sourceOrder: Int? = nil,
     date: Date,
@@ -91,7 +91,7 @@ public struct AssetEvent {
   }
 
   /// Convenience initializer for CAPRETURN and DIVIDEND events.
-  init(
+  public init(
     id: UUID = UUID(),
     sourceOrder: Int? = nil,
     type: AssetEventType,

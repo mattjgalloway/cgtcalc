@@ -295,6 +295,51 @@ final class ParserTests: XCTestCase {
     XCTAssertThrowsError(try InputParser.parse(content: input))
   }
 
+  func testParseRejectsExtraFieldsForBuySell() {
+    let input = """
+    BUY 01/01/2020 TEST 100 10.0 5 EXTRA
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.insufficientFields(let line, let expected, let got) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(expected, 6)
+      XCTAssertEqual(got, 7)
+    }
+  }
+
+  func testParseRejectsExtraFieldsForSpouseOut() {
+    let input = """
+    SPOUSEOUT 01/02/2020 TEST 50 EXTRA
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.insufficientFields(let line, let expected, let got) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(expected, 4)
+      XCTAssertEqual(got, 5)
+    }
+  }
+
+  func testParseRejectsExtraFieldsForAssetEvent() {
+    let input = """
+    DIVIDEND 01/02/2020 TEST 50 25.0 EXTRA
+    """
+
+    XCTAssertThrowsError(try InputParser.parse(content: input)) { error in
+      guard case ParserError.insufficientFields(let line, let expected, let got) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(line, 1)
+      XCTAssertEqual(expected, 5)
+      XCTAssertEqual(got, 6)
+    }
+  }
+
   func testParseWithPoundSymbol() throws {
     let input = """
     BUY 01/01/2020 TEST 100 10.50 5.00

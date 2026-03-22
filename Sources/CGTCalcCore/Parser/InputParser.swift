@@ -107,35 +107,35 @@ public enum InputParser {
 
     switch type {
     case "BUY", "SELL":
-      guard fields.count >= 6 else {
+      guard fields.count == 6 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 6, got: fields.count)
       }
       let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .transaction(transaction)
 
     case "SPOUSEIN":
-      guard fields.count >= 5 else {
+      guard fields.count == 5 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 5, got: fields.count)
       }
       let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .transaction(transaction)
 
     case "SPOUSEOUT":
-      guard fields.count >= 4 else {
+      guard fields.count == 4 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 4, got: fields.count)
       }
       let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .transaction(transaction)
 
     case "CAPRETURN", "DIVIDEND":
-      guard fields.count >= 5 else {
+      guard fields.count == 5 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 5, got: fields.count)
       }
       let event = try parseAssetEvent(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .assetEvent(event)
 
     case "SPLIT", "UNSPLIT", "RESTRUCT":
-      guard fields.count >= 4 else {
+      guard fields.count == 4 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 4, got: fields.count)
       }
       let event = try parseAssetEvent(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)

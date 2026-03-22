@@ -104,6 +104,8 @@ The full list of kinds of data are as follows:
 | `UNSPLIT`   | Asset event  | Stock un-split  | `<DATE> <ASSET> <MULTIPLIER>` |
 | `RESTRUCT`  | Asset event  | Exact-ratio share restructure using old:new units | `<DATE> <ASSET> <OLD>:<NEW>` |
 
+Rows must contain exactly the fields shown above; extra trailing fields are rejected.
+
 Notes for spouse transfers:
 
 - `SPOUSEOUT` does not take price or expenses. The calculator derives transferred allowable cost using normal share-identification ordering (same day, then following 30 days, then Section 104 fallback) and reports it in a dedicated `SPOUSE TRANSFERS OUT` section.
