@@ -274,7 +274,7 @@ public enum InputParser {
       .replacingOccurrences(of: "£", with: "")
       .replacingOccurrences(of: ",", with: "")
 
-    guard let decimal = Decimal(string: cleaned) else {
+    guard let decimal = Decimal.parse(cleaned) else {
       throw ParserError.invalidNumber(string)
     }
     return decimal

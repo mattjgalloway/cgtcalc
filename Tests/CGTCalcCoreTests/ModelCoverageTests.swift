@@ -115,4 +115,12 @@ final class ModelCoverageTests: XCTestCase {
     XCTAssertNil(normalYear.specialCapitalGainsRateChangeLastOldRateDate)
     XCTAssertNil(normalYear.specialCapitalGainsRateChangeLabel)
   }
+
+  func testDecimalHelpersUseFixedLocale() {
+    let enGB = Locale(identifier: "en_GB")
+    let parsed = Decimal.parse("1234.56")
+    XCTAssertEqual(parsed, Decimal(string: "1234.56"))
+    XCTAssertEqual(parsed?.string, "1234.56")
+    XCTAssertEqual(Decimal.parse("1,234.56"), Decimal(string: "1,234.56", locale: enGB))
+  }
 }

@@ -129,14 +129,14 @@ public struct TextReportFormatter {
       let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
       let totalLosses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
 
-      output += "\(gainsCount) gains with total of \(totalGains).\n"
-      output += "\(lossesCount) losses with total of \(totalLosses).\n\n"
+      output += "\(gainsCount) gains with total of \(self.formatDecimal(totalGains)).\n"
+      output += "\(lossesCount) losses with total of \(self.formatDecimal(totalLosses)).\n\n"
 
       for (index, disposal) in summary.disposals.enumerated() {
-        let gainStr = abs(disposal.gain)
+        let gainStr = self.formatDecimal(abs(disposal.gain))
         let gainLabel = disposal.gain >= 0 ? "GAIN" : "LOSS"
 
-        output += "\(index + 1)) SOLD \(disposal.sellTransaction.quantity) of \(disposal.sellTransaction.asset) on \(DateParser.format(disposal.sellTransaction.date)) for \(gainLabel) of £\(gainStr)\n"
+        output += "\(index + 1)) SOLD \(self.formatDecimal(disposal.sellTransaction.quantity)) of \(disposal.sellTransaction.asset) on \(DateParser.format(disposal.sellTransaction.date)) for \(gainLabel) of £\(gainStr)\n"
 
         output += "Matches with:\n"
 
@@ -152,9 +152,9 @@ public struct TextReportFormatter {
               .eventAdjustment != 0 ? " with offset of £\(abs(match.eventAdjustment).rounded(to: 2).string)" : ""
             let suffix = restructureSuffix + eventOffsetSuffix
             if UTC.calendar.isDate(match.buyTransaction.date, inSameDayAs: disposal.sellTransaction.date) {
-              output += "  - SAME DAY: \(buyQuantity) bought on \(matchDate) at £\(match.buyTransaction.price)\(suffix)\n"
+              output += "  - SAME DAY: \(self.formatDecimal(buyQuantity)) bought on \(matchDate) at £\(self.formatDecimal(match.buyTransaction.price))\(suffix)\n"
             } else {
-              output += "  - BED & BREAKFAST: \(buyQuantity) bought on \(matchDate) at £\(match.buyTransaction.price)\(suffix)\n"
+              output += "  - BED & BREAKFAST: \(self.formatDecimal(buyQuantity)) bought on \(matchDate) at £\(self.formatDecimal(match.buyTransaction.price))\(suffix)\n"
             }
           }
         }
@@ -164,7 +164,7 @@ public struct TextReportFormatter {
           let poolQty = disposal.section104Matches[0].poolQuantity
           let poolCost = disposal.section104Matches[0].poolCost
           let poolAvgCost = poolQty > 0 ? poolCost / poolQty : 0
-          output += "  - SECTION 104: \(poolQty) at cost basis of £\(poolAvgCost.rounded(to: 5).string)\n"
+          output += "  - SECTION 104: \(self.formatDecimal(poolQty)) at cost basis of £\(poolAvgCost.rounded(to: 5).string)\n"
         }
 
         let saleExpenses = disposal.sellTransaction.expenses
@@ -199,7 +199,7 @@ public struct TextReportFormatter {
 
         costStr += " )"
 
-        output += "Calculation: (\(disposal.sellTransaction.quantity) * \(disposal.sellTransaction.price) - \(saleExpenses)) - \(costStr) = \(disposal.gain)\n"
+        output += "Calculation: (\(self.formatDecimal(disposal.sellTransaction.quantity)) * \(self.formatDecimal(disposal.sellTransaction.price)) - \(self.formatDecimal(saleExpenses))) - \(costStr) = \(self.formatDecimal(disposal.gain))\n"
 
         output += "\n"
       }
@@ -230,7 +230,7 @@ public struct TextReportFormatter {
       let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
       let totalLosses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
 
-      output += "\(summary.taxYear.label): Disposals = \(disposalsCount), proceeds = \(TaxMethods.roundedGain(totalProceeds)), allowable costs = \(TaxMethods.roundedGain(allowableCosts)), total gains = \(totalGains), total losses = \(totalLosses)\n"
+      output += "\(summary.taxYear.label): Disposals = \(disposalsCount), proceeds = \(self.formatDecimal(TaxMethods.roundedGain(totalProceeds))), allowable costs = \(self.formatDecimal(TaxMethods.roundedGain(allowableCosts))), total gains = \(self.formatDecimal(totalGains)), total losses = \(self.formatDecimal(totalLosses))\n"
 
       if let specialRateChangeDate = summary.taxYear.specialCapitalGainsRateChangeLastOldRateDate,
          let specialRateChangeLabel = summary.taxYear.specialCapitalGainsRateChangeLabel
@@ -242,7 +242,7 @@ public struct TextReportFormatter {
           .filter { $0.gain > 0 && $0.sellTransaction.date > specialRateChangeDate }
           .reduce(Decimal(0)) { $0 + $1.gain }
 
-        output += "    > Gains to (and inc.) \(specialRateChangeLabel) = \(gainsToAndIncludingCutoff), gains after \(specialRateChangeLabel) = \(gainsAfterCutoff)\n"
+        output += "    > Gains to (and inc.) \(specialRateChangeLabel) = \(self.formatDecimal(gainsToAndIncludingCutoff)), gains after \(specialRateChangeLabel) = \(self.formatDecimal(gainsAfterCutoff))\n"
       }
     }
 
@@ -264,7 +264,7 @@ public struct TextReportFormatter {
     for (asset, holding) in holdings.sorted(by: { $0.key < $1.key }) {
       if holding.quantity > 0 {
         let avgCost = holding.quantity > 0 ? holding.costBasis / holding.quantity : 0
-        output += "\(asset): \(holding.quantity) units acquired at £\(avgCost.rounded(to: 5).string) cost basis\n"
+        output += "\(asset): \(self.formatDecimal(holding.quantity)) units acquired at £\(avgCost.rounded(to: 5).string) cost basis\n"
       }
     }
 
@@ -287,7 +287,7 @@ public struct TextReportFormatter {
     for transfer in spouseTransfersOut {
       let tx = transfer.transaction
       let dateStr = DateParser.format(tx.date)
-      output += "\(dateStr) SPOUSEOUT \(tx.quantity) of \(tx.asset) at transferred cost basis £\(transfer.costBasis.rounded(to: 2).string) (£\(transfer.averageCost.rounded(to: 5).string) per unit)\n"
+      output += "\(dateStr) SPOUSEOUT \(self.formatDecimal(tx.quantity)) of \(tx.asset) at transferred cost basis £\(transfer.costBasis.rounded(to: 2).string) (£\(transfer.averageCost.rounded(to: 5).string) per unit)\n"
     }
     return output
   }
@@ -308,13 +308,13 @@ public struct TextReportFormatter {
       let dateStr = DateParser.format(transaction.date)
       let line = switch transaction.type {
       case .buy:
-        "\(dateStr) BOUGHT \(transaction.quantity) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses"
+        "\(dateStr) BOUGHT \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price)) with £\(self.formatDecimal(transaction.expenses)) expenses"
       case .sell:
-        "\(dateStr) SOLD \(transaction.quantity) of \(transaction.asset) at £\(transaction.price) with £\(transaction.expenses) expenses"
+        "\(dateStr) SOLD \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price)) with £\(self.formatDecimal(transaction.expenses)) expenses"
       case .spouseIn:
-        "\(dateStr) SPOUSEIN \(transaction.quantity) of \(transaction.asset) at £\(transaction.price)"
+        "\(dateStr) SPOUSEIN \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price))"
       case .spouseOut:
-        "\(dateStr) SPOUSEOUT \(transaction.quantity) of \(transaction.asset)"
+        "\(dateStr) SPOUSEOUT \(self.formatDecimal(transaction.quantity)) of \(transaction.asset)"
       }
       output += line + "\n"
     }
@@ -339,15 +339,15 @@ public struct TextReportFormatter {
 
       switch event.kind {
       case .split(let multiplier):
-        output += "\(dateStr) \(event.asset) SPLIT by \(multiplier)\n"
+        output += "\(dateStr) \(event.asset) SPLIT by \(self.formatDecimal(multiplier))\n"
       case .unsplit(let multiplier):
-        output += "\(dateStr) \(event.asset) UNSPLIT by \(multiplier)\n"
+        output += "\(dateStr) \(event.asset) UNSPLIT by \(self.formatDecimal(multiplier))\n"
       case .restruct(let oldUnits, let newUnits):
-        output += "\(dateStr) \(event.asset) RESTRUCT by \(oldUnits):\(newUnits)\n"
+        output += "\(dateStr) \(event.asset) RESTRUCT by \(self.formatDecimal(oldUnits)):\(self.formatDecimal(newUnits))\n"
       case .capitalReturn(let amount, let value):
-        output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(amount) for \(self.formatCurrency(value))\n"
+        output += "\(dateStr) \(event.asset) CAPITAL RETURN on \(self.formatDecimal(amount)) for \(self.formatCurrency(value))\n"
       case .dividend(let amount, let value):
-        output += "\(dateStr) \(event.asset) DIVIDEND on \(amount) for \(self.formatCurrency(value))\n"
+        output += "\(dateStr) \(event.asset) DIVIDEND on \(self.formatDecimal(amount)) for \(self.formatCurrency(value))\n"
       }
     }
 
@@ -361,5 +361,9 @@ public struct TextReportFormatter {
   /// - Returns: A string prefixed with `£`.
   private func formatCurrency(_ value: Decimal) -> String {
     "£" + value.rounded(to: 2).string
+  }
+
+  private func formatDecimal(_ value: Decimal) -> String {
+    value.string
   }
 }

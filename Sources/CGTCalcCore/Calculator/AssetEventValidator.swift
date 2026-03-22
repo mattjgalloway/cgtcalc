@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Asset Event Validator
 
 enum AssetEventValidator {
-  private static let amountTolerance = Decimal(string: "0.00000001") ?? Decimal(0)
+  private static let amountTolerance = Decimal.parse("0.00000001") ?? Decimal(0)
 
   /// Validates CAPRETURN and DIVIDEND amounts against the actual holding state for one asset.
   /// - Parameters:
