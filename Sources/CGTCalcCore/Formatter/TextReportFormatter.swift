@@ -105,8 +105,7 @@ public struct TextReportFormatter {
   /// - Parameter summary: The tax-year summary to inspect.
   /// - Returns: Rounded proceeds as a currency string.
   private func formatProceeds(_ summary: TaxYearSummary) -> String {
-    let totalProceeds = summary.disposals.reduce(Decimal(0)) { $0 + $1.sellTransaction.proceeds }
-    return "\(self.formatCurrency(TaxMethods.roundedGain(totalProceeds)))"
+    "\(self.formatCurrency(summary.summaryReportedProceeds))"
   }
 
   // MARK: - Tax Year Details
@@ -217,32 +216,11 @@ public struct TextReportFormatter {
     var output = ""
 
     for summary in summaries.sorted(by: { $0.taxYear < $1.taxYear }) {
-      let disposalsCount = summary.disposals.count
-      let totalProceeds = summary.disposals.reduce(Decimal(0)) { total, disposal in
-        total + TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
-      }
-      let allowableCosts = summary.disposals.reduce(Decimal(0)) { total, disposal in
-        let roundedDisposalProceeds = TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
-        let reportedDisposalAllowableCost = roundedDisposalProceeds - disposal.gain
-        return total + reportedDisposalAllowableCost
-      }
+      let taxReturn = summary.taxReturnMath
+      output += "\(summary.taxYear.label): Disposals = \(taxReturn.disposalsCount), proceeds = \(self.formatDecimal(taxReturn.proceeds)), allowable costs = \(self.formatDecimal(TaxMethods.roundedGain(taxReturn.allowableCosts))), total gains = \(self.formatDecimal(taxReturn.totalGains)), total losses = \(self.formatDecimal(taxReturn.totalLosses))\n"
 
-      let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
-      let totalLosses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
-
-      output += "\(summary.taxYear.label): Disposals = \(disposalsCount), proceeds = \(self.formatDecimal(TaxMethods.roundedGain(totalProceeds))), allowable costs = \(self.formatDecimal(TaxMethods.roundedGain(allowableCosts))), total gains = \(self.formatDecimal(totalGains)), total losses = \(self.formatDecimal(totalLosses))\n"
-
-      if let specialRateChangeDate = summary.taxYear.specialCapitalGainsRateChangeLastOldRateDate,
-         let specialRateChangeLabel = summary.taxYear.specialCapitalGainsRateChangeLabel
-      {
-        let gainsToAndIncludingCutoff = summary.disposals
-          .filter { $0.gain > 0 && $0.sellTransaction.date <= specialRateChangeDate }
-          .reduce(Decimal(0)) { $0 + $1.gain }
-        let gainsAfterCutoff = summary.disposals
-          .filter { $0.gain > 0 && $0.sellTransaction.date > specialRateChangeDate }
-          .reduce(Decimal(0)) { $0 + $1.gain }
-
-        output += "    > Gains to (and inc.) \(specialRateChangeLabel) = \(self.formatDecimal(gainsToAndIncludingCutoff)), gains after \(specialRateChangeLabel) = \(self.formatDecimal(gainsAfterCutoff))\n"
+      if let split = taxReturn.specialRateSplit {
+        output += "    > Gains to (and inc.) \(split.label) = \(self.formatDecimal(split.gainsToAndIncludingLabelDate)), gains after \(split.label) = \(self.formatDecimal(split.gainsAfterLabelDate))\n"
       }
     }
 

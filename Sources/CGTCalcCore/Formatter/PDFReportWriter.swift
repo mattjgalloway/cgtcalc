@@ -109,7 +109,7 @@
         rows.append([
           summary.taxYear.label,
           self.currency(summary.netGain),
-          self.currency(self.roundedGain(summary.disposals.reduce(0) { $0 + $1.sellTransaction.proceeds })),
+          self.currency(summary.summaryReportedProceeds),
           self.currency(summary.exemption),
           self.currency(summary.lossCarryForward),
           self.currency(summary.taxableGain)
@@ -563,32 +563,19 @@
     }
 
     func taxReturnEntry(for summary: TaxYearSummary, disposalsCount: Int? = nil) -> TaxReturnEntry {
-      let count = disposalsCount ?? summary.disposals.count
-      let proceeds = summary.disposals.reduce(Decimal(0)) { $0 + self.roundedGain($1.sellTransaction.proceeds) }
-      let allowable = summary.disposals.reduce(Decimal(0)) {
-        let roundedProceeds = self.roundedGain($1.sellTransaction.proceeds)
-        return $0 + (roundedProceeds - $1.gain)
-      }
-      let gains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
-      let losses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
+      let taxReturn = summary.taxReturnMath
+      let count = disposalsCount ?? taxReturn.disposalsCount
 
       let rows: [(label: String, value: String)] = [
         ("Disposals", String(count)),
-        ("Proceeds", self.decimalString(proceeds)),
-        ("Allowable costs", self.decimalString(allowable)),
-        ("Total gains", self.decimalString(gains)),
-        ("Total losses", self.decimalString(losses))
+        ("Proceeds", self.decimalString(taxReturn.proceeds)),
+        ("Allowable costs", self.decimalString(taxReturn.allowableCosts)),
+        ("Total gains", self.decimalString(taxReturn.totalGains)),
+        ("Total losses", self.decimalString(taxReturn.totalLosses))
       ]
 
-      var specialLine: String?
-      if let cutoff = summary.taxYear.specialCapitalGainsRateChangeLastOldRateDate,
-         let label = summary.taxYear.specialCapitalGainsRateChangeLabel
-      {
-        let gainsTo = summary.disposals.filter { $0.gain > 0 && $0.sellTransaction.date <= cutoff }
-          .reduce(Decimal(0)) { $0 + $1.gain }
-        let gainsAfter = summary.disposals.filter { $0.gain > 0 && $0.sellTransaction.date > cutoff }
-          .reduce(Decimal(0)) { $0 + $1.gain }
-        specialLine = "Rate-change split: gains to \(label) = \(self.decimalString(gainsTo)); gains after \(label) = \(self.decimalString(gainsAfter))."
+      let specialLine = taxReturn.specialRateSplit.map { split in
+        "Rate-change split: gains to \(split.label) = \(self.decimalString(split.gainsToAndIncludingLabelDate)); gains after \(split.label) = \(self.decimalString(split.gainsAfterLabelDate))."
       }
 
       return TaxReturnEntry(rows: rows, specialLine: specialLine)
@@ -621,10 +608,6 @@
       var out = Decimal.zero
       NSDecimalRound(&out, &input, scale, mode)
       return out
-    }
-
-    private func roundedGain(_ value: Decimal) -> Decimal {
-      self.rounded(value, scale: 0, mode: .down)
     }
 
     private func decimalString(_ value: Decimal) -> String {

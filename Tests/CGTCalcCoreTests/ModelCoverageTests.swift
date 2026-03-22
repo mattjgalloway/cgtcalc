@@ -123,4 +123,51 @@ final class ModelCoverageTests: XCTestCase {
     XCTAssertEqual(parsed?.string, "1234.56")
     XCTAssertEqual(Decimal.parse("1,234.56"), Decimal(string: "1,234.56", locale: enGB))
   }
+
+  func testTaxReturnMathComputedProperties() throws {
+    let beforeRateChange = TestSupport.disposal(
+      asset: "TEST",
+      date: "29/10/2024",
+      quantity: 1,
+      price: 10.9,
+      gain: 3.5,
+      taxYear: TaxYear(startYear: 2024))
+    let afterRateChange = TestSupport.disposal(
+      asset: "TEST",
+      date: "30/10/2024",
+      quantity: 1,
+      price: 10.9,
+      gain: 4,
+      taxYear: TaxYear(startYear: 2024))
+    let loss = TestSupport.disposal(
+      asset: "TEST",
+      date: "31/10/2024",
+      quantity: 1,
+      price: 5.9,
+      gain: -1.25,
+      taxYear: TaxYear(startYear: 2024))
+    let summary = TaxYearSummary(
+      taxYear: TaxYear(startYear: 2024),
+      disposals: [beforeRateChange, afterRateChange, loss],
+      totalGain: 7.5,
+      totalLoss: 1.25,
+      netGain: 6.25,
+      exemption: 3000,
+      taxableGain: 0,
+      lossCarryForward: 0)
+
+    XCTAssertEqual(summary.summaryReportedProceeds, 27)
+
+    let taxReturn = summary.taxReturnMath
+    XCTAssertEqual(taxReturn.disposalsCount, 3)
+    XCTAssertEqual(taxReturn.proceeds, 25)
+    XCTAssertEqual(taxReturn.allowableCosts, 18.75)
+    XCTAssertEqual(taxReturn.totalGains, 7.5)
+    XCTAssertEqual(taxReturn.totalLosses, 1.25)
+
+    let split = try XCTUnwrap(taxReturn.specialRateSplit)
+    XCTAssertEqual(split.label, "29th October")
+    XCTAssertEqual(split.gainsToAndIncludingLabelDate, 3.5)
+    XCTAssertEqual(split.gainsAfterLabelDate, 4)
+  }
 }
