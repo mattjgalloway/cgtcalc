@@ -28,12 +28,33 @@ jobs:
   
   test-linux:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - locale_name: en_GB.UTF-8
+            timezone: Europe/London
+            setup_locale: en_GB.UTF-8
+          - locale_name: fr_FR.UTF-8
+            timezone: Europe/Paris
+            setup_locale: fr_FR.UTF-8
+    env:
+      LANG: ${{ matrix.locale_name }}
+      LC_ALL: ${{ matrix.locale_name }}
+      TZ: ${{ matrix.timezone }}
     
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Setup Swift
       uses: swift-actions/setup-swift@v2
+    - name: Configure locale
+      run: |
+        sudo locale-gen "${{ matrix.setup_locale }}"
+        sudo update-locale LANG="${{ matrix.locale_name }}" LC_ALL="${{ matrix.locale_name }}"
+        locale
+    - name: Show timezone
+      run: date
     - name: Build
       run: swift build -v
     - name: Run tests
