@@ -27,7 +27,7 @@ Important assumption:
 
 - 30-day matching currently assumes the disposer is UK resident at the time of the later acquisition.
 
-The calculator specifically only deals with shares where acquisitions and disposals are all on or after 6th April 2008 when the latest rules came into effect.
+The calculator supports the post-6 April 2008 identification rules, and currently has annual exempt amount data for disposals in tax years `2013/2014` onwards.
 
 It also supports handling of equalisation payments (capital return) for funds where those amounts should be subtracted from allowable cost, and accumulation distributions (dividend rows) where those amounts should increase allowable cost.
 
@@ -36,8 +36,9 @@ It also supports handling of equalisation payments (capital return) for funds wh
 Currently there is no support for:
 
 1. Transactions before 6th April 2008.
-2. The additional HMRC identification fallback where, if same-day + 30-day + Section 104 still do not fully identify a disposal, the remainder is matched with later acquisitions beyond the 30-day window.
-3. Anything not represented by the supported input row types documented below.
+2. Disposal tax years before 2013/2014 (annual exempt amounts are not configured for earlier years).
+3. The additional HMRC identification fallback where, if same-day + 30-day + Section 104 still do not fully identify a disposal, the remainder is matched with later acquisitions beyond the 30-day window.
+4. Anything not represented by the supported input row types documented below.
 
 ### Unsupported Identification Cases
 
