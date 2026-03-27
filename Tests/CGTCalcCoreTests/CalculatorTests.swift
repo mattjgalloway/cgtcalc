@@ -345,6 +345,43 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(holding.costBasis, 40, accuracy: 0.00001)
   }
 
+  func testSameDaySellAndSpouseOutUseCombinedIdentificationRegardlessOfSourceOrder() throws {
+    let sellFirstResult = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
+      TestSupport.buy("01/02/2020", "TEST", 100, 10, 0),
+      TestSupport.sell("01/02/2020", "TEST", 100, 20, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 100)
+    ], assetEvents: [])
+
+    let spouseFirstResult = try CGTEngine.calculate(transactions: [
+      TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
+      TestSupport.buy("01/02/2020", "TEST", 100, 10, 0),
+      TestSupport.spouseOut("01/02/2020", "TEST", 100),
+      TestSupport.sell("01/02/2020", "TEST", 100, 20, 0)
+    ], assetEvents: [])
+
+    let sellFirstSummary = try XCTUnwrap(sellFirstResult.taxYearSummaries.first)
+    let spouseFirstSummary = try XCTUnwrap(spouseFirstResult.taxYearSummaries.first)
+    let sellFirstDisposal = try XCTUnwrap(sellFirstSummary.disposals.first)
+    let spouseFirstDisposal = try XCTUnwrap(spouseFirstSummary.disposals.first)
+
+    XCTAssertEqual(sellFirstDisposal.gain, spouseFirstDisposal.gain, accuracy: 0.00001)
+    XCTAssertEqual(sellFirstDisposal.gain, 1450, accuracy: 0.00001)
+
+    let sellFirstTransfer = try XCTUnwrap(sellFirstResult.spouseTransfersOut.first)
+    let spouseFirstTransfer = try XCTUnwrap(spouseFirstResult.spouseTransfersOut.first)
+    XCTAssertEqual(sellFirstTransfer.costBasis, spouseFirstTransfer.costBasis, accuracy: 0.00001)
+    XCTAssertEqual(sellFirstTransfer.costBasis, 550, accuracy: 0.00001)
+    XCTAssertEqual(sellFirstTransfer.averageCost, 5.5, accuracy: 0.00001)
+
+    let sellFirstHolding = try XCTUnwrap(sellFirstResult.holdings["TEST"])
+    let spouseFirstHolding = try XCTUnwrap(spouseFirstResult.holdings["TEST"])
+    XCTAssertEqual(sellFirstHolding.quantity, 0, accuracy: 0.00001)
+    XCTAssertEqual(spouseFirstHolding.quantity, 0, accuracy: 0.00001)
+    XCTAssertEqual(sellFirstHolding.costBasis, 0, accuracy: 0.00001)
+    XCTAssertEqual(spouseFirstHolding.costBasis, 0, accuracy: 0.00001)
+  }
+
   func testPostBuyDividendIsNotDoubleCountedAcrossThirtyDayAndLaterSection104Disposals() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
