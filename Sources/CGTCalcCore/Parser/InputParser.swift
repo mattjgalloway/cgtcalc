@@ -73,7 +73,7 @@ public enum ParserError: Error, LocalizedError {
 
 public enum InputParser {
   private static let decimalTokenPattern =
-    #"^[+-]?£?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?|\d+(?:\.\d+)?[eE][+-]?\d+)$"#
+    #"^[+-]?£?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$"#
 
   /// Loads and parses calculator input rows from a UTF-8 file.
   /// - Parameter fileURL: File location for the input text.
