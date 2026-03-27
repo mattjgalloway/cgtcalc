@@ -20,6 +20,45 @@ final class CLITests: XCTestCase {
     XCTAssertTrue(result.stdout.contains("# TRANSACTIONS"))
   }
 
+  func testCLIReportsParseErrors() throws {
+    let input = """
+    BUY invalid_date TEST 10 1 0
+    """
+    let inputURL = try self.writeTempInputFile(contents: input)
+    defer { try? FileManager.default.removeItem(at: inputURL) }
+
+    let result = try self.runCLI(arguments: [inputURL.path])
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.stderr.contains("Error parsing input:"))
+  }
+
+  func testCLIReportsCalculationErrors() throws {
+    let input = """
+    SELL 01/06/2019 TEST 50 15 0
+    """
+    let inputURL = try self.writeTempInputFile(contents: input)
+    defer { try? FileManager.default.removeItem(at: inputURL) }
+
+    let result = try self.runCLI(arguments: [inputURL.path])
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.stderr.contains("Error calculating CGT:"))
+    XCTAssertTrue(result.stderr.contains("Insufficient shares"))
+  }
+
+  func testCLIReportsTextOutputWriteErrors() throws {
+    let input = """
+    BUY 01/01/2020 TEST 10 1 0
+    SELL 02/01/2020 TEST 10 2 0
+    """
+    let inputURL = try self.writeTempInputFile(contents: input)
+    defer { try? FileManager.default.removeItem(at: inputURL) }
+
+    let directoryOutputPath = FileManager.default.temporaryDirectory.path
+    let result = try self.runCLI(arguments: [inputURL.path, "--output-file", directoryOutputPath])
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.stderr.contains("Error writing output file:"))
+  }
+
   #if os(macOS)
     func testPDFFormatRequiresOutputFile() throws {
       let input = """
@@ -34,6 +73,26 @@ final class CLITests: XCTestCase {
       let result = try self.runCLI(arguments: [inputURL.path, "--format", "pdf"])
       XCTAssertNotEqual(result.status, 0)
       XCTAssertTrue(result.stderr.contains("requires `--output-file <path>`"))
+    }
+
+    func testCLIReportsBinaryOutputWriteErrors() throws {
+      let input = """
+      BUY 01/01/2020 TEST 10 1 0
+      SELL 02/01/2020 TEST 10 2 0
+      """
+      let inputURL = try self.writeTempInputFile(contents: input)
+      defer { try? FileManager.default.removeItem(at: inputURL) }
+
+      let directoryOutputPath = FileManager.default.temporaryDirectory.path
+      let result = try self.runCLI(arguments: [
+        inputURL.path,
+        "--format",
+        "pdf",
+        "--output-file",
+        directoryOutputPath
+      ])
+      XCTAssertNotEqual(result.status, 0)
+      XCTAssertTrue(result.stderr.contains("Error writing output file:"))
     }
   #endif
 
@@ -113,5 +172,12 @@ final class CLITests: XCTestCase {
     }
 
     return candidate
+  }
+
+  private func writeTempInputFile(contents: String) throws -> URL {
+    let inputURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("cgtcalc_cli_test_\(UUID().uuidString).txt")
+    try contents.write(to: inputURL, atomically: true, encoding: .utf8)
+    return inputURL
   }
 }
