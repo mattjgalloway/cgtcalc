@@ -57,91 +57,22 @@ public enum CGTEngine {
     for outboundGroup in self.groupedOutboundsByAssetAndDay(allOutbounds) {
       let asset = outboundGroup[0].asset
       let outboundDate = outboundGroup[0].date
-      let groupedQuantity = outboundGroup.reduce(Decimal(0)) { $0 + $1.quantity }
-      let groupedOutbound = Transaction(
-        sourceOrder: outboundGroup[0].sourceOrder,
-        type: .sell,
-        date: outboundDate,
-        asset: asset,
-        quantity: groupedQuantity,
-        price: 0,
-        expenses: 0)
       let assetOutbounds = outboundsByAsset[asset, default: []]
       let assetBuys = buysByAsset[asset, default: []]
       let assetEvents = eventsByAsset[asset, default: []]
       let previousOutboundDate = previousOutboundDateByAsset[asset] ?? Date.distantPast
-
-      let sameDayBuys = assetBuys.filter { buy in
-        UTC.calendar.isDate(buy.date, inSameDayAs: outboundDate)
-      }
-      let thirtyDaysAfter = UTC.calendar.date(byAdding: .day, value: 30, to: outboundDate)!
-      let postOutboundBnbBuys = assetBuys.filter { buy in
-        buy.date > outboundDate && buy.date <= thirtyDaysAfter
-      }
-      let allBnbBuys = sameDayBuys + postOutboundBnbBuys
-
-      let (bnbMatches, bnbQuantityUsed) = BedAndBreakfastMatcher.findMatches(
-        for: groupedOutbound,
-        from: allBnbBuys,
-        usedBuyQuantities: usedBuyQuantities,
-        sortedEvents: assetEvents,
-        allOutbounds: assetOutbounds)
-
-      for match in bnbMatches {
-        usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity
-      }
-
-      let actions = Section104Processor.actions(
-        buys: assetBuys,
-        events: assetEvents,
-        after: previousOutboundDate,
-        through: outboundDate)
-
-      let processedHolding = Section104Processor.processActions(
-        actions,
-        into: section104Holdings[asset, default: Section104Holding()],
-        usedBuyQuantities: usedBuyQuantities)
-      section104Holdings[asset] = processedHolding
-
-      let holding = section104Holdings[asset]
-      let s104QuantityNeeded = groupedQuantity - bnbQuantityUsed
-      var section104Matches: [Section104Match] = []
-
-      if let holding, s104QuantityNeeded > 0 {
-        section104Matches = Section104Processor.makeMatches(quantityNeeded: s104QuantityNeeded, holding: holding)
-      }
-
-      let matchedQuantity = bnbQuantityUsed + section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
-      guard matchedQuantity == groupedQuantity else {
-        if let firstLaterAcquisitionDate = self.firstLaterAcquisitionDateForUnsupportedFallback(
-          outboundDate: outboundDate,
-          buys: assetBuys)
-        {
-          throw CalculationError.unsupportedLaterAcquisitionIdentification(
-            asset: asset,
-            date: outboundDate,
-            requested: groupedQuantity,
-            matched: matchedQuantity,
-            firstLaterAcquisitionDate: firstLaterAcquisitionDate)
-        }
-        throw CalculationError.insufficientShares(
-          asset: asset,
-          date: outboundDate,
-          requested: groupedQuantity,
-          matched: matchedQuantity)
-      }
-
-      if let holding = section104Holdings[asset] {
-        section104Holdings[asset] = Section104Processor.applyMatches(section104Matches, to: holding)
-      }
-
-      let allocationByOutbound = self.allocateMatchBreakdown(
-        outbounds: outboundGroup,
-        bnbMatches: bnbMatches,
-        section104Matches: section104Matches)
+      let processResult = try self.processOutboundGroup(
+        outboundGroup,
+        assetBuys: assetBuys,
+        assetEvents: assetEvents,
+        assetOutbounds: assetOutbounds,
+        previousOutboundDate: previousOutboundDate,
+        currentHolding: section104Holdings[asset, default: Section104Holding()],
+        usedBuyQuantities: &usedBuyQuantities)
+      section104Holdings[asset] = processResult.updatedHolding
 
       for outbound in outboundGroup {
-        let allocation = allocationByOutbound[outbound.id, default: MatchAllocation()]
+        let allocation = processResult.allocationByOutbound[outbound.id, default: MatchAllocation()]
         let totalCost = allocation.totalCost
 
         if outbound.type.isTaxableDisposal {
@@ -219,6 +150,100 @@ public enum CGTEngine {
       .sorted { lhs, rhs in
         self.transactionSortsBefore(lhs[0], rhs[0])
       }
+  }
+
+  private struct OutboundGroupProcessResult {
+    let updatedHolding: Section104Holding
+    let allocationByOutbound: [UUID: MatchAllocation]
+  }
+
+  private static func processOutboundGroup(
+    _ outboundGroup: [Transaction],
+    assetBuys: [Transaction],
+    assetEvents: [AssetEvent],
+    assetOutbounds: [Transaction],
+    previousOutboundDate: Date,
+    currentHolding: Section104Holding,
+    usedBuyQuantities: inout [UUID: Decimal]) throws -> OutboundGroupProcessResult
+  {
+    let asset = outboundGroup[0].asset
+    let outboundDate = outboundGroup[0].date
+    let groupedQuantity = outboundGroup.reduce(Decimal(0)) { $0 + $1.quantity }
+    let groupedOutbound = Transaction(
+      sourceOrder: outboundGroup[0].sourceOrder,
+      type: .sell,
+      date: outboundDate,
+      asset: asset,
+      quantity: groupedQuantity,
+      price: 0,
+      expenses: 0)
+
+    let sameDayBuys = assetBuys.filter { buy in
+      UTC.calendar.isDate(buy.date, inSameDayAs: outboundDate)
+    }
+    let thirtyDaysAfter = UTC.calendar.date(byAdding: .day, value: 30, to: outboundDate)!
+    let postOutboundBnbBuys = assetBuys.filter { buy in
+      buy.date > outboundDate && buy.date <= thirtyDaysAfter
+    }
+    let allBnbBuys = sameDayBuys + postOutboundBnbBuys
+
+    let (bnbMatches, bnbQuantityUsed) = BedAndBreakfastMatcher.findMatches(
+      for: groupedOutbound,
+      from: allBnbBuys,
+      usedBuyQuantities: usedBuyQuantities,
+      sortedEvents: assetEvents,
+      allOutbounds: assetOutbounds)
+
+    for match in bnbMatches {
+      usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity
+    }
+
+    let actions = Section104Processor.actions(
+      buys: assetBuys,
+      events: assetEvents,
+      after: previousOutboundDate,
+      through: outboundDate)
+
+    let processedHolding = Section104Processor.processActions(
+      actions,
+      into: currentHolding,
+      usedBuyQuantities: usedBuyQuantities)
+    let s104QuantityNeeded = groupedQuantity - bnbQuantityUsed
+    var section104Matches: [Section104Match] = []
+
+    if s104QuantityNeeded > 0 {
+      section104Matches = Section104Processor.makeMatches(quantityNeeded: s104QuantityNeeded, holding: processedHolding)
+    }
+
+    let matchedQuantity = bnbQuantityUsed + section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
+    guard matchedQuantity == groupedQuantity else {
+      if let firstLaterAcquisitionDate = self.firstLaterAcquisitionDateForUnsupportedFallback(
+        outboundDate: outboundDate,
+        buys: assetBuys)
+      {
+        throw CalculationError.unsupportedLaterAcquisitionIdentification(
+          asset: asset,
+          date: outboundDate,
+          requested: groupedQuantity,
+          matched: matchedQuantity,
+          firstLaterAcquisitionDate: firstLaterAcquisitionDate)
+      }
+      throw CalculationError.insufficientShares(
+        asset: asset,
+        date: outboundDate,
+        requested: groupedQuantity,
+        matched: matchedQuantity)
+    }
+
+    let allocationByOutbound = self.allocateMatchBreakdown(
+      outbounds: outboundGroup,
+      bnbMatches: bnbMatches,
+      section104Matches: section104Matches)
+    let updatedHolding = Section104Processor.applyMatches(section104Matches, to: processedHolding)
+
+    return OutboundGroupProcessResult(
+      updatedHolding: updatedHolding,
+      allocationByOutbound: allocationByOutbound)
   }
 
   private static func assetEventSortsBefore(_ lhs: AssetEvent, _ rhs: AssetEvent) -> Bool {
