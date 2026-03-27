@@ -47,9 +47,13 @@ Owns:
 - `SPLIT` / `UNSPLIT` / `RESTRUCT` support across matching paths
 - `CAPRETURN` and `DIVIDEND` support with current semantics
 - grouped same-day distribution amount validation
+- strict numeric token parsing (optional `£`, valid thousands separators, no scientific notation)
 - oversell rejection with explicit errors
 - stable report output via `TextReportFormatter` (all platforms) and `PDFReportFormatter` (macOS)
 - golden fixture verification and formatter-focused tests
+
+Platform note:
+- Minimum macOS deployment target is macOS 15.
 
 ## Intentional Non-Coverage
 

@@ -29,6 +29,7 @@ cgtcalc-swift2/
 `InputParser`:
 - parses text rows into typed transactions/events
 - performs structural validation (field shape and simple numeric constraints)
+- enforces strict decimal token grammar (optional `£`, valid thousands separators, no scientific notation)
 - assigns source-order metadata for deterministic tie-breaking
 
 ### Calculator Orchestrator

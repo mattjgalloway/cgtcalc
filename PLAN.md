@@ -11,9 +11,13 @@ The project currently provides:
 - `SPLIT`, `UNSPLIT`, and exact-ratio `RESTRUCT` handling in both B&B and Section 104 paths
 - `CAPRETURN` and `DIVIDEND` cost-basis adjustments
 - grouped same-day validation for distribution amounts
+- strict numeric token parsing (optional `£`, valid thousands separators, scientific notation rejected)
 - explicit oversell errors
 - deterministic report output with tax-year summaries, disposal detail, tax-return info, holdings, and input-order transaction/event sections
 - pluggable report formatting (`text` on all platforms, `pdf` on macOS)
+
+Platform note:
+- Minimum macOS deployment target is macOS 15.
 
 ## Current Priorities
 

@@ -53,6 +53,7 @@ the calculator currently does not implement HMRC's further "later acquisitions" 
 ## Platforms
 
 The library and console app both run on macOS and Linux.
+Minimum macOS deployment target is macOS 15.
 Text output works on both platforms. PDF output is currently available on macOS only.
 
 ## Usage
@@ -105,6 +106,7 @@ The full list of kinds of data are as follows:
 | `RESTRUCT`  | Asset event  | Exact-ratio share restructure using old:new units | `<DATE> <ASSET> <OLD>:<NEW>` |
 
 Rows must contain exactly the fields shown above; extra trailing fields are rejected.
+Numeric tokens accept standard decimal numbers with optional `£` and valid thousands separators (for example `1234.56`, `1,234.56`, `£1,234.56`). Scientific notation is rejected.
 
 Notes for spouse transfers:
 
