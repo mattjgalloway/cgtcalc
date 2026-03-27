@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 // MARK: - Date Formatter
 
@@ -12,14 +13,22 @@ public enum DateParser {
     return formatter
   }()
 
+  private static let formatterMutex = Mutex<Void>(())
+
   /// Parses a `dd/MM/yyyy` date string into a `Date`.
   /// - Parameter string: The raw date string from input.
   /// - Returns: The parsed date.
   public static func parse(_ string: String) throws -> Date {
-    guard let date = formatter.date(from: string) else {
+    try self.formatterMutex.withLock { _ in
+      try self.parseLocked(string)
+    }
+  }
+
+  private static func parseLocked(_ string: String) throws -> Date {
+    guard let date = self.formatter.date(from: string) else {
       throw ParserError.invalidDate(string)
     }
-    guard self.format(date) == string else {
+    guard self.formatter.string(from: date) == string else {
       throw ParserError.invalidDate(string)
     }
     return date
@@ -29,7 +38,9 @@ public enum DateParser {
   /// - Parameter date: The date to render.
   /// - Returns: A `dd/MM/yyyy` string.
   public static func format(_ date: Date) -> String {
-    self.formatter.string(from: date)
+    self.formatterMutex.withLock { _ in
+      self.formatter.string(from: date)
+    }
   }
 }
 

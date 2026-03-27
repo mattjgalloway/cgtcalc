@@ -1,8 +1,23 @@
 @testable import CGTCalcCore
+import Synchronization
 import XCTest
 
 /// Tests for InputParser
 final class ParserTests: XCTestCase {
+  private final class FailureBox: Sendable {
+    private let failures = Mutex<[String]>([])
+
+    func append(_ value: String) {
+      self.failures.withLock { messages in
+        messages.append(value)
+      }
+    }
+
+    func snapshot() -> [String] {
+      self.failures.withLock { $0 }
+    }
+  }
+
   func testParseTransactions() throws {
     let input = """
     BUY 01/01/2020 TEST 100 10.0 5
@@ -433,5 +448,33 @@ final class ParserTests: XCTestCase {
       ParserError.insufficientFields(line: 3, expected: 6, got: 4).errorDescription,
       "Line 3: Expected 6 fields, got 4")
     XCTAssertEqual(ParserError.unknownLineType(line: 9).errorDescription, "Line 9: Unknown line type")
+  }
+
+  func testDateParserIsThreadSafeUnderConcurrentParseAndFormatLoad() {
+    let queue = DispatchQueue(label: "DateParserConcurrency", attributes: .concurrent)
+    let group = DispatchGroup()
+    let failures = FailureBox()
+
+    for index in 0 ..< 2000 {
+      group.enter()
+      queue.async {
+        defer { group.leave() }
+        let input = index.isMultiple(of: 2) ? "01/01/2020" : "29/02/2024"
+
+        do {
+          let parsed = try DateParser.parse(input)
+          let formatted = DateParser.format(parsed)
+          if formatted != input {
+            failures.append("Round-trip mismatch: \(input) -> \(formatted)")
+          }
+        } catch {
+          failures.append("Unexpected error for \(input): \(error)")
+        }
+      }
+    }
+
+    group.wait()
+    let allFailures = failures.snapshot()
+    XCTAssertTrue(allFailures.isEmpty, allFailures.prefix(10).joined(separator: "\n"))
   }
 }
