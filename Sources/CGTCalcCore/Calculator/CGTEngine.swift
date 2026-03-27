@@ -28,8 +28,8 @@ public enum CGTEngine {
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
     try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
 
-    let normalizedTransactions = self.normalizingSourceOrder(transactions)
-    let normalizedEvents = self.normalizingSourceOrder(assetEvents)
+    let normalizedTransactions = try self.normalizingSourceOrder(transactions)
+    let normalizedEvents = try self.normalizingSourceOrder(assetEvents)
     let sortedTransactions = normalizedTransactions.sorted(by: self.transactionSortsBefore)
     let sortedEvents = normalizedEvents.sorted(by: self.assetEventSortsBefore)
     let buys = sortedTransactions.filter(\.type.isAcquisition)
@@ -232,7 +232,10 @@ public enum CGTEngine {
   }
 
   /// Ensures transactions without explicit source order still get a deterministic tie-breaker.
-  private static func normalizingSourceOrder(_ transactions: [Transaction]) -> [Transaction] {
+  private static func normalizingSourceOrder(_ transactions: [Transaction]) throws -> [Transaction] {
+    if transactions.compactMap(\.sourceOrder).contains(Int.max) {
+      throw CalculationError.sourceOrderOverflow(kind: "transactions")
+    }
     var nextSourceOrder = (transactions.compactMap(\.sourceOrder).max() ?? -1) + 1
     return transactions.map { transaction in
       guard transaction.sourceOrder == nil else { return transaction }
@@ -250,7 +253,10 @@ public enum CGTEngine {
   }
 
   /// Ensures asset events without explicit source order still get a deterministic tie-breaker.
-  private static func normalizingSourceOrder(_ assetEvents: [AssetEvent]) -> [AssetEvent] {
+  private static func normalizingSourceOrder(_ assetEvents: [AssetEvent]) throws -> [AssetEvent] {
+    if assetEvents.compactMap(\.sourceOrder).contains(Int.max) {
+      throw CalculationError.sourceOrderOverflow(kind: "asset events")
+    }
     var nextSourceOrder = (assetEvents.compactMap(\.sourceOrder).max() ?? -1) + 1
     return assetEvents.map { event in
       guard event.sourceOrder == nil else { return event }

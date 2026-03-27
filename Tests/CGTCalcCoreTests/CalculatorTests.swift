@@ -203,6 +203,42 @@ final class CalculatorTests: XCTestCase {
     }
   }
 
+  func testTransactionSourceOrderIntMaxThrowsOverflowError() {
+    let buy = Transaction(
+      sourceOrder: Int.max,
+      type: .buy,
+      date: TestSupport.date("01/01/2020"),
+      asset: "TEST",
+      quantity: 1,
+      price: 1,
+      expenses: 0)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(transactions: [buy], assetEvents: [])) { error in
+      guard case CalculationError.sourceOrderOverflow(let kind) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(kind, "transactions")
+    }
+  }
+
+  func testAssetEventSourceOrderIntMaxThrowsOverflowError() {
+    let buy = TestSupport.buy("01/01/2020", "TEST", 1, 1, 0)
+    let dividend = AssetEvent(
+      sourceOrder: Int.max,
+      type: .dividend,
+      date: TestSupport.date("02/01/2020"),
+      asset: "TEST",
+      distributionAmount: 1,
+      distributionValue: 1)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(transactions: [buy], assetEvents: [dividend])) { error in
+      guard case CalculationError.sourceOrderOverflow(let kind) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(kind, "asset events")
+    }
+  }
+
   func testExampleFromReadme() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("05/12/2019", "GB00B41YBW71", 500, 4.7012, 2),

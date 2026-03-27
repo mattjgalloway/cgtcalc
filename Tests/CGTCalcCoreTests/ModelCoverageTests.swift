@@ -90,6 +90,11 @@ final class ModelCoverageTests: XCTestCase {
       unsupportedDate.errorDescription,
       "Unsupported input date 01/01/2007: dates before 06/04/2008 are not supported")
 
+    let sourceOrderOverflow = CalculationError.sourceOrderOverflow(kind: "transactions")
+    XCTAssertEqual(
+      sourceOrderOverflow.errorDescription,
+      "Source-order overflow while normalizing transactions: sourceOrder values must be less than Int.max")
+
     let unsupportedFallback = CalculationError.unsupportedLaterAcquisitionIdentification(
       asset: "ABC",
       date: TestSupport.date("01/01/2020"),
