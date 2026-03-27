@@ -169,6 +169,35 @@ final class ParserTests: XCTestCase {
     XCTAssertThrowsError(try InputParser.parse(content: input))
   }
 
+  func testParseRejectsMalformedCommaNumbers() {
+    let malformedTokens = ["1,0", "12,34", "1,,000", ",1000", "1000,", "1,23,456"]
+
+    for token in malformedTokens {
+      let input = "BUY 01/01/2020 TEST \(token) 10 0"
+      XCTAssertThrowsError(try InputParser.parse(content: input), "Expected invalid number for token \(token)") {
+        error in
+        guard case ParserError.invalidNumber(let value) = error else {
+          return XCTFail("Unexpected error for token \(token): \(error)")
+        }
+        XCTAssertEqual(value, token)
+      }
+    }
+  }
+
+  func testParseAcceptsValidGroupedNumberFormats() throws {
+    let input = """
+    BUY 01/01/2020 TEST £1,000 2,500.75 0
+    """
+
+    let data = try InputParser.parse(content: input)
+    guard case .transaction(let tx) = try XCTUnwrap(data.first) else {
+      return XCTFail("Expected transaction")
+    }
+
+    XCTAssertEqual(tx.quantity, 1000)
+    XCTAssertEqual(tx.price, Decimal(string: "2500.75"))
+  }
+
   func testParseRejectsZeroTransactionQuantity() {
     let input = """
     BUY 01/01/2020 TEST 0 10.0 5

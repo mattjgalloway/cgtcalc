@@ -61,6 +61,8 @@ public enum ParserError: Error, LocalizedError {
 // MARK: - Input Parser
 
 public enum InputParser {
+  private static let decimalTokenPattern = #"^[+-]?£?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$"#
+
   /// Loads and parses calculator input rows from a UTF-8 file.
   /// - Parameter fileURL: File location for the input text.
   /// - Returns: Parsed transactions and asset events in input order.
@@ -263,13 +265,16 @@ public enum InputParser {
     return (oldUnits, newUnits)
   }
 
-  /// Parses a decimal field after stripping optional pound signs and thousands separators.
+  /// Parses a decimal field using strict token grammar and optional currency/thousands formatting.
   /// - Parameters:
   ///   - string: Raw numeric field text.
   ///   - lineNumber: Source line number for diagnostics.
   /// - Returns: The parsed decimal value.
   private static func parseDecimal(_ string: String, lineNumber: Int) throws -> Decimal {
-    // Handle £ symbol and commas
+    guard string.range(of: self.decimalTokenPattern, options: .regularExpression) != nil else {
+      throw ParserError.invalidNumber(string)
+    }
+
     let cleaned = string
       .replacingOccurrences(of: "£", with: "")
       .replacingOccurrences(of: ",", with: "")
