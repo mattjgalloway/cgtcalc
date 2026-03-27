@@ -106,6 +106,38 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 432, accuracy: 0.00001)
   }
 
+  func testEventAdjustmentScalesMatchedQuantityAcrossSplitBeforeDividend() {
+    let buy = TestSupport.buy("10/06/2020", "TEST", 100, 10, 0)
+    let events: [AssetEvent] = [
+      AssetEvent(type: .split, date: TestSupport.date("20/06/2020"), asset: "TEST", multiplier: 2),
+      TestSupport.dividend("30/06/2020", "TEST", 200, 100)
+    ]
+
+    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+      for: buy,
+      through: nil,
+      sortedEvents: events,
+      matchedBuyQuantity: 100)
+
+    XCTAssertEqual(adjustment, 100, accuracy: 0.00001)
+  }
+
+  func testEventAdjustmentScalesMatchedQuantityAcrossUnsplitBeforeDividend() {
+    let buy = TestSupport.buy("10/06/2020", "TEST", 100, 10, 0)
+    let events: [AssetEvent] = [
+      AssetEvent(type: .unsplit, date: TestSupport.date("20/06/2020"), asset: "TEST", multiplier: 2),
+      TestSupport.dividend("30/06/2020", "TEST", 50, 100)
+    ]
+
+    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+      for: buy,
+      through: nil,
+      sortedEvents: events,
+      matchedBuyQuantity: 50)
+
+    XCTAssertEqual(adjustment, 50, accuracy: 0.00001)
+  }
+
   func testAllowsPartialReuseOfSingleRebuyAcrossMultipleEarlierSells() {
     let firstSell = TestSupport.sell("29/07/2016", "NASDAQ:META", 106, 94.71, 6.99)
     let secondSell = TestSupport.sell("10/08/2016", "NASDAQ:META", 1, 95.00, 0)

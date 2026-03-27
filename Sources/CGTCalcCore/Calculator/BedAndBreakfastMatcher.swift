@@ -150,12 +150,17 @@ enum BedAndBreakfastMatcher {
     }
 
     return relevantEvents.reduce(Decimal(0)) { total, event in
+      let matchedQuantityOnEventDateBasis = self.quantityOnDateBasis(
+        buyDateQuantity: matchedBuyQuantity,
+        for: buy,
+        at: event.date,
+        sortedEvents: sortedEvents)
       switch event.kind {
       case .capitalReturn(let amount, let value):
-        let quantityRatio = matchedBuyQuantity / amount
+        let quantityRatio = matchedQuantityOnEventDateBasis / amount
         return total - (value * quantityRatio)
       case .dividend(let amount, let value):
-        let quantityRatio = matchedBuyQuantity / amount
+        let quantityRatio = matchedQuantityOnEventDateBasis / amount
         return total + (value * quantityRatio)
       case .split, .unsplit, .restruct:
         return total
@@ -186,6 +191,37 @@ enum BedAndBreakfastMatcher {
         false
       }
     }
+  }
+
+  /// Converts a quantity on the rebuy-date basis onto the basis at a later date by replaying intervening
+  /// SPLIT/UNSPLIT/RESTRUCT events.
+  private static func quantityOnDateBasis(
+    buyDateQuantity: Decimal,
+    for buy: Transaction,
+    at date: Date,
+    sortedEvents: [AssetEvent]) -> Decimal
+  {
+    guard buyDateQuantity > 0 else { return 0 }
+    var adjustedQuantity = buyDateQuantity
+
+    for event in self.restructureEvents(in: sortedEvents, after: buy.date, through: date) {
+      let ratio: (oldUnits: Decimal, newUnits: Decimal)? = switch event.kind {
+      case .split(let multiplier):
+        (oldUnits: 1, newUnits: multiplier)
+      case .unsplit(let multiplier):
+        (oldUnits: multiplier, newUnits: 1)
+      case .restruct(let oldUnits, let newUnits):
+        (oldUnits: oldUnits, newUnits: newUnits)
+      case .capitalReturn, .dividend:
+        nil
+      }
+
+      if let ratio {
+        adjustedQuantity = adjustedQuantity * ratio.newUnits / ratio.oldUnits
+      }
+    }
+
+    return adjustedQuantity
   }
 
   private static func groupedBuysByDay(_ buys: [Transaction]) -> [[Transaction]] {
