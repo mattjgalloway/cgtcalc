@@ -144,7 +144,7 @@ import XCTest
         lossCarryForward: 0)
 
       let asset = "EVENT-ASSET"
-      let events: [AssetEvent] = [
+      let events: [AssetEvent] = try [
         AssetEvent(type: .split, date: TestSupport.date("01/01/2025"), asset: asset, multiplier: 2),
         AssetEvent(type: .unsplit, date: TestSupport.date("02/01/2025"), asset: asset, multiplier: 2),
         AssetEvent(

@@ -231,15 +231,15 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(updated.pool[0].poolQuantity, 70, accuracy: 0.00001)
   }
 
-  func testActionsUseUUIDTieBreakForSameDateEventsWithoutSourceOrder() {
+  func testActionsUseUUIDTieBreakForSameDateEventsWithoutSourceOrder() throws {
     let sameDate = TestSupport.date("01/03/2019")
-    let eventA = AssetEvent(
+    let eventA = try AssetEvent(
       type: .capitalReturn,
       date: sameDate,
       asset: "TEST",
       distributionAmount: 100,
       distributionValue: 10)
-    let eventB = AssetEvent(
+    let eventB = try AssetEvent(
       type: .dividend,
       date: sameDate,
       asset: "TEST",

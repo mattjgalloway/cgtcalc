@@ -87,7 +87,7 @@ struct TestSupport {
     _ value: Decimal,
     sourceOrder: Int? = nil) -> AssetEvent
   {
-    AssetEvent(
+    try! AssetEvent(
       sourceOrder: sourceOrder,
       type: .capitalReturn,
       date: self.date(date),
@@ -103,7 +103,7 @@ struct TestSupport {
     _ value: Decimal,
     sourceOrder: Int? = nil) -> AssetEvent
   {
-    AssetEvent(
+    try! AssetEvent(
       sourceOrder: sourceOrder,
       type: .dividend,
       date: self.date(date),

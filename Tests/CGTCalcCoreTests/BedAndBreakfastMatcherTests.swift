@@ -52,10 +52,10 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(quantityUsed, 0)
   }
 
-  func testAdjustsRebuyQuantityAcrossSplit() {
+  func testAdjustsRebuyQuantityAcrossSplit() throws {
     let sellDate = TestSupport.date("01/06/2019")
     let rebuy = TestSupport.buy("10/06/2019", "TEST", 200, 5, 0)
-    let split = AssetEvent(type: .split, date: TestSupport.date("05/06/2019"), asset: "TEST", multiplier: 2)
+    let split = try AssetEvent(type: .split, date: TestSupport.date("05/06/2019"), asset: "TEST", multiplier: 2)
 
     let adjustedQuantity = BedAndBreakfastMatcher.adjustedQuantity(
       for: rebuy,
@@ -106,9 +106,9 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 432, accuracy: 0.00001)
   }
 
-  func testEventAdjustmentScalesMatchedQuantityAcrossSplitBeforeDividend() {
+  func testEventAdjustmentScalesMatchedQuantityAcrossSplitBeforeDividend() throws {
     let buy = TestSupport.buy("10/06/2020", "TEST", 100, 10, 0)
-    let events: [AssetEvent] = [
+    let events: [AssetEvent] = try [
       AssetEvent(type: .split, date: TestSupport.date("20/06/2020"), asset: "TEST", multiplier: 2),
       TestSupport.dividend("30/06/2020", "TEST", 200, 100)
     ]
@@ -122,9 +122,9 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(adjustment, 100, accuracy: 0.00001)
   }
 
-  func testEventAdjustmentScalesMatchedQuantityAcrossUnsplitBeforeDividend() {
+  func testEventAdjustmentScalesMatchedQuantityAcrossUnsplitBeforeDividend() throws {
     let buy = TestSupport.buy("10/06/2020", "TEST", 100, 10, 0)
-    let events: [AssetEvent] = [
+    let events: [AssetEvent] = try [
       AssetEvent(type: .unsplit, date: TestSupport.date("20/06/2020"), asset: "TEST", multiplier: 2),
       TestSupport.dividend("30/06/2020", "TEST", 50, 100)
     ]

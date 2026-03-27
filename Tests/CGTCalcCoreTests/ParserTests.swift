@@ -213,6 +213,19 @@ final class ParserTests: XCTestCase {
     XCTAssertEqual(tx.price, Decimal(string: "2500.75"))
   }
 
+  func testParseAcceptsScientificNotation() throws {
+    let input = """
+    BUY 01/01/2020 TEST 1.047e-7 10 0
+    """
+
+    let data = try InputParser.parse(content: input)
+    guard case .transaction(let tx) = try XCTUnwrap(data.first) else {
+      return XCTFail("Expected transaction")
+    }
+
+    XCTAssertEqual(tx.quantity, Decimal(string: "0.0000001047"))
+  }
+
   func testParseRejectsZeroTransactionQuantity() {
     let input = """
     BUY 01/01/2020 TEST 0 10.0 5

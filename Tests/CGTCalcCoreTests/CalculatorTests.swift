@@ -221,9 +221,9 @@ final class CalculatorTests: XCTestCase {
     }
   }
 
-  func testAssetEventSourceOrderIntMaxThrowsOverflowError() {
+  func testAssetEventSourceOrderIntMaxThrowsOverflowError() throws {
     let buy = TestSupport.buy("01/01/2020", "TEST", 1, 1, 0)
-    let dividend = AssetEvent(
+    let dividend = try AssetEvent(
       sourceOrder: Int.max,
       type: .dividend,
       date: TestSupport.date("02/01/2020"),

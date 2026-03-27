@@ -40,7 +40,7 @@ final class TextReportFormatterTests: XCTestCase {
       "    > Gains to (and inc.) 29th October = 100, gains after 29th October = 200"))
   }
 
-  func testFormatsTransactionsAndAssetEventsInInputOrder() {
+  func testFormatsTransactionsAndAssetEventsInInputOrder() throws {
     let summary = TaxYearSummary(
       taxYear: TaxYear(startYear: 2023),
       disposals: [],
@@ -55,7 +55,7 @@ final class TextReportFormatterTests: XCTestCase {
       TestSupport.buy("01/01/2024", "AAA", 1, 10, 0),
       TestSupport.buy("02/01/2024", "CCC", 3, 11, 0)
     ]
-    let assetEvents = [
+    let assetEvents = try [
       TestSupport.dividend("03/03/2024", "BBB", 2, 5),
       AssetEvent(type: .split, date: TestSupport.date("01/03/2024"), asset: "AAA", multiplier: 2),
       TestSupport.capReturn("02/03/2024", "CCC", 3, 4)

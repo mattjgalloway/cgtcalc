@@ -72,7 +72,8 @@ public enum ParserError: Error, LocalizedError {
 // MARK: - Input Parser
 
 public enum InputParser {
-  private static let decimalTokenPattern = #"^[+-]?£?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$"#
+  private static let decimalTokenPattern =
+    #"^[+-]?£?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?|\d+(?:\.\d+)?[eE][+-]?\d+)$"#
 
   /// Loads and parses calculator input rows from a UTF-8 file.
   /// - Parameter fileURL: File location for the input text.
@@ -242,7 +243,7 @@ public enum InputParser {
       let value = try parseDecimal(fields[4], lineNumber: lineNumber)
       try self.validatePositive(amount, field: "amount", lineNumber: lineNumber)
       try self.validateNonNegative(value, field: "value", lineNumber: lineNumber)
-      return AssetEvent(
+      return try AssetEvent(
         sourceOrder: sourceOrder,
         type: type,
         date: date,
@@ -253,7 +254,7 @@ public enum InputParser {
     case .split, .unsplit:
       let multiplier = try parseDecimal(fields[3], lineNumber: lineNumber)
       try self.validatePositive(multiplier, field: "multiplier", lineNumber: lineNumber)
-      return AssetEvent(sourceOrder: sourceOrder, type: type, date: date, asset: asset, multiplier: multiplier)
+      return try AssetEvent(sourceOrder: sourceOrder, type: type, date: date, asset: asset, multiplier: multiplier)
 
     case .restruct:
       let (oldUnits, newUnits) = try self.parseRestructureRatio(fields[3], lineNumber: lineNumber)

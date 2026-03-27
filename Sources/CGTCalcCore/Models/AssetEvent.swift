@@ -11,6 +11,20 @@ public enum AssetEventType: String, CaseIterable, Sendable {
 }
 
 public struct AssetEvent {
+  public enum InitializationError: Error, LocalizedError, Equatable {
+    case invalidRestructureType(AssetEventType)
+    case invalidDistributionType(AssetEventType)
+
+    public var errorDescription: String? {
+      switch self {
+      case .invalidRestructureType(let type):
+        "Invalid restructure initializer type: \(type.rawValue). Expected SPLIT or UNSPLIT."
+      case .invalidDistributionType(let type):
+        "Invalid distribution initializer type: \(type.rawValue). Expected CAPRETURN or DIVIDEND."
+      }
+    }
+  }
+
   public enum Kind {
     case capitalReturn(amount: Decimal, value: Decimal)
     case dividend(amount: Decimal, value: Decimal)
@@ -54,7 +68,7 @@ public struct AssetEvent {
     type: AssetEventType,
     date: Date,
     asset: String,
-    multiplier: Decimal)
+    multiplier: Decimal) throws
   {
     switch type {
     case .split:
@@ -62,7 +76,7 @@ public struct AssetEvent {
     case .unsplit:
       self.init(id: id, sourceOrder: sourceOrder, date: date, asset: asset, kind: .unsplit(multiplier: multiplier))
     case .capitalReturn, .dividend, .restruct:
-      preconditionFailure("type must be SPLIT or UNSPLIT")
+      throw InitializationError.invalidRestructureType(type)
     }
   }
 
@@ -98,7 +112,7 @@ public struct AssetEvent {
     date: Date,
     asset: String,
     distributionAmount: Decimal,
-    distributionValue: Decimal)
+    distributionValue: Decimal) throws
   {
     switch type {
     case .capitalReturn:
@@ -116,7 +130,7 @@ public struct AssetEvent {
         asset: asset,
         kind: .dividend(amount: distributionAmount, value: distributionValue))
     case .split, .unsplit, .restruct:
-      preconditionFailure("type must be CAPRETURN or DIVIDEND")
+      throw InitializationError.invalidDistributionType(type)
     }
   }
 }
