@@ -31,6 +31,8 @@ The calculator supports the post-6 April 2008 identification rules, and currentl
 
 It also supports handling of equalisation payments (capital return) for funds where those amounts should be subtracted from allowable cost, and accumulation distributions (dividend rows) where those amounts should increase allowable cost.
 
+For interpretation choices and implementation policies that affect tax outcomes, see [TAX_DECISIONS.md](TAX_DECISIONS.md).
+
 ## What does it not support?
 
 Currently there is no support for:
