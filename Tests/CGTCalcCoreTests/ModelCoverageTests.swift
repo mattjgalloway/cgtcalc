@@ -83,6 +83,13 @@ final class ModelCoverageTests: XCTestCase {
       insufficient.errorDescription,
       "Insufficient shares for ABC on 01/01/2020: tried to sell 10, but only 3 could be matched")
 
+    let unsupportedDate = CalculationError.unsupportedInputDate(
+      date: TestSupport.date("01/01/2007"),
+      minimumDate: TestSupport.date("06/04/2008"))
+    XCTAssertEqual(
+      unsupportedDate.errorDescription,
+      "Unsupported input date 01/01/2007: dates before 06/04/2008 are not supported")
+
     let unsupportedFallback = CalculationError.unsupportedLaterAcquisitionIdentification(
       asset: "ABC",
       date: TestSupport.date("01/01/2020"),

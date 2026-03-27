@@ -26,6 +26,8 @@ public enum CGTEngine {
   ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, and RESTRUCT rows for all assets.
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
+    try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
+
     let normalizedTransactions = self.normalizingSourceOrder(transactions)
     let normalizedEvents = self.normalizingSourceOrder(assetEvents)
     let sortedTransactions = normalizedTransactions.sorted(by: self.transactionSortsBefore)
@@ -273,6 +275,33 @@ public enum CGTEngine {
       .map(\.date)
       .filter { $0 > day30 }
       .min()
+  }
+
+  private static var minimumSupportedDate: Date {
+    var components = DateComponents()
+    components.year = 2008
+    components.month = 4
+    components.day = 6
+    return UTC.calendar.date(from: components)!
+  }
+
+  private static func validateSupportedDateScope(transactions: [Transaction], assetEvents: [AssetEvent]) throws {
+    let minimumDate = self.minimumSupportedDate
+    if let unsupportedTransactionDate = transactions
+      .map(\.date)
+      .filter({ $0 < minimumDate })
+      .min()
+    {
+      throw CalculationError.unsupportedInputDate(date: unsupportedTransactionDate, minimumDate: minimumDate)
+    }
+
+    if let unsupportedEventDate = assetEvents
+      .map(\.date)
+      .filter({ $0 < minimumDate })
+      .min()
+    {
+      throw CalculationError.unsupportedInputDate(date: unsupportedEventDate, minimumDate: minimumDate)
+    }
   }
 
   private struct MatchAllocation {

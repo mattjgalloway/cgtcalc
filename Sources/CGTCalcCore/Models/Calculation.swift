@@ -4,6 +4,7 @@ import Foundation
 
 public enum CalculationError: Error, LocalizedError {
   case insufficientShares(asset: String, date: Date, requested: Decimal, matched: Decimal)
+  case unsupportedInputDate(date: Date, minimumDate: Date)
   case unsupportedLaterAcquisitionIdentification(
     asset: String,
     date: Date,
@@ -17,6 +18,8 @@ public enum CalculationError: Error, LocalizedError {
     switch self {
     case .insufficientShares(let asset, let date, let requested, let matched):
       "Insufficient shares for \(asset) on \(DateParser.format(date)): tried to sell \(requested), but only \(matched) could be matched"
+    case .unsupportedInputDate(let date, let minimumDate):
+      "Unsupported input date \(DateParser.format(date)): dates before \(DateParser.format(minimumDate)) are not supported"
     case .unsupportedLaterAcquisitionIdentification(
       let asset,
       let date,

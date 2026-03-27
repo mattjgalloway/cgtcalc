@@ -1,0 +1,1 @@
+Error calculating CGT: Unsupported input date 01/01/2007: dates before 06/04/2008 are not supported

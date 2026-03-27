@@ -187,6 +187,22 @@ final class CalculatorTests: XCTestCase {
     }
   }
 
+  func testPre2008InputDateThrowsUnsupportedScopeError() {
+    XCTAssertThrowsError(try CGTEngine.calculate(
+      transactions: [
+        TestSupport.buy("01/01/2007", "TEST", 100, 1, 0),
+        TestSupport.sell("01/06/2020", "TEST", 100, 2, 0)
+      ],
+      assetEvents: []))
+    { error in
+      guard case CalculationError.unsupportedInputDate(let date, let minimumDate) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(DateParser.format(date), "01/01/2007")
+      XCTAssertEqual(DateParser.format(minimumDate), "06/04/2008")
+    }
+  }
+
   func testExampleFromReadme() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("05/12/2019", "GB00B41YBW71", 500, 4.7012, 2),
