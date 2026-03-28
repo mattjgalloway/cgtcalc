@@ -44,8 +44,40 @@ import XCTest
       XCTAssertEqual(
         entry.rows.map(\.label),
         ["Disposals", "Proceeds", "Allowable costs", "Total gains", "Total losses"])
-      XCTAssertEqual(entry.rows.map(\.value), ["1", "1200", "805", "395", "0"])
+      XCTAssertEqual(entry.rows.map(\.value), ["1", "1200", "802", "395", "0"])
       XCTAssertNil(entry.specialLine)
+    }
+
+    func testPDFTaxReturnEntryUsesPerDisposalPenceRoundingForProceedsAndCosts() {
+      let taxYear = TaxYear(startYear: 2020)
+      let disposalA = TestSupport.disposal(
+        asset: "A",
+        date: "01/06/2020",
+        gain: 0,
+        rawGain: 0.01,
+        rawProceeds: 1.99,
+        rawAllowableCosts: 1.98,
+        taxYear: taxYear)
+      let disposalB = TestSupport.disposal(
+        asset: "B",
+        date: "01/06/2020",
+        gain: 0,
+        rawGain: 0.01,
+        rawProceeds: 1.99,
+        rawAllowableCosts: 1.98,
+        taxYear: taxYear)
+      let summary = TaxYearSummary(
+        taxYear: taxYear,
+        disposals: [disposalA, disposalB],
+        totalGain: 0,
+        totalLoss: 0,
+        netGain: 0,
+        exemption: 12300,
+        taxableGain: 0,
+        lossCarryForward: 0)
+
+      let entry = PDFReportFormatter().taxReturnEntry(for: summary)
+      XCTAssertEqual(entry.rows.map(\.value), ["2", "2", "2", "0", "0"])
     }
 
     func testPDFDetailedCalculationLineIncludesCostComponents() throws {

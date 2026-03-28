@@ -1,0 +1,46 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
+===================================================================
+2020/2021   £0     £2         £12300      £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2020/2021
+
+2 gains with total of 0.
+0 losses with total of 0.
+
+1) SOLD 1 of A on 01/06/2020 for GAIN of £0
+Matches with:
+  - SECTION 104: 1 at cost basis of £1
+Calculation: (1 * 1.99 - 0) - ( (1 * 1) ) = 0
+
+2) SOLD 1 of B on 01/06/2020 for GAIN of £0
+Matches with:
+  - SECTION 104: 1 at cost basis of £1
+Calculation: (1 * 1.99 - 0) - ( (1 * 1) ) = 0
+
+
+# TAX RETURN INFORMATION
+
+2020/2021: Disposals = 2, proceeds = 2, allowable costs = 2, total gains = 0, total losses = 0
+
+
+# HOLDINGS
+
+NONE
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 1 of A at £1 with £0 expenses
+01/06/2020 SOLD 1 of A at £1.99 with £0 expenses
+01/01/2020 BOUGHT 1 of B at £1 with £0 expenses
+01/06/2020 SOLD 1 of B at £1.99 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

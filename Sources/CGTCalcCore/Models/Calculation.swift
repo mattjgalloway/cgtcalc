@@ -161,6 +161,9 @@ public struct Disposal: Identifiable {
   public let sellTransaction: Transaction
   public let taxYear: TaxYear
   public let gain: Decimal
+  public let rawGain: Decimal
+  public let rawProceeds: Decimal
+  public let rawAllowableCosts: Decimal
   public let section104Matches: [Section104Match]
   public let bedAndBreakfastMatches: [BedAndBreakfastMatch]
 
@@ -170,6 +173,9 @@ public struct Disposal: Identifiable {
   ///   - sellTransaction: The effective disposal transaction.
   ///   - taxYear: Tax year containing the disposal.
   ///   - gain: Rounded gain or loss.
+  ///   - rawGain: Raw gain or loss before whole-pound rounding.
+  ///   - rawProceeds: Raw disposal proceeds before whole-pound rounding.
+  ///   - rawAllowableCosts: Raw disposal allowable costs before whole-pound rounding.
   ///   - section104Matches: Section 104 matches used for pricing.
   ///   - bedAndBreakfastMatches: Same-day and 30-day rebuy matches used for pricing.
   public init(
@@ -177,6 +183,9 @@ public struct Disposal: Identifiable {
     sellTransaction: Transaction,
     taxYear: TaxYear,
     gain: Decimal,
+    rawGain: Decimal? = nil,
+    rawProceeds: Decimal? = nil,
+    rawAllowableCosts: Decimal? = nil,
     section104Matches: [Section104Match],
     bedAndBreakfastMatches: [BedAndBreakfastMatch])
   {
@@ -184,6 +193,9 @@ public struct Disposal: Identifiable {
     self.sellTransaction = sellTransaction
     self.taxYear = taxYear
     self.gain = gain
+    self.rawGain = rawGain ?? gain
+    self.rawProceeds = rawProceeds ?? sellTransaction.proceeds
+    self.rawAllowableCosts = rawAllowableCosts ?? (sellTransaction.proceeds - sellTransaction.expenses - self.rawGain)
     self.section104Matches = section104Matches
     self.bedAndBreakfastMatches = bedAndBreakfastMatches
   }

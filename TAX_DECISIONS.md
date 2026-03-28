@@ -207,13 +207,33 @@ This is not legal advice. It is a project decision log.
 - Note:
   - this is an implementation policy choice and should be preserved unless the project deliberately decides to move to raw-amount annual aggregation instead
 
-### Summary proceeds are reported as whole pounds
+### Summary proceeds are the sum of disposal-level rounded proceeds
 
-- Decision: the summary section reports proceeds rounded down to whole pounds.
-- Why: this is a reporting simplification used consistently in the current formatter.
+- Decision: the summary section reports proceeds as the sum of each disposal's rounded proceeds.
+- Why: this keeps the summary on the same per-disposal-rounded basis as the disposal workings and tax-return reporting.
 - Code:
   - `Sources/CGTCalcCore/Formatter/TaxReturnMath.swift`
   - `Sources/CGTCalcCore/Formatter/TextReportFormatter.swift`
+
+### Tax-return figures use per-disposal rounded values
+
+- Decision:
+  - `proceeds` are the sum of rounded per-disposal proceeds
+  - `allowable costs` are the sum of rounded per-disposal allowable costs
+  - `total gains` are the sum of rounded positive per-disposal gains
+  - `total losses` are the sum of rounded positive per-disposal losses
+- Why:
+  - the project keeps the disposal workings, top summary, and tax-return section on one coherent rounding basis
+  - this avoids introducing a separate raw-total box-rounding regime that would create broader visible output changes and make the report harder to follow
+- Status: explicit project reporting policy.
+- Code:
+  - `Sources/CGTCalcCore/Formatter/TaxReturnMath.swift`
+  - `Sources/CGTCalcCore/Models/Calculation.swift`
+  - `Sources/CGTCalcCore/Calculator/CGTEngine.swift`
+- Tests:
+  - `Tests/CGTCalcCoreTests/TaxReturnMathTests.swift`
+  - `Tests/CGTCalcCoreTests/PDFReportWriterTests.swift`
+  - `Tests/CGTCalcCoreTests/TestData/Examples/Outputs/TaxReturnTotalsPenceRounding.txt`
 
 ## Restructures
 

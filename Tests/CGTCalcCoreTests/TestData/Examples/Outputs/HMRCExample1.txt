@@ -25,7 +25,7 @@ Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 
 # TAX RETURN INFORMATION
 
-2018/2019: Disposals = 2, proceeds = 5440, allowable costs = 4811, total gains = 629, total losses = 0
+2018/2019: Disposals = 2, proceeds = 5440, allowable costs = 4809, total gains = 629, total losses = 0
 
 
 # HOLDINGS

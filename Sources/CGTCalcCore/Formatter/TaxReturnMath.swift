@@ -16,23 +16,27 @@ struct TaxReturnMath {
 }
 
 extension TaxYearSummary {
-  /// Summary-table proceeds are reported as rounded whole pounds from raw proceeds.
+  /// Summary-table proceeds are reported as the sum of disposal-level rounded proceeds.
   var summaryReportedProceeds: Decimal {
-    let totalProceeds = self.disposals.reduce(Decimal(0)) { $0 + $1.sellTransaction.proceeds }
-    return TaxMethods.roundedGain(totalProceeds)
+    self.disposals.reduce(Decimal(0)) { total, disposal in
+      total + TaxMethods.roundedGain(disposal.rawProceeds)
+    }
   }
 
   /// HMRC tax-return figures derived from disposals in this tax year.
   var taxReturnMath: TaxReturnMath {
     let proceeds = self.disposals.reduce(Decimal(0)) { total, disposal in
-      total + TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
+      total + TaxMethods.roundedGain(disposal.rawProceeds)
     }
     let allowableCosts = self.disposals.reduce(Decimal(0)) { total, disposal in
-      let roundedDisposalProceeds = TaxMethods.roundedGain(disposal.sellTransaction.proceeds)
-      return total + (roundedDisposalProceeds - disposal.gain)
+      total + TaxMethods.roundedGain(disposal.rawAllowableCosts)
     }
-    let totalGains = self.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
-    let totalLosses = self.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
+    let totalGains = self.disposals
+      .filter { $0.rawGain > 0 }
+      .reduce(Decimal(0)) { $0 + TaxMethods.roundedGain($1.rawGain) }
+    let totalLosses = self.disposals
+      .filter { $0.rawGain < 0 }
+      .reduce(Decimal(0)) { $0 + TaxMethods.roundedGain(abs($1.rawGain)) }
 
     let specialRateSplit: TaxReturnMath.SpecialRateSplit?
     if let cutoff = self.taxYear.specialCapitalGainsRateChangeLastOldRateDate,

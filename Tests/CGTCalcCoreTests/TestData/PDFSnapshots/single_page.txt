@@ -15,7 +15,7 @@ Values below are laid out for HMRC Self Assessment entry.
 Tax Year 2023/2024
 Disposals 1
 Proceeds 1200
-Allowable costs 805
+Allowable costs 802
 Total gains 395
 Total losses 0
 Holdings

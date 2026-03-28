@@ -119,6 +119,9 @@ struct TestSupport {
     price: Decimal = 1,
     expenses: Decimal = 0,
     gain: Decimal,
+    rawGain: Decimal? = nil,
+    rawProceeds: Decimal? = nil,
+    rawAllowableCosts: Decimal? = nil,
     taxYear: TaxYear? = nil) -> Disposal
   {
     let sellTransaction = self.sell(date, asset, quantity, price, expenses)
@@ -126,6 +129,9 @@ struct TestSupport {
       sellTransaction: sellTransaction,
       taxYear: taxYear ?? TaxYear.from(date: sellTransaction.date),
       gain: gain,
+      rawGain: rawGain,
+      rawProceeds: rawProceeds,
+      rawAllowableCosts: rawAllowableCosts,
       section104Matches: [],
       bedAndBreakfastMatches: [])
   }

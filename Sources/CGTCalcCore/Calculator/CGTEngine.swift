@@ -83,6 +83,9 @@ public enum CGTEngine {
             sellTransaction: outbound,
             taxYear: taxYear,
             gain: gain,
+            rawGain: rawGain,
+            rawProceeds: outbound.proceeds,
+            rawAllowableCosts: totalCost + outbound.expenses,
             section104Matches: allocation.section104Matches,
             bedAndBreakfastMatches: allocation.bedAndBreakfastMatches))
         } else {

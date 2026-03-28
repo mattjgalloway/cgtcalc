@@ -2,7 +2,7 @@
 
 Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
 ===================================================================
-2018/2019   £-40   £93        £11700      £40          £0          
+2018/2019   £-40   £92        £11700      £40          £0          
 
 
 # TAX YEAR DETAILS
@@ -25,7 +25,7 @@ Calculation: (10 * 4.6702 - 12.5) - ( (10 * 4.1565 + 12.5) ) = -20
 
 # TAX RETURN INFORMATION
 
-2018/2019: Disposals = 2, proceeds = 92, allowable costs = 132, total gains = 0, total losses = 40
+2018/2019: Disposals = 2, proceeds = 92, allowable costs = 132, total gains = 0, total losses = 38
 
 
 # HOLDINGS

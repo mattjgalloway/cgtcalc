@@ -168,14 +168,14 @@ final class ModelCoverageTests: XCTestCase {
       taxableGain: 0,
       lossCarryForward: 0)
 
-    XCTAssertEqual(summary.summaryReportedProceeds, 27)
+    XCTAssertEqual(summary.summaryReportedProceeds, 25)
 
     let taxReturn = summary.taxReturnMath
     XCTAssertEqual(taxReturn.disposalsCount, 3)
     XCTAssertEqual(taxReturn.proceeds, 25)
-    XCTAssertEqual(taxReturn.allowableCosts, 18.75)
-    XCTAssertEqual(taxReturn.totalGains, 7.5)
-    XCTAssertEqual(taxReturn.totalLosses, 1.25)
+    XCTAssertEqual(taxReturn.allowableCosts, 20)
+    XCTAssertEqual(taxReturn.totalGains, 7)
+    XCTAssertEqual(taxReturn.totalLosses, 1)
 
     let split = try XCTUnwrap(taxReturn.specialRateSplit)
     XCTAssertEqual(split.label, "29th October")
