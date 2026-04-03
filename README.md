@@ -181,6 +181,24 @@ Important semantics:
 - Asset-event amount validation allows a very small decimal tolerance to avoid rejecting mathematically equal split rows because of `Decimal` representation noise.
 - Same-day same-asset sells are merged into one effective disposal for calculation and rounding.
 
+### Excess Reportable Income (ERI) on reporting offshore funds
+
+`cgtcalc` does not currently have a dedicated `ERI` input row type.
+
+To model ERI for CGT cost-basis purposes, enter it as a `DIVIDEND` asset event:
+
+- `AMOUNT`: the units that the ERI amount applies to
+- `VALUE`: the total ERI amount for those units
+
+Date the row using the holding entitlement / effective date for CGT cost basis (typically the fund period-end entitlement basis), not a later broker payment or statement date.
+
+Why this matters:
+
+- in this tool, `DIVIDEND` increases allowable cost to prevent double taxation in CGT calculations
+- event-date holding validation uses the row date, so incorrect dating can fail validation or misallocate the adjustment
+
+Important: income-tax reporting of ERI (for example SA106 timing) is separate and follows HMRC offshore-fund rules; this section is only about the CGT cost-basis treatment in this calculator.
+
 ## Extending
 
 `cgtcalc` is broken into two parts:
