@@ -180,7 +180,7 @@ public struct TextReportFormatter {
             }
             let eventAdjustmentComponent = match
               .eventAdjustment != 0 ? " + \(match.eventAdjustment.rounded(to: 2).string)" : ""
-            costStr += "(\(match.buyDateQuantity) * \(purchasePrice.rounded(to: 5).string) + \(purchaseExpenses.rounded(to: 2).string)\(eventAdjustmentComponent))"
+            costStr += "(\(self.formatDecimal(match.buyDateQuantity)) * \(purchasePrice.rounded(to: 5).string) + \(purchaseExpenses.rounded(to: 2).string)\(eventAdjustmentComponent))"
           }
         }
 
@@ -193,7 +193,7 @@ public struct TextReportFormatter {
           if !disposal.bedAndBreakfastMatches.isEmpty {
             costStr += " + "
           }
-          costStr += "(\(section104MatchedQuantity) * \(poolAvgCost.rounded(to: 5).string))"
+          costStr += "(\(self.formatDecimal(section104MatchedQuantity)) * \(poolAvgCost.rounded(to: 5).string))"
         }
 
         costStr += " )"
@@ -342,6 +342,6 @@ public struct TextReportFormatter {
   }
 
   private func formatDecimal(_ value: Decimal) -> String {
-    value.string
+    value.rounded(to: 6).string
   }
 }
