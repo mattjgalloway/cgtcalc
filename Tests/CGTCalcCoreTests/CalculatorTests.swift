@@ -434,6 +434,46 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(spouseFirstHolding.costBasis, 0, accuracy: 0.00001)
   }
 
+  func testRestructureRoundTripArithmeticProducesDecimalNoise() {
+    // RESTRUCT 3:10 produces a repeating decimal (70/3), exhausting Decimal's 38-digit
+    // precision. The reverse RESTRUCT 10:3 then multiplies the already-truncated value,
+    // so the round-trip result is not exactly equal to the original.
+    let initial = Decimal(7)
+    let afterForwardRestruct = initial * Decimal(10) / Decimal(3)
+    let afterRoundTrip = afterForwardRestruct * Decimal(3) / Decimal(10)
+
+    XCTAssertNotEqual(afterRoundTrip, initial)
+    XCTAssertLessThanOrEqual(abs(afterRoundTrip - initial), Decimal.parse("0.00000001")!)
+  }
+
+  func testDisposalSucceedsAfterRestructureRoundTripDespiteDecimalNoise() throws {
+    // RESTRUCT 3:10 followed by RESTRUCT 10:3 leaves the Section 104 pool at ~6.999...
+    // instead of exactly 7 due to repeating-decimal Decimal noise (see arithmetic test above).
+    // The engine's tolerance comparison must treat this as a full match so the disposal
+    // completes rather than throwing insufficientShares or unsupportedLaterAcquisition.
+    let result = try CGTEngine.calculate(
+      transactions: [
+        TestSupport.buy("01/01/2020", "TEST", 7, 10, 0),
+        TestSupport.sell("01/07/2020", "TEST", 7, 12, 0)
+      ],
+      assetEvents: [
+        AssetEvent(
+          date: TestSupport.date("01/03/2020"),
+          asset: "TEST",
+          oldUnits: 3,
+          newUnits: 10),
+        AssetEvent(
+          date: TestSupport.date("01/05/2020"),
+          asset: "TEST",
+          oldUnits: 10,
+          newUnits: 3)
+      ])
+
+    let summary = try XCTUnwrap(result.taxYearSummaries.first)
+    let disposal = try XCTUnwrap(summary.disposals.first)
+    XCTAssertEqual(disposal.gain, 14, accuracy: 1)
+  }
+
   func testPostBuyDividendIsNotDoubleCountedAcrossThirtyDayAndLaterSection104Disposals() throws {
     let result = try CGTEngine.calculate(transactions: [
       TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),

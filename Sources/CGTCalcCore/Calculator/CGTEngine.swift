@@ -219,7 +219,9 @@ public enum CGTEngine {
     }
 
     let matchedQuantity = bnbQuantityUsed + section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
-    guard matchedQuantity == groupedQuantity else {
+    // Tolerance guards against Decimal arithmetic noise from SPLIT/UNSPLIT/RESTRUCT ratio operations.
+    let quantityTolerance = Decimal.parse("0.00000001") ?? Decimal(0)
+    guard abs(matchedQuantity - groupedQuantity) <= quantityTolerance else {
       if let firstLaterAcquisitionDate = self.firstLaterAcquisitionDateForUnsupportedFallback(
         outboundDate: outboundDate,
         buys: assetBuys)
