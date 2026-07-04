@@ -3,7 +3,8 @@ import Foundation
 // MARK: - Asset Event Validator
 
 enum AssetEventValidator {
-  private static let amountTolerance = Decimal.parse("0.00000001") ?? Decimal(0)
+  private static let absoluteAmountTolerance = Decimal.parse("0.0001") ?? Decimal(0)
+  private static let relativeAmountTolerance = Decimal.parse("0.00001") ?? Decimal(0)
 
   /// Validates CAPRETURN and DIVIDEND amounts against the actual holding state for one asset.
   /// - Parameters:
@@ -146,7 +147,8 @@ enum AssetEventValidator {
   }
 
   private static func amountsMatch(_ lhs: Decimal, _ rhs: Decimal) -> Bool {
-    abs(lhs - rhs) <= self.amountTolerance
+    let tolerance = max(self.absoluteAmountTolerance, abs(lhs) * self.relativeAmountTolerance)
+    return abs(lhs - rhs) <= tolerance
   }
 
   private static func depletingPool(_ pool: [PoolEntry], by quantity: Decimal) -> [PoolEntry] {

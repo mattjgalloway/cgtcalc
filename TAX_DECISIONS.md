@@ -154,7 +154,9 @@ This is not legal advice. It is a project decision log.
 - Decision:
   - same-day `DIVIDEND` rows for one asset/date must sum to the holding quantity on that date
   - same-day `CAPRETURN` rows for one asset/date must sum to the Group II tranche still held at that date
+  - both validations allow a small broker/fund rounding tolerance of `max(0.0001, expected units * 0.00001)`
 - Why: multiple lines on one date are treated as one logical distribution event of that type.
+- Why: brokers and fund platforms can report harmless fractional-unit dust, but meaningful mismatches should still fail validation.
 - Status: intended validation behavior.
 - Code:
   - `Sources/CGTCalcCore/Calculator/AssetEventValidator.swift`

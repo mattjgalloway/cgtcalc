@@ -116,13 +116,110 @@ final class AssetEventValidatorTests: XCTestCase {
       ]))
   }
 
+  func testAllowsDividendAmountAboveExpectedWithinCombinedTolerance() throws {
+    XCTAssertNoThrow(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.dividend("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "250.00001")), 50)
+      ]))
+  }
+
+  func testAllowsDividendAmountBelowExpectedWithinCombinedTolerance() throws {
+    XCTAssertNoThrow(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.dividend("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "249.99999")), 50)
+      ]))
+  }
+
+  func testAllowsCapitalReturnAmountAboveExpectedWithinCombinedTolerance() throws {
+    XCTAssertNoThrow(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.capReturn("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "250.00001")), 50)
+      ]))
+  }
+
+  func testAllowsCapitalReturnAmountBelowExpectedWithinCombinedTolerance() throws {
+    XCTAssertNoThrow(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.capReturn("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "249.99999")), 50)
+      ]))
+  }
+
+  func testRejectsDividendAmountWithMeaningfulMismatch() throws {
+    XCTAssertThrowsError(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.dividend("01/03/2019", "TEST", 249, 50)
+      ])) { error in
+        guard case CalculationError
+          .invalidAssetEventAmount(_, _, let type, let expected, let actual) = error
+        else {
+          return XCTFail("Unexpected error: \(error)")
+        }
+        XCTAssertEqual(type, .dividend)
+        XCTAssertEqual(expected, 250)
+        XCTAssertEqual(actual, 249)
+      }
+  }
+
+  func testRejectsCapitalReturnAmountWithMeaningfulMismatch() throws {
+    XCTAssertThrowsError(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 250, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.capReturn("01/03/2019", "TEST", 249, 50)
+      ])) { error in
+        guard case CalculationError
+          .invalidAssetEventAmount(_, _, let type, let expected, let actual) = error
+        else {
+          return XCTFail("Unexpected error: \(error)")
+        }
+        XCTAssertEqual(type, .capitalReturn)
+        XCTAssertEqual(expected, 250)
+        XCTAssertEqual(actual, 249)
+      }
+  }
+
+  func testRejectsTinyHoldingMismatchOutsideAbsoluteTolerance() throws {
+    XCTAssertThrowsError(try AssetEventValidator.validate(
+      transactions: [
+        TestSupport.buy("01/01/2019", "TEST", 0.02, 10, 0)
+      ],
+      assetEvents: [
+        TestSupport.dividend("01/03/2019", "TEST", 0.03, 50)
+      ])) { error in
+        guard case CalculationError
+          .invalidAssetEventAmount(_, _, let type, let expected, let actual) = error
+        else {
+          return XCTFail("Unexpected error: \(error)")
+        }
+        XCTAssertEqual(type, .dividend)
+        XCTAssertEqual(expected, Decimal(string: "0.02"))
+        XCTAssertEqual(actual, Decimal(string: "0.03"))
+      }
+  }
+
   func testRejectsCapitalReturnOutsideTolerance() throws {
     XCTAssertThrowsError(try AssetEventValidator.validate(
       transactions: [
         TestSupport.buy("01/01/2019", "TEST", 100, 10, 0)
       ],
       assetEvents: [
-        TestSupport.capReturn("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "100.00000002")), 10)
+        TestSupport.capReturn("01/03/2019", "TEST", XCTUnwrap(Decimal(string: "100.002")), 10)
       ])) { error in
         guard case CalculationError
           .invalidAssetEventAmount(let asset, let date, let type, let expected, let actual) = error
@@ -133,7 +230,7 @@ final class AssetEventValidatorTests: XCTestCase {
         XCTAssertEqual(DateParser.format(date), "01/03/2019")
         XCTAssertEqual(type, .capitalReturn)
         XCTAssertEqual(expected, 100)
-        XCTAssertEqual(actual, Decimal(string: "100.00000002"))
+        XCTAssertEqual(actual, Decimal(string: "100.002"))
       }
   }
 }
