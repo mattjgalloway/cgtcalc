@@ -3,6 +3,48 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testDistributionValueIsConservedAcrossThirtyDayMatchAndSection104() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 50 20 0
+    BUY 10/06/2020 TEST 50 12 0
+    DIVIDEND 15/06/2020 TEST 100 100
+    SELL 20/06/2020 TEST 50 25 0
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposals = result.taxYearSummaries.flatMap(\.disposals)
+      .sorted { $0.sellTransaction.date < $1.sellTransaction.date }
+
+    XCTAssertEqual(disposals.count, 2)
+    XCTAssertEqual(disposals[0].rawGain, 350)
+    XCTAssertEqual(disposals[0].bedAndBreakfastMatches.first?.eventAdjustment, 50)
+    XCTAssertEqual(disposals[1].rawGain, 725)
+    XCTAssertEqual(result.holdings["TEST"]?.quantity, 50)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 525)
+  }
+
+  func testCapitalReturnValueIsConservedAcrossThirtyDayMatchAndSection104() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 50 20 0
+    BUY 10/06/2020 TEST 50 12 0
+    CAPRETURN 15/06/2020 TEST 100 100
+    SELL 20/06/2020 TEST 50 25 0
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposals = result.taxYearSummaries.flatMap(\.disposals)
+      .sorted { $0.sellTransaction.date < $1.sellTransaction.date }
+
+    XCTAssertEqual(disposals.count, 2)
+    XCTAssertEqual(disposals[0].rawGain, 450)
+    XCTAssertEqual(disposals[0].bedAndBreakfastMatches.first?.eventAdjustment, -50)
+    XCTAssertEqual(disposals[1].rawGain, 775)
+    XCTAssertEqual(result.holdings["TEST"]?.quantity, 50)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 475)
+  }
+
   func testTransactionTotalCost() {
     let transaction = Transaction(
       type: .buy,

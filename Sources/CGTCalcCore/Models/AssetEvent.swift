@@ -134,3 +134,14 @@ public struct AssetEvent {
     }
   }
 }
+
+extension AssetEvent {
+  var distributionValue: Decimal {
+    switch self.kind {
+    case .capitalReturn(_, let value), .dividend(_, let value):
+      value
+    case .split, .unsplit, .restruct:
+      0
+    }
+  }
+}

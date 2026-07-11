@@ -47,7 +47,8 @@ enum Section104Processor {
   static func processActions(
     _ actions: [Action],
     into holding: Section104Holding,
-    usedBuyQuantities: [UUID: Decimal]) -> Section104Holding
+    usedBuyQuantities: [UUID: Decimal],
+    allocatedEventValues: [UUID: Decimal] = [:]) -> Section104Holding
   {
     var updatedHolding = holding
 
@@ -72,7 +73,8 @@ enum Section104Processor {
         updatedHolding.pool.append(match)
 
       case .event(let event):
-        updatedHolding = self.applyAssetEvent(event, to: updatedHolding)
+        let residualValue = max(0, event.distributionValue - allocatedEventValues[event.id, default: 0])
+        updatedHolding = self.applyAssetEvent(event, value: residualValue, to: updatedHolding)
       }
     }
 
@@ -134,14 +136,22 @@ enum Section104Processor {
   ///   - holding: The holding to update.
   /// - Returns: The adjusted holding.
   static func applyAssetEvent(_ event: AssetEvent, to holding: Section104Holding) -> Section104Holding {
+    self.applyAssetEvent(event, value: event.distributionValue, to: holding)
+  }
+
+  private static func applyAssetEvent(
+    _ event: AssetEvent,
+    value: Decimal,
+    to holding: Section104Holding) -> Section104Holding
+  {
     switch event.kind {
     case .split, .unsplit, .restruct:
       return self.applyRestructureEvents([event], to: holding)
-    case .capitalReturn(_, let value):
+    case .capitalReturn:
       var adjustedHolding = holding
       adjustedHolding.costBasis = max(0, adjustedHolding.costBasis - value)
       return adjustedHolding
-    case .dividend(_, let value):
+    case .dividend:
       var adjustedHolding = holding
       adjustedHolding.costBasis += value
       return adjustedHolding

@@ -51,6 +51,7 @@ public enum CGTEngine {
 
     var section104Holdings: [String: Section104Holding] = [:]
     var usedBuyQuantities: [UUID: Decimal] = [:]
+    var allocatedEventValues: [UUID: Decimal] = [:]
     var disposals: [Disposal] = []
     var spouseTransfersOut: [SpouseTransferOut] = []
     var previousOutboundDateByAsset: [String: Date] = [:]
@@ -68,7 +69,8 @@ public enum CGTEngine {
         assetOutbounds: assetOutbounds,
         previousOutboundDate: previousOutboundDate,
         currentHolding: section104Holdings[asset, default: Section104Holding()],
-        usedBuyQuantities: &usedBuyQuantities)
+        usedBuyQuantities: &usedBuyQuantities,
+        allocatedEventValues: &allocatedEventValues)
       section104Holdings[asset] = processResult.updatedHolding
 
       for outbound in outboundGroup {
@@ -112,7 +114,8 @@ public enum CGTEngine {
       let holding = Section104Processor.processActions(
         actions,
         into: section104Holdings[asset, default: Section104Holding()],
-        usedBuyQuantities: usedBuyQuantities)
+        usedBuyQuantities: usedBuyQuantities,
+        allocatedEventValues: allocatedEventValues)
       return (asset, holding)
     })
 
@@ -167,7 +170,8 @@ public enum CGTEngine {
     assetOutbounds: [Transaction],
     previousOutboundDate: Date,
     currentHolding: Section104Holding,
-    usedBuyQuantities: inout [UUID: Decimal]) throws -> OutboundGroupProcessResult
+    usedBuyQuantities: inout [UUID: Decimal],
+    allocatedEventValues: inout [UUID: Decimal]) throws -> OutboundGroupProcessResult
   {
     let asset = outboundGroup[0].asset
     let outboundDate = outboundGroup[0].date
@@ -195,7 +199,8 @@ public enum CGTEngine {
       from: allBnbBuys,
       usedBuyQuantities: usedBuyQuantities,
       sortedEvents: assetEvents,
-      allOutbounds: assetOutbounds)
+      allOutbounds: assetOutbounds,
+      allocatedEventValues: &allocatedEventValues)
 
     for match in bnbMatches {
       usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity
@@ -210,7 +215,8 @@ public enum CGTEngine {
     let processedHolding = Section104Processor.processActions(
       actions,
       into: currentHolding,
-      usedBuyQuantities: usedBuyQuantities)
+      usedBuyQuantities: usedBuyQuantities,
+      allocatedEventValues: allocatedEventValues)
     let s104QuantityNeeded = groupedQuantity - bnbQuantityUsed
     var section104Matches: [Section104Match] = []
 

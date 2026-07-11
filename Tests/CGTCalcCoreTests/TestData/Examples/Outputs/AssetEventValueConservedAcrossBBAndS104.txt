@@ -1,0 +1,46 @@
+# SUMMARY
+
+Tax year    Gain    Proceeds   Exemption   Loss carry   Taxable gain
+====================================================================
+2020/2021   £1075   £2250      £12300      £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2020/2021
+
+2 gains with total of 1075.
+0 losses with total of 0.
+
+1) SOLD 50 of TEST on 01/06/2020 for GAIN of £350
+Matches with:
+  - BED & BREAKFAST: 50 bought on 10/06/2020 at £12 with offset of £50
+Calculation: (50 * 20 - 0) - ( (50 * 12 + 0 + 50) ) = 350
+
+2) SOLD 50 of TEST on 20/06/2020 for GAIN of £725
+Matches with:
+  - SECTION 104: 100 at cost basis of £10.5
+Calculation: (50 * 25 - 0) - ( (50 * 10.5) ) = 725
+
+
+# TAX RETURN INFORMATION
+
+2020/2021: Disposals = 2, proceeds = 2250, allowable costs = 1175, total gains = 1075, total losses = 0
+
+
+# HOLDINGS
+
+TEST: 50 units acquired at £10.5 cost basis
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 100 of TEST at £10 with £0 expenses
+01/06/2020 SOLD 50 of TEST at £20 with £0 expenses
+10/06/2020 BOUGHT 50 of TEST at £12 with £0 expenses
+20/06/2020 SOLD 50 of TEST at £25 with £0 expenses
+
+
+# ASSET EVENTS
+
+15/06/2020 TEST DIVIDEND on 100 for £100

@@ -2,6 +2,24 @@
 import XCTest
 
 final class BedAndBreakfastMatcherTests: XCTestCase {
+  func testTracksEventValueAllocatedToMatchedRebuy() {
+    let sell = TestSupport.sell("01/06/2020", "TEST", 50, 20, 0)
+    let buy = TestSupport.buy("10/06/2020", "TEST", 50, 12, 0)
+    let event = TestSupport.dividend("15/06/2020", "TEST", 100, 100)
+    let laterSell = TestSupport.sell("20/06/2020", "TEST", 50, 25, 0)
+    var allocatedEventValues: [UUID: Decimal] = [:]
+
+    _ = BedAndBreakfastMatcher.findMatches(
+      for: sell,
+      from: [buy],
+      usedBuyQuantities: [:],
+      sortedEvents: [event],
+      allOutbounds: [sell, laterSell],
+      allocatedEventValues: &allocatedEventValues)
+
+    XCTAssertEqual(allocatedEventValues[event.id], 50)
+  }
+
   func testMatchesSameDayBuyFirst() {
     let sell = TestSupport.sell("01/06/2019", "TEST", 50, 12, 0)
     let sameDayBuy = TestSupport.buy("01/06/2019", "TEST", 50, 10, 0)

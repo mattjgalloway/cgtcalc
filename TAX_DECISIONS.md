@@ -168,6 +168,7 @@ This is not legal advice. It is a project decision log.
 ### Later fund events can adjust matched rebuy cost
 
 - Decision: later `DIVIDEND` and `CAPRETURN` events can affect the allowable cost of a same-day or 30-day matched rebuy.
+- Any event value allocated to an identified rebuy is deducted before the residual event value is applied to the Section 104 holding. The event value therefore affects allowable cost exactly once across matches and the pool.
 - Why: the rebuy remains the relevant holding for those later events unless and until later outbound use means otherwise.
 - Status: intended tax behavior in the current model.
 

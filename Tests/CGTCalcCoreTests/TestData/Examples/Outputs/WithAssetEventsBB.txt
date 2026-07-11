@@ -26,7 +26,7 @@ Calculation: (40 * 194.22 - 12.5) - ( (20 * 190.19 + 2 + 15.81) + (20 * 183.4797
 
 # HOLDINGS
 
-GB00B3TYHH97: 20 units acquired at £184.27025 cost basis
+GB00B3TYHH97: 20 units acquired at £183.47975 cost basis
 
 
 # TRANSACTIONS
