@@ -11,17 +11,53 @@ enum AssetEventValidator {
   ///   - transactions: Buy and sell transactions for one asset.
   ///   - assetEvents: Asset events for the same asset.
   static func validate(transactions: [Transaction], assetEvents: [AssetEvent]) throws {
+    _ = try self.eligibleAmounts(transactions: transactions, assetEvents: assetEvents)
+  }
+
+  /// Validates distribution quantities and replaces accepted broker-rounded amounts with the eligible quantity used
+  /// for cost-basis apportionment.
+  static func normalizingGroupedDistributionAmounts(
+    transactions: [Transaction],
+    assetEvents: [AssetEvent]) throws -> [AssetEvent]
+  {
+    let eligibleAmounts = try self.eligibleAmounts(transactions: transactions, assetEvents: assetEvents)
+    return assetEvents.map { event in
+      guard let eligibleAmount = eligibleAmounts[event.id] else { return event }
+      let kind: AssetEvent.Kind = switch event.kind {
+      case .capitalReturn(_, let value):
+        .capitalReturn(amount: eligibleAmount, value: value)
+      case .dividend(_, let value):
+        .dividend(amount: eligibleAmount, value: value)
+      case .split, .unsplit, .restruct:
+        event.kind
+      }
+      return AssetEvent(
+        id: event.id,
+        sourceOrder: event.sourceOrder,
+        date: event.date,
+        asset: event.asset,
+        kind: kind)
+    }
+  }
+
+  private static func eligibleAmounts(
+    transactions: [Transaction],
+    assetEvents: [AssetEvent]) throws -> [UUID: Decimal]
+  {
     let actions = (
       transactions.map(Action.transaction) +
         assetEvents.map(Action.event)).sorted(by: self.actionSortsBefore)
 
     var holding = Holding()
+    var eligibleAmounts: [UUID: Decimal] = [:]
 
     for actionsOnDate in Dictionary(grouping: actions, by: \.date)
       .sorted(by: { $0.key < $1.key })
       .map(\.value)
     {
-      try self.validateDistributionAmounts(in: actionsOnDate, against: holding)
+      try eligibleAmounts.merge(
+        self.validateDistributionAmounts(in: actionsOnDate, against: holding),
+        uniquingKeysWith: { _, latest in latest })
 
       for action in actionsOnDate {
         switch action {
@@ -68,14 +104,19 @@ enum AssetEventValidator {
         holding.lastDistributionDate = actionsOnDate[0].date
       }
     }
+    return eligibleAmounts
   }
 
-  private static func validateDistributionAmounts(in actions: [Action], against holding: Holding) throws {
+  private static func validateDistributionAmounts(
+    in actions: [Action],
+    against holding: Holding) throws -> [UUID: Decimal]
+  {
     // Same-day distribution rows are validated as one logical event per type.
     let events = actions.compactMap { action -> AssetEvent? in
       guard case .event(let event) = action else { return nil }
       return event
     }
+    var eligibleAmounts: [UUID: Decimal] = [:]
 
     let totalDividendAmount = events
       .filter { event in
@@ -91,12 +132,23 @@ enum AssetEventValidator {
         return partial
       }
     if totalDividendAmount > 0 {
+      guard holding.quantity > 0 else {
+        throw CalculationError.invalidAssetEventAmount(
+          asset: events[0].asset,
+          date: events[0].date,
+          type: .dividend,
+          expected: 0,
+          actual: totalDividendAmount)
+      }
       try self.validateDistributionAmount(
         asset: events[0].asset,
         date: events[0].date,
         type: .dividend,
         expected: holding.quantity,
         actual: totalDividendAmount)
+      for event in events where event.distributionType == .dividend {
+        eligibleAmounts[event.id] = holding.quantity
+      }
     }
 
     let totalCapitalReturnAmount = events
@@ -126,7 +178,11 @@ enum AssetEventValidator {
         type: .capitalReturn,
         expected: expectedQuantity,
         actual: totalCapitalReturnAmount)
+      for event in events where event.distributionType == .capitalReturn {
+        eligibleAmounts[event.id] = expectedQuantity
+      }
     }
+    return eligibleAmounts
   }
 
   private static func validateDistributionAmount(

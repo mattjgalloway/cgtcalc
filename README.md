@@ -181,6 +181,7 @@ Important semantics:
 - The summed `DIVIDEND` amount must match the holding quantity on that date.
 - The summed `CAPRETURN` amount must match the Group II tranche for that distribution period, i.e. the units bought since the last distribution date and still held at the event date.
 - Asset-event amount validation allows a small tolerance for broker/fund rounding dust: the summed amount must match the expected units within `max(0.0001, expected units * 0.00001)`.
+- When a mismatch is accepted within that tolerance, cost-basis adjustments are apportioned using the calculator's eligible holding quantity, not the broker-rounded reported amount.
 - Same-day same-asset sells are merged into one effective disposal for calculation and rounding.
 
 ### Excess Reportable Income (ERI) on reporting offshore funds

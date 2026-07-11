@@ -3,6 +3,31 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testToleratedEventAmountIsAllocatedProportionatelyAcrossTaxYears() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2024 TEST 0.0002 500000 0
+    SELL 20/03/2025 TEST 0.0001 2000000 0
+    SELL 06/04/2025 TEST 0.0001 2000000 0
+    BUY 10/04/2025 TEST 0.0002 500000 0
+    DIVIDEND 15/04/2025 TEST 0.0001 100
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposals = result.taxYearSummaries
+      .flatMap(\.disposals)
+      .sorted { $0.sellTransaction.date < $1.sellTransaction.date }
+
+    XCTAssertEqual(disposals.count, 2)
+    XCTAssertEqual(disposals[0].bedAndBreakfastMatches.first?.eventAdjustment, 50)
+    XCTAssertEqual(disposals[0].rawGain, 100)
+    XCTAssertEqual(disposals[0].gain, 100)
+    XCTAssertEqual(disposals[1].bedAndBreakfastMatches.first?.eventAdjustment, 50)
+    XCTAssertEqual(disposals[1].rawGain, 100)
+    XCTAssertEqual(disposals[1].gain, 100)
+    XCTAssertEqual(result.holdings["TEST"]?.quantity, Decimal.parse("0.0002"))
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 100)
+  }
+
   func testToleratedTinyDividendAmountCannotAllocateMoreThanEventValue() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 0.0001 1000000 0

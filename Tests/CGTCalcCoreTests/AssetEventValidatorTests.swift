@@ -2,6 +2,30 @@
 import XCTest
 
 final class AssetEventValidatorTests: XCTestCase {
+  func testNormalizesToleratedDividendAmountToEligibleHoldingQuantity() throws {
+    let buy = TestSupport.buy("01/01/2020", "TEST", 100000, 1, 0)
+    let event = TestSupport.dividend("01/02/2020", "TEST", 100001, 100)
+
+    let normalized = try AssetEventValidator.normalizingGroupedDistributionAmounts(
+      transactions: [buy],
+      assetEvents: [event])
+
+    XCTAssertEqual(normalized[0].distributionAmount, 100000)
+    XCTAssertEqual(normalized[0].distributionValue, 100)
+  }
+
+  func testNormalizesToleratedCapitalReturnAmountToEligibleGroupTwoQuantity() throws {
+    let buy = TestSupport.buy("01/01/2020", "TEST", 100000, 1, 0)
+    let event = TestSupport.capReturn("01/02/2020", "TEST", 99999, 100)
+
+    let normalized = try AssetEventValidator.normalizingGroupedDistributionAmounts(
+      transactions: [buy],
+      assetEvents: [event])
+
+    XCTAssertEqual(normalized[0].distributionAmount, 100000)
+    XCTAssertEqual(normalized[0].distributionValue, 100)
+  }
+
   func testRejectsDividendWithWrongAmount() {
     XCTAssertThrowsError(try AssetEventValidator.validate(
       transactions: [

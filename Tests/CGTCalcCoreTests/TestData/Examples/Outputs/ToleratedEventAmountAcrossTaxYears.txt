@@ -1,0 +1,54 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
+===================================================================
+2024/2025   £100   £200       £3000       £0           £0          
+2025/2026   £100   £200       £3000       £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2024/2025
+
+1 gains with total of 100.
+0 losses with total of 0.
+
+1) SOLD 0.0001 of TEST on 20/03/2025 for GAIN of £100
+Matches with:
+  - BED & BREAKFAST: 0.0001 bought on 10/04/2025 at £500000 with offset of £50
+Calculation: (0.0001 * 2000000 - 0) - ( (0.0001 * 500000 + 0 + 50) ) = 100
+
+## TAX YEAR 2025/2026
+
+1 gains with total of 100.
+0 losses with total of 0.
+
+1) SOLD 0.0001 of TEST on 06/04/2025 for GAIN of £100
+Matches with:
+  - BED & BREAKFAST: 0.0001 bought on 10/04/2025 at £500000 with offset of £50
+Calculation: (0.0001 * 2000000 - 0) - ( (0.0001 * 500000 + 0 + 50) ) = 100
+
+
+# TAX RETURN INFORMATION
+
+2024/2025: Disposals = 1, proceeds = 200, allowable costs = 100, total gains = 100, total losses = 0
+    > Gains to (and inc.) 29th October = 0, gains after 29th October = 100
+2025/2026: Disposals = 1, proceeds = 200, allowable costs = 100, total gains = 100, total losses = 0
+
+
+# HOLDINGS
+
+TEST: 0.0002 units acquired at £500000 cost basis
+
+
+# TRANSACTIONS
+
+01/01/2024 BOUGHT 0.0002 of TEST at £500000 with £0 expenses
+20/03/2025 SOLD 0.0001 of TEST at £2000000 with £0 expenses
+06/04/2025 SOLD 0.0001 of TEST at £2000000 with £0 expenses
+10/04/2025 BOUGHT 0.0002 of TEST at £500000 with £0 expenses
+
+
+# ASSET EVENTS
+
+15/04/2025 TEST DIVIDEND on 0.0001 for £100

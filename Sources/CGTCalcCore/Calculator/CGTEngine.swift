@@ -42,15 +42,17 @@ public enum CGTEngine {
     let allOutbounds = (sells + spouseOuts).sorted(by: self.transactionSortsBefore)
     let outboundsByAsset = Dictionary(grouping: allOutbounds, by: \.asset)
 
-    let validationEventsByAsset = Dictionary(grouping: sortedEvents, by: \.asset)
-    for asset in Set(transactionsByAsset.keys).union(validationEventsByAsset.keys) {
-      try AssetEventValidator.validate(
+    let groupedEvents = AssetEventGrouper.groupDistributions(sortedEvents)
+    let groupedEventsByAsset = Dictionary(grouping: groupedEvents, by: \.asset)
+    var calculationEvents: [AssetEvent] = []
+    for asset in Set(transactionsByAsset.keys).union(groupedEventsByAsset.keys) {
+      let normalizedAssetEvents = try AssetEventValidator.normalizingGroupedDistributionAmounts(
         transactions: transactionsByAsset[asset, default: []],
-        assetEvents: validationEventsByAsset[asset, default: []])
+        assetEvents: groupedEventsByAsset[asset, default: []])
+      calculationEvents.append(contentsOf: normalizedAssetEvents)
     }
 
-    let groupedEvents = AssetEventGrouper.groupDistributions(sortedEvents)
-    let eventsByAsset = Dictionary(grouping: groupedEvents, by: \.asset)
+    let eventsByAsset = Dictionary(grouping: calculationEvents.sorted(by: self.assetEventSortsBefore), by: \.asset)
 
     var section104Holdings: [String: Section104Holding] = [:]
     var usedBuyQuantities: [UUID: Decimal] = [:]
