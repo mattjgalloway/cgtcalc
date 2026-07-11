@@ -2,14 +2,14 @@
 import XCTest
 
 final class BedAndBreakfastMatcherTests: XCTestCase {
-  func testTracksEventValueAllocatedToMatchedRebuy() {
+  func testTracksEventValueAllocatedToMatchedRebuy() throws {
     let sell = TestSupport.sell("01/06/2020", "TEST", 50, 20, 0)
     let buy = TestSupport.buy("10/06/2020", "TEST", 50, 12, 0)
     let event = TestSupport.dividend("15/06/2020", "TEST", 100, 100)
     let laterSell = TestSupport.sell("20/06/2020", "TEST", 50, 25, 0)
     var allocatedEventValues: [UUID: Decimal] = [:]
 
-    _ = BedAndBreakfastMatcher.findMatches(
+    _ = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [buy],
       usedBuyQuantities: [:],
@@ -20,11 +20,11 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(allocatedEventValues[event.id], 50)
   }
 
-  func testMatchesSameDayBuyFirst() {
+  func testMatchesSameDayBuyFirst() throws {
     let sell = TestSupport.sell("01/06/2019", "TEST", 50, 12, 0)
     let sameDayBuy = TestSupport.buy("01/06/2019", "TEST", 50, 10, 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [sameDayBuy],
       usedBuyQuantities: [:],
@@ -38,11 +38,11 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 500)
   }
 
-  func testMatchesBuyWithin30DayWindow() {
+  func testMatchesBuyWithin30DayWindow() throws {
     let sell = TestSupport.sell("01/06/2019", "TEST", 50, 12, 0)
     let rebuy = TestSupport.buy("08/06/2019", "TEST", 50, 11, 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [rebuy],
       usedBuyQuantities: [:],
@@ -55,11 +55,11 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 550)
   }
 
-  func testDoesNotMatchBuyOutside30DayWindow() {
+  func testDoesNotMatchBuyOutside30DayWindow() throws {
     let sell = TestSupport.sell("01/06/2019", "TEST", 50, 12, 0)
     let rebuy = TestSupport.buy("06/07/2019", "TEST", 50, 11, 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [rebuy],
       usedBuyQuantities: [:],
@@ -83,7 +83,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(adjustedQuantity, 100)
   }
 
-  func testIncludesPostBuyAssetEventOffsetsInMatchedCost() {
+  func testIncludesPostBuyAssetEventOffsetsInMatchedCost() throws {
     let sell = TestSupport.sell("05/11/2019", "TEST", 20, 20, 0)
     let rebuy = TestSupport.buy("10/11/2019", "TEST", 20, 19, 2)
     let events = [
@@ -91,7 +91,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       TestSupport.capReturn("30/11/2019", "TEST", 20, 95.12)
     ]
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [rebuy],
       usedBuyQuantities: [:],
@@ -104,14 +104,14 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 397.81, accuracy: 0.00001)
   }
 
-  func testUsesEventAmountWhenAllocatingPostBuyEventOffset() {
+  func testUsesEventAmountWhenAllocatingPostBuyEventOffset() throws {
     let sell = TestSupport.sell("05/11/2019", "TEST", 20, 20, 0)
     let rebuy = TestSupport.buy("10/11/2019", "TEST", 20, 19, 2)
     let events = [
       TestSupport.dividend("30/11/2019", "TEST", 40, 100)
     ]
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [rebuy],
       usedBuyQuantities: [:],
@@ -131,7 +131,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       TestSupport.dividend("30/06/2020", "TEST", 200, 100)
     ]
 
-    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+    let adjustment = try BedAndBreakfastMatcher.eventAdjustment(
       for: buy,
       through: nil,
       sortedEvents: events,
@@ -147,7 +147,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       TestSupport.dividend("30/06/2020", "TEST", 50, 100)
     ]
 
-    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+    let adjustment = try BedAndBreakfastMatcher.eventAdjustment(
       for: buy,
       through: nil,
       sortedEvents: events,
@@ -156,12 +156,12 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(adjustment, 50, accuracy: 0.00001)
   }
 
-  func testAllowsPartialReuseOfSingleRebuyAcrossMultipleEarlierSells() {
+  func testAllowsPartialReuseOfSingleRebuyAcrossMultipleEarlierSells() throws {
     let firstSell = TestSupport.sell("29/07/2016", "NASDAQ:META", 106, 94.71, 6.99)
     let secondSell = TestSupport.sell("10/08/2016", "NASDAQ:META", 1, 95.00, 0)
     let rebuy = TestSupport.buy("15/08/2016", "NASDAQ:META", 107, 96.28, 0)
 
-    let (firstMatches, firstQuantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (firstMatches, firstQuantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: firstSell,
       from: [rebuy],
       usedBuyQuantities: [:],
@@ -172,7 +172,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(firstMatches.count, 1)
     XCTAssertEqual(firstMatches[0].buyDateQuantity, 106)
 
-    let (secondMatches, secondQuantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (secondMatches, secondQuantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: secondSell,
       from: [rebuy],
       usedBuyQuantities: [rebuy.id: firstMatches[0].buyDateQuantity],
@@ -184,12 +184,12 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(secondMatches[0].buyDateQuantity, 1)
   }
 
-  func testAggregatesSameDayBuysForPartialMatchCosting() {
+  func testAggregatesSameDayBuysForPartialMatchCosting() throws {
     let sell = TestSupport.sell("01/01/2020", "TEST", 10, 100, 0)
     let cheapBuy = TestSupport.buy("01/01/2020", "TEST", 10, 1, 100, sourceOrder: 0)
     let expensiveBuy = TestSupport.buy("01/01/2020", "TEST", 10, 100, 0, sourceOrder: 1)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [cheapBuy, expensiveBuy],
       usedBuyQuantities: [:],
@@ -204,13 +204,13 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[1].quantity, 5, accuracy: 0.00001)
   }
 
-  func testReservesFutureBuyDayForItsOwnSameDayDisposalBeforeEarlier30DayMatching() {
+  func testReservesFutureBuyDayForItsOwnSameDayDisposalBeforeEarlier30DayMatching() throws {
     let earlySell = TestSupport.sell("16/12/2013", "BTC", 30, 10, 0)
     let sameDayBuyForEarlySell = TestSupport.buy("16/12/2013", "BTC", 10, 8, 0)
     let buyOnFutureSellDay = TestSupport.buy("18/12/2013", "BTC", 25, 9, 0)
     let futureSell = TestSupport.sell("18/12/2013", "BTC", 20, 11, 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: earlySell,
       from: [sameDayBuyForEarlySell, buyOnFutureSellDay],
       usedBuyQuantities: [:],
@@ -225,13 +225,13 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(matches[1].buyDateQuantity, 5, accuracy: 0.00001)
   }
 
-  func testReservesFutureDayBuysProRataAcrossMultipleLots() {
+  func testReservesFutureDayBuysProRataAcrossMultipleLots() throws {
     let earlySell = TestSupport.sell("10/01/2020", "TEST", 40, 10, 0)
     let futureDayBuyA = TestSupport.buy("20/01/2020", "TEST", 30, 2, 0, sourceOrder: 0)
     let futureDayBuyB = TestSupport.buy("20/01/2020", "TEST", 70, 4, 0, sourceOrder: 1)
     let futureSell = TestSupport.sell("20/01/2020", "TEST", 60, 11, 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: earlySell,
       from: [futureDayBuyA, futureDayBuyB],
       usedBuyQuantities: [:],
@@ -281,7 +281,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     XCTAssertEqual(adjustedQuantity, 30, accuracy: 0.00001)
   }
 
-  func testEventAdjustmentExcludesEventsAfterEndDate() {
+  func testEventAdjustmentExcludesEventsAfterEndDate() throws {
     let buy = TestSupport.buy("01/06/2019", "TEST", 100, 10, 0)
     let endDate = TestSupport.date("15/06/2019")
     let events = [
@@ -289,7 +289,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       TestSupport.capReturn("20/06/2019", "TEST", 100, 10)
     ]
 
-    let adjustment = BedAndBreakfastMatcher.eventAdjustment(
+    let adjustment = try BedAndBreakfastMatcher.eventAdjustment(
       for: buy,
       through: endDate,
       sortedEvents: events,
@@ -321,7 +321,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       price: 10,
       expenses: 0)
 
-    let (matches, quantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (matches, quantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: sell,
       from: [buyLater, buyEarlier],
       usedBuyQuantities: [:],

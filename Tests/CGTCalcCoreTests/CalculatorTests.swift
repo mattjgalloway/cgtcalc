@@ -3,6 +3,94 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testRejectsCapitalReturnExceedingRemainingAllowableCost() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 1 0
+    CAPRETURN 01/02/2020 TEST 100 150
+    SELL 01/03/2020 TEST 100 2 0
+    """)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(inputData: input)) { error in
+      guard case CalculationError.unsupportedCapitalReturn(
+        let asset,
+        let date,
+        let value,
+        let availableCost) = error
+      else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(asset, "TEST")
+      XCTAssertEqual(date, TestSupport.date("01/02/2020"))
+      XCTAssertEqual(value, 150)
+      XCTAssertEqual(availableCost, 100)
+    }
+  }
+
+  func testAllowsCapitalReturnEqualToRemainingAllowableCost() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 1 0
+    CAPRETURN 01/02/2020 TEST 100 100
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 0)
+  }
+
+  func testAllowsCapitalReturnWithinMonetaryDustTolerance() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 1 0
+    CAPRETURN 01/02/2020 TEST 100 100.00005
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 0)
+  }
+
+  func testRejectsCapitalReturnOnePennyAboveRemainingAllowableCost() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 1 0
+    CAPRETURN 01/02/2020 TEST 100 100.01
+    """)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(inputData: input))
+  }
+
+  func testRejectsExcessResidualCapitalReturnAfterPartialThirtyDayAllocation() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 0.5 0
+    SELL 01/06/2020 TEST 50 1 0
+    BUY 10/06/2020 TEST 50 2 0
+    CAPRETURN 15/06/2020 TEST 100 150
+    """)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(inputData: input)) { error in
+      guard case CalculationError.unsupportedCapitalReturn(_, _, let value, let availableCost) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(value, 75)
+      XCTAssertEqual(availableCost, 25)
+    }
+  }
+
+  func testRejectsExcessCapitalReturnAgainstFullyMatchedRebuy() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 1 0
+    SELL 01/06/2020 TEST 100 2 0
+    BUY 10/06/2020 TEST 100 1 0
+    CAPRETURN 15/06/2020 TEST 100 101
+    """)
+
+    XCTAssertThrowsError(try CGTEngine.calculate(inputData: input)) { error in
+      guard case CalculationError.unsupportedCapitalReturn(_, _, let value, let availableCost) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(value, 101)
+      XCTAssertEqual(availableCost, 100)
+    }
+  }
+
   func testMultipleSameDayDividendRowsMatchSingleAggregatedEvent() throws {
     let splitRows = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 100 10 0

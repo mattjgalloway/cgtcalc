@@ -48,7 +48,7 @@ enum Section104Processor {
     _ actions: [Action],
     into holding: Section104Holding,
     usedBuyQuantities: [UUID: Decimal],
-    allocatedEventValues: [UUID: Decimal] = [:]) -> Section104Holding
+    allocatedEventValues: [UUID: Decimal] = [:]) throws -> Section104Holding
   {
     var updatedHolding = holding
 
@@ -74,7 +74,7 @@ enum Section104Processor {
 
       case .event(let event):
         let residualValue = max(0, event.distributionValue - allocatedEventValues[event.id, default: 0])
-        updatedHolding = self.applyAssetEvent(event, value: residualValue, to: updatedHolding)
+        updatedHolding = try self.applyAssetEvent(event, value: residualValue, to: updatedHolding)
       }
     }
 
@@ -135,20 +135,29 @@ enum Section104Processor {
   ///   - event: The event to apply.
   ///   - holding: The holding to update.
   /// - Returns: The adjusted holding.
-  static func applyAssetEvent(_ event: AssetEvent, to holding: Section104Holding) -> Section104Holding {
-    self.applyAssetEvent(event, value: event.distributionValue, to: holding)
+  static func applyAssetEvent(_ event: AssetEvent, to holding: Section104Holding) throws -> Section104Holding {
+    try self.applyAssetEvent(event, value: event.distributionValue, to: holding)
   }
 
   private static func applyAssetEvent(
     _ event: AssetEvent,
     value: Decimal,
-    to holding: Section104Holding) -> Section104Holding
+    to holding: Section104Holding) throws -> Section104Holding
   {
     switch event.kind {
     case .split, .unsplit, .restruct:
       return self.applyRestructureEvents([event], to: holding)
     case .capitalReturn:
       var adjustedHolding = holding
+      let residualAmount = event.distributionValue > 0
+        ? event.distributionAmount * value / event.distributionValue
+        : 0
+      let availableCost = holding.averageCost * residualAmount
+      try CapitalReturnValidator.validate(
+        asset: event.asset,
+        date: event.date,
+        value: value,
+        availableCost: availableCost)
       adjustedHolding.costBasis = max(0, adjustedHolding.costBasis - value)
       return adjustedHolding
     case .dividend:

@@ -107,14 +107,14 @@ public enum CGTEngine {
       .union(sellsByAsset.keys)
       .union(spouseOutsByAsset.keys)
       .union(eventsByAsset.keys)
-    let finalHoldings = Dictionary(uniqueKeysWithValues: assets.map { asset in
+    let finalHoldings = try Dictionary(uniqueKeysWithValues: assets.map { asset in
       let lastOutboundDate = previousOutboundDateByAsset[asset] ?? Date.distantPast
       let actions = Section104Processor.actions(
         buys: buysByAsset[asset, default: []],
         events: eventsByAsset[asset, default: []],
         after: lastOutboundDate,
         through: nil)
-      let holding = Section104Processor.processActions(
+      let holding = try Section104Processor.processActions(
         actions,
         into: section104Holdings[asset, default: Section104Holding()],
         usedBuyQuantities: usedBuyQuantities,
@@ -197,7 +197,7 @@ public enum CGTEngine {
     }
     let allBnbBuys = sameDayBuys + postOutboundBnbBuys
 
-    let (bnbMatches, bnbQuantityUsed) = BedAndBreakfastMatcher.findMatches(
+    let (bnbMatches, bnbQuantityUsed) = try BedAndBreakfastMatcher.findMatches(
       for: groupedOutbound,
       from: allBnbBuys,
       usedBuyQuantities: usedBuyQuantities,
@@ -215,7 +215,7 @@ public enum CGTEngine {
       after: previousOutboundDate,
       through: outboundDate)
 
-    let processedHolding = Section104Processor.processActions(
+    let processedHolding = try Section104Processor.processActions(
       actions,
       into: currentHolding,
       usedBuyQuantities: usedBuyQuantities,

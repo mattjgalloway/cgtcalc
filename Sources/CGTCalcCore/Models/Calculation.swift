@@ -13,6 +13,7 @@ public enum CalculationError: Error, LocalizedError {
     matched: Decimal,
     firstLaterAcquisitionDate: Date)
   case invalidAssetEventAmount(asset: String, date: Date, type: AssetEventType, expected: Decimal, actual: Decimal)
+  case unsupportedCapitalReturn(asset: String, date: Date, value: Decimal, availableCost: Decimal)
 
   /// Human-readable explanation for a calculation failure.
   public var errorDescription: String? {
@@ -32,6 +33,8 @@ public enum CalculationError: Error, LocalizedError {
       "Unsupported share-identification case for \(asset) on \(DateParser.format(date)): matched \(matched) of \(requested) using same-day/30-day/Section 104 rules, and found later acquisitions from \(DateParser.format(firstLaterAcquisitionDate)). HMRC's later-acquisition fallback stage is not currently implemented."
     case .invalidAssetEventAmount(let asset, let date, let type, let expected, let actual):
       "Invalid \(type.rawValue) amount for \(asset) on \(DateParser.format(date)): expected \(expected), got \(actual)"
+    case .unsupportedCapitalReturn(let asset, let date, let value, let availableCost):
+      "Unsupported CAPRETURN for \(asset) on \(DateParser.format(date)): value £\(value) exceeds the £\(availableCost) remaining allowable cost attributable to the event. CAPRETURN supports fund equalisation cost reductions and cannot reduce allowable cost below zero."
     }
   }
 }

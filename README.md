@@ -176,6 +176,7 @@ Important semantics:
 
 - `DIVIDEND` means an accumulation distribution. It does not mean an ordinary cash dividend.
 - `CAPRETURN` and `DIVIDEND` should be dated using the effective / entitlement date for the holding, not merely the later cash reporting date.
+- `CAPRETURN` supports fund equalisation cost reductions, not general company capital distributions. A return exceeding the remaining allowable cost attributable to its units is rejected rather than treated as a part disposal.
 - Same-day rows for one asset/date/type form one logical event: both their amounts and values are summed before validation and cost-basis apportionment.
 - The summed `DIVIDEND` amount must match the holding quantity on that date.
 - The summed `CAPRETURN` amount must match the Group II tranche for that distribution period, i.e. the units bought since the last distribution date and still held at the event date.

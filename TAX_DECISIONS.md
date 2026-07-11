@@ -136,6 +136,8 @@ This is not legal advice. It is a project decision log.
 ### `CAPRETURN` means capital return / equalisation
 
 - Decision: `CAPRETURN` rows reduce allowable cost.
+- Supported scope: fund equalisation cost reductions only. A `CAPRETURN` cannot reduce the allowable cost attributable to its units below zero; excess values are rejected because general capital distributions require part-disposal rules outside the current model.
+- A monetary tolerance of £0.0001 permits harmless decimal dust at the zero-cost boundary.
 - Why: they model equalisation or other capital-return style adjustments relevant to pooled fund cost basis.
 - Status: explicit semantic choice.
 - User-facing wording:

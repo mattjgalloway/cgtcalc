@@ -42,7 +42,7 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(secondEvent.sourceOrder, 4)
   }
 
-  func testProcessActionsBuildsHoldingAndAppliesCapitalReturn() {
+  func testProcessActionsBuildsHoldingAndAppliesCapitalReturn() throws {
     let buy = TestSupport.buy("01/01/2019", "TEST", 100, 10, 0)
     let event = TestSupport.capReturn("01/03/2019", "TEST", 100, 50)
     let actions = Section104Processor.actions(
@@ -51,7 +51,7 @@ final class Section104ProcessorTests: XCTestCase {
       after: Date.distantPast,
       through: TestSupport.date("01/03/2019"))
 
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       actions,
       into: Section104Holding(),
       usedBuyQuantities: [:])
@@ -61,7 +61,7 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(holding.pool.count, 1)
   }
 
-  func testProcessActionsDoesNotUseSameDayBuyToPriceDisposalButKeepsRemainder() {
+  func testProcessActionsDoesNotUseSameDayBuyToPriceDisposalButKeepsRemainder() throws {
     let buy = TestSupport.buy("01/06/2019", "TEST", 100, 10, 0)
     let actions = Section104Processor.actions(
       buys: [buy],
@@ -69,7 +69,7 @@ final class Section104ProcessorTests: XCTestCase {
       after: Date.distantPast,
       through: TestSupport.date("01/06/2019"))
 
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       actions,
       into: Section104Holding(),
       usedBuyQuantities: [buy.id: 40])
@@ -78,7 +78,7 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(holding.costBasis, 600, accuracy: 0.00001)
   }
 
-  func testProcessActionsAddsUnmatchedRemainderOfSameDayBuyAfterDisposal() {
+  func testProcessActionsAddsUnmatchedRemainderOfSameDayBuyAfterDisposal() throws {
     let buy = TestSupport.buy("01/06/2019", "TEST", 100, 10, 0)
     let actions = Section104Processor.actions(
       buys: [buy],
@@ -86,7 +86,7 @@ final class Section104ProcessorTests: XCTestCase {
       after: Date.distantPast,
       through: TestSupport.date("01/06/2019"))
 
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       actions,
       into: Section104Holding(),
       usedBuyQuantities: [buy.id: 40])
@@ -97,10 +97,10 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(holding.pool[0].quantity, 60)
   }
 
-  func testMakeMatchesUsesPoolAverageCost() {
+  func testMakeMatchesUsesPoolAverageCost() throws {
     let buy1 = TestSupport.buy("01/01/2019", "TEST", 100, 10, 0, sourceOrder: 0)
     let buy2 = TestSupport.buy("01/02/2019", "TEST", 100, 12, 0, sourceOrder: 1)
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       Section104Processor.actions(
         buys: [buy1, buy2],
         events: [],
@@ -116,10 +116,10 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(matches[0].cost, 550, accuracy: 0.00001)
   }
 
-  func testApplyMatchesReducesHoldingQuantityCostAndPool() {
+  func testApplyMatchesReducesHoldingQuantityCostAndPool() throws {
     let buy1 = TestSupport.buy("01/01/2019", "TEST", 100, 10, 0, sourceOrder: 0)
     let buy2 = TestSupport.buy("01/02/2019", "TEST", 100, 12, 0, sourceOrder: 1)
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       Section104Processor.actions(
         buys: [buy1, buy2],
         events: [],
@@ -137,10 +137,10 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(updatedHolding.pool[1].quantity, 50)
   }
 
-  func testMakeMatchesUsesSourceOrderForSameDateBuys() {
+  func testMakeMatchesUsesSourceOrderForSameDateBuys() throws {
     let buy1 = TestSupport.buy("01/01/2019", "TEST", 100, 10, 0, sourceOrder: 1)
     let buy2 = TestSupport.buy("01/01/2019", "TEST", 100, 12, 0, sourceOrder: 0)
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       Section104Processor.actions(
         buys: [buy1, buy2],
         events: [],
@@ -158,7 +158,7 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(matches[1].quantity, 50)
   }
 
-  func testProcessActionsAddsOnlyUnmatchedRemainderOfPartlyUsedBuy() {
+  func testProcessActionsAddsOnlyUnmatchedRemainderOfPartlyUsedBuy() throws {
     let buy = TestSupport.buy("15/08/2016", "NASDAQ:META", 107, 96.28, 0)
     let actions = Section104Processor.actions(
       buys: [buy],
@@ -166,7 +166,7 @@ final class Section104ProcessorTests: XCTestCase {
       after: Date.distantPast,
       through: nil)
 
-    let holding = Section104Processor.processActions(
+    let holding = try Section104Processor.processActions(
       actions,
       into: Section104Holding(),
       usedBuyQuantities: [buy.id: 106])
