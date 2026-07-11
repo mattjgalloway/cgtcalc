@@ -136,6 +136,26 @@ public struct AssetEvent {
 }
 
 extension AssetEvent {
+  var distributionType: AssetEventType? {
+    switch self.kind {
+    case .capitalReturn:
+      .capitalReturn
+    case .dividend:
+      .dividend
+    case .split, .unsplit, .restruct:
+      nil
+    }
+  }
+
+  var distributionAmount: Decimal {
+    switch self.kind {
+    case .capitalReturn(let amount, _), .dividend(let amount, _):
+      amount
+    case .split, .unsplit, .restruct:
+      0
+    }
+  }
+
   var distributionValue: Decimal {
     switch self.kind {
     case .capitalReturn(_, let value), .dividend(_, let value):

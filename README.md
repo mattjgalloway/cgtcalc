@@ -176,8 +176,9 @@ Important semantics:
 
 - `DIVIDEND` means an accumulation distribution. It does not mean an ordinary cash dividend.
 - `CAPRETURN` and `DIVIDEND` should be dated using the effective / entitlement date for the holding, not merely the later cash reporting date.
-- Same-day `DIVIDEND` rows for one asset/date are validated by their summed amount, which must match the holding quantity on that date.
-- Same-day `CAPRETURN` rows for one asset/date are validated by their summed amount, which must match the Group II tranche for that distribution period, i.e. the units bought since the last distribution date and still held at the event date.
+- Same-day rows for one asset/date/type form one logical event: both their amounts and values are summed before validation and cost-basis apportionment.
+- The summed `DIVIDEND` amount must match the holding quantity on that date.
+- The summed `CAPRETURN` amount must match the Group II tranche for that distribution period, i.e. the units bought since the last distribution date and still held at the event date.
 - Asset-event amount validation allows a small tolerance for broker/fund rounding dust: the summed amount must match the expected units within `max(0.0001, expected units * 0.00001)`.
 - Same-day same-asset sells are merged into one effective disposal for calculation and rounding.
 

@@ -3,6 +3,50 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testMultipleSameDayDividendRowsMatchSingleAggregatedEvent() throws {
+    let splitRows = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 100 20 0
+    BUY 10/06/2020 TEST 100 10 0
+    DIVIDEND 15/06/2020 TEST 50 5
+    DIVIDEND 15/06/2020 TEST 50 5
+    """)
+    let aggregatedRow = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 100 20 0
+    BUY 10/06/2020 TEST 100 10 0
+    DIVIDEND 15/06/2020 TEST 100 10
+    """)
+
+    let splitResult = try CGTEngine.calculate(inputData: splitRows)
+    let aggregatedResult = try CGTEngine.calculate(inputData: aggregatedRow)
+    let splitDisposal = try XCTUnwrap(splitResult.taxYearSummaries.first?.disposals.first)
+    let aggregatedDisposal = try XCTUnwrap(aggregatedResult.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(splitDisposal.rawGain, 990)
+    XCTAssertEqual(splitDisposal.rawGain, aggregatedDisposal.rawGain)
+    XCTAssertEqual(splitDisposal.bedAndBreakfastMatches.first?.eventAdjustment, 10)
+    XCTAssertEqual(splitResult.holdings["TEST"]?.costBasis, 1000)
+    XCTAssertEqual(splitResult.holdings["TEST"]?.costBasis, aggregatedResult.holdings["TEST"]?.costBasis)
+  }
+
+  func testMultipleSameDayCapitalReturnRowsMatchSingleAggregatedEvent() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 100 20 0
+    BUY 10/06/2020 TEST 100 10 0
+    CAPRETURN 15/06/2020 TEST 25 2
+    CAPRETURN 15/06/2020 TEST 75 9
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(disposal.rawGain, 1011)
+    XCTAssertEqual(disposal.bedAndBreakfastMatches.first?.eventAdjustment, -11)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 1000)
+  }
+
   func testDistributionValueIsConservedAcrossThirtyDayMatchAndSection104() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 100 10 0
