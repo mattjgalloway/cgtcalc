@@ -159,6 +159,7 @@ This is not legal advice. It is a project decision log.
   - rows are grouped separately by asset, UTC calendar date, and event type; both amount and value are summed before cost-basis apportionment
   - both validations allow a small broker/fund rounding tolerance of `max(0.0001, expected units * 0.00001)`
   - an amount accepted within that tolerance is normalized to the eligible quantity established by validation; event value is apportioned proportionately using eligible event-date quantities, independent of disposal processing order
+  - proportional event values use nearest rounding at 10 decimal places before entering matched or Section 104 cost-basis calculations; this removes non-economic repeating-decimal residue without applying tax-report whole-pound rounding early
 - Why: multiple lines on one date are treated as one logical distribution event of that type.
 - Why: brokers and fund platforms can report harmless fractional-unit dust, but meaningful mismatches should still fail validation.
 - Status: intended validation behavior.

@@ -57,6 +57,7 @@ public enum CGTEngine {
     var section104Holdings: [String: Section104Holding] = [:]
     var usedBuyQuantities: [UUID: Decimal] = [:]
     var allocatedEventValues: [UUID: Decimal] = [:]
+    var allocatedEventQuantities: [UUID: Decimal] = [:]
     var disposals: [Disposal] = []
     var spouseTransfersOut: [SpouseTransferOut] = []
     var previousOutboundDateByAsset: [String: Date] = [:]
@@ -75,7 +76,8 @@ public enum CGTEngine {
         previousOutboundDate: previousOutboundDate,
         currentHolding: section104Holdings[asset, default: Section104Holding()],
         usedBuyQuantities: &usedBuyQuantities,
-        allocatedEventValues: &allocatedEventValues)
+        allocatedEventValues: &allocatedEventValues,
+        allocatedEventQuantities: &allocatedEventQuantities)
       section104Holdings[asset] = processResult.updatedHolding
 
       for outbound in outboundGroup {
@@ -176,7 +178,8 @@ public enum CGTEngine {
     previousOutboundDate: Date,
     currentHolding: Section104Holding,
     usedBuyQuantities: inout [UUID: Decimal],
-    allocatedEventValues: inout [UUID: Decimal]) throws -> OutboundGroupProcessResult
+    allocatedEventValues: inout [UUID: Decimal],
+    allocatedEventQuantities: inout [UUID: Decimal]) throws -> OutboundGroupProcessResult
   {
     let asset = outboundGroup[0].asset
     let outboundDate = outboundGroup[0].date
@@ -205,7 +208,8 @@ public enum CGTEngine {
       usedBuyQuantities: usedBuyQuantities,
       sortedEvents: assetEvents,
       allOutbounds: assetOutbounds,
-      allocatedEventValues: &allocatedEventValues)
+      allocatedEventValues: &allocatedEventValues,
+      allocatedEventQuantities: &allocatedEventQuantities)
 
     for match in bnbMatches {
       usedBuyQuantities[match.buyTransaction.id, default: 0] += match.buyDateQuantity

@@ -3,6 +3,90 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testFinalMatchedDestinationReceivesRepeatingAllocationResidual() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 0.0003 500000 0
+    SELL 01/06/2020 TEST 0.0001 2000000 0
+    SELL 02/06/2020 TEST 0.0001 2000000 0
+    SELL 03/06/2020 TEST 0.0001 2000000 0
+    BUY 10/06/2020 TEST 0.0003 500000 0
+    DIVIDEND 15/06/2020 TEST 0.0002 100
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let adjustments = result.taxYearSummaries
+      .flatMap(\.disposals)
+      .sorted { $0.sellTransaction.date < $1.sellTransaction.date }
+      .compactMap { $0.bedAndBreakfastMatches.first?.eventAdjustment }
+
+    XCTAssertEqual(adjustments, try [
+      XCTUnwrap(Decimal.parse("33.3333333333")),
+      XCTUnwrap(Decimal.parse("33.3333333333")),
+      XCTUnwrap(Decimal.parse("33.3333333334"))
+    ])
+    XCTAssertEqual(adjustments.reduce(Decimal(0), +), 100)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 150)
+  }
+
+  func testRepeatingOneThirdCapitalReturnUsesExactMonetaryAllocation() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 0.0003 1000000 0
+    SELL 01/06/2020 TEST 0.0001 2000000 0
+    BUY 10/06/2020 TEST 0.0001 1000000 0
+    CAPRETURN 15/06/2020 TEST 0.0002 90
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(disposal.bedAndBreakfastMatches.first?.eventAdjustment, -30)
+    XCTAssertEqual(disposal.rawAllowableCosts, 70)
+    XCTAssertEqual(disposal.rawGain, 130)
+    XCTAssertEqual(disposal.gain, 130)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 240)
+  }
+
+  func testRepeatingOneThirdDividendUsesExactMonetaryAllocation() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 0.0003 1000000 0
+    SELL 01/06/2020 TEST 0.0001 2000000 0
+    BUY 10/06/2020 TEST 0.0001 1000000 0
+    DIVIDEND 15/06/2020 TEST 0.0002 90
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(disposal.bedAndBreakfastMatches.first?.eventAdjustment, 30)
+    XCTAssertEqual(disposal.rawAllowableCosts, 130)
+    XCTAssertEqual(disposal.rawGain, 70)
+    XCTAssertEqual(disposal.gain, 70)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 360)
+  }
+
+  func testAllocationPrecisionPreservesGenuineValuesAroundWholePoundBoundary() throws {
+    let belowInput = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 0.0003 1000000 0
+    SELL 01/06/2020 TEST 0.0001 2000000 0
+    BUY 10/06/2020 TEST 0.0001 1000000 0
+    CAPRETURN 15/06/2020 TEST 0.0002 89.999997
+    """)
+    let aboveInput = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 0.0003 1000000 0
+    SELL 01/06/2020 TEST 0.0001 2000000 0
+    BUY 10/06/2020 TEST 0.0001 1000000 0
+    CAPRETURN 15/06/2020 TEST 0.0002 90.000003
+    """)
+
+    let below = try XCTUnwrap(try CGTEngine.calculate(inputData: belowInput).taxYearSummaries.first?.disposals.first)
+    let above = try XCTUnwrap(try CGTEngine.calculate(inputData: aboveInput).taxYearSummaries.first?.disposals.first)
+
+    XCTAssertLessThan(try -XCTUnwrap(below.bedAndBreakfastMatches.first).eventAdjustment, 30)
+    XCTAssertEqual(below.gain, 129)
+    XCTAssertGreaterThan(try -XCTUnwrap(above.bedAndBreakfastMatches.first).eventAdjustment, 30)
+    XCTAssertEqual(above.gain, 130)
+  }
+
   func testToleratedEventAmountIsAllocatedProportionatelyAcrossTaxYears() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2024 TEST 0.0002 500000 0

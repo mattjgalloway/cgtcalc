@@ -8,6 +8,7 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
     let event = TestSupport.dividend("15/06/2020", "TEST", 100, 100)
     let laterSell = TestSupport.sell("20/06/2020", "TEST", 50, 25, 0)
     var allocatedEventValues: [UUID: Decimal] = [:]
+    var allocatedEventQuantities: [UUID: Decimal] = [:]
 
     _ = try BedAndBreakfastMatcher.findMatches(
       for: sell,
@@ -15,7 +16,8 @@ final class BedAndBreakfastMatcherTests: XCTestCase {
       usedBuyQuantities: [:],
       sortedEvents: [event],
       allOutbounds: [sell, laterSell],
-      allocatedEventValues: &allocatedEventValues)
+      allocatedEventValues: &allocatedEventValues,
+      allocatedEventQuantities: &allocatedEventQuantities)
 
     XCTAssertEqual(allocatedEventValues[event.id], 50)
   }

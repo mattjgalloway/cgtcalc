@@ -19,13 +19,15 @@ enum BedAndBreakfastMatcher {
     allOutbounds: [Transaction]) throws -> ([BedAndBreakfastMatch], Decimal)
   {
     var allocatedEventValues: [UUID: Decimal] = [:]
+    var allocatedEventQuantities: [UUID: Decimal] = [:]
     return try self.findMatches(
       for: sell,
       from: buys,
       usedBuyQuantities: usedBuyQuantities,
       sortedEvents: sortedEvents,
       allOutbounds: allOutbounds,
-      allocatedEventValues: &allocatedEventValues)
+      allocatedEventValues: &allocatedEventValues,
+      allocatedEventQuantities: &allocatedEventQuantities)
   }
 
   static func findMatches(
@@ -34,7 +36,8 @@ enum BedAndBreakfastMatcher {
     usedBuyQuantities: [UUID: Decimal],
     sortedEvents: [AssetEvent],
     allOutbounds: [Transaction],
-    allocatedEventValues: inout [UUID: Decimal]) throws -> ([BedAndBreakfastMatch], Decimal)
+    allocatedEventValues: inout [UUID: Decimal],
+    allocatedEventQuantities: inout [UUID: Decimal]) throws -> ([BedAndBreakfastMatch], Decimal)
   {
     var bnbMatches: [BedAndBreakfastMatch] = []
     var totalQuantityMatched: Decimal = 0
@@ -61,10 +64,12 @@ enum BedAndBreakfastMatcher {
         sellDate: sellDate,
         sortedEvents: sortedEvents,
         allOutbounds: allOutbounds,
-        previouslyAllocatedEventValues: allocatedEventValues)
+        previouslyAllocatedEventValues: allocatedEventValues,
+        previouslyAllocatedEventQuantities: allocatedEventQuantities)
       guard groupResult.quantityMatched > 0 else { continue }
       bnbMatches.append(contentsOf: groupResult.matches)
       self.merge(groupResult.allocatedEventValues, into: &allocatedEventValues)
+      self.merge(groupResult.allocatedEventQuantities, into: &allocatedEventQuantities)
       totalQuantityMatched += groupResult.quantityMatched
       remainingToMatch -= groupResult.quantityMatched
     }
@@ -97,10 +102,12 @@ enum BedAndBreakfastMatcher {
         sellDate: sellDate,
         sortedEvents: sortedEvents,
         allOutbounds: allOutbounds,
-        previouslyAllocatedEventValues: allocatedEventValues)
+        previouslyAllocatedEventValues: allocatedEventValues,
+        previouslyAllocatedEventQuantities: allocatedEventQuantities)
       guard groupResult.quantityMatched > 0 else { continue }
       bnbMatches.append(contentsOf: groupResult.matches)
       self.merge(groupResult.allocatedEventValues, into: &allocatedEventValues)
+      self.merge(groupResult.allocatedEventQuantities, into: &allocatedEventQuantities)
       totalQuantityMatched += groupResult.quantityMatched
       remainingToMatch -= groupResult.quantityMatched
     }
@@ -168,11 +175,13 @@ enum BedAndBreakfastMatcher {
     through endDate: Date?,
     sortedEvents: [AssetEvent],
     matchedBuyQuantity: Decimal,
-    previouslyAllocatedEventValues: [UUID: Decimal] = [:]) throws -> (
+    previouslyAllocatedEventValues: [UUID: Decimal] = [:],
+    previouslyAllocatedEventQuantities: [UUID: Decimal] = [:]) throws -> (
     adjustment: Decimal,
-    allocatedEventValues: [UUID: Decimal])
+    allocatedEventValues: [UUID: Decimal],
+    allocatedEventQuantities: [UUID: Decimal])
   {
-    guard matchedBuyQuantity > 0 else { return (0, [:]) }
+    guard matchedBuyQuantity > 0 else { return (0, [:], [:]) }
 
     let relevantEvents = sortedEvents.filter { event in
       guard event.asset == buy.asset, event.date > buy.date else { return false }
@@ -190,6 +199,7 @@ enum BedAndBreakfastMatcher {
     var adjustment: Decimal = 0
     var attributableCost = buy.totalCost * matchedBuyQuantity / buy.quantity
     var allocatedEventValues: [UUID: Decimal] = [:]
+    var allocatedEventQuantities: [UUID: Decimal] = [:]
     for event in relevantEvents {
       let matchedQuantityOnEventDateBasis = self.quantityOnDateBasis(
         buyDateQuantity: matchedBuyQuantity,
@@ -198,11 +208,18 @@ enum BedAndBreakfastMatcher {
         sortedEvents: sortedEvents)
       switch event.kind {
       case .capitalReturn(let amount, let value):
-        let quantityRatio = matchedQuantityOnEventDateBasis / amount
         let remainingEventValue = max(
           0,
           value - previouslyAllocatedEventValues[event.id, default: 0] - allocatedEventValues[event.id, default: 0])
-        let allocatedValue = min(value * quantityRatio, remainingEventValue)
+        let proportionalValue = EventAllocationMath.proportionalValue(
+          eventValue: value,
+          destinationQuantity: matchedQuantityOnEventDateBasis,
+          eligibleQuantity: amount)
+        let cumulativeQuantity = previouslyAllocatedEventQuantities[event.id, default: 0] +
+          allocatedEventQuantities[event.id, default: 0] + matchedQuantityOnEventDateBasis
+        let allocatedValue = cumulativeQuantity >= amount ? remainingEventValue : min(
+          proportionalValue,
+          remainingEventValue)
         try CapitalReturnValidator.validate(
           asset: event.asset,
           date: event.date,
@@ -211,20 +228,29 @@ enum BedAndBreakfastMatcher {
         attributableCost = max(0, attributableCost - allocatedValue)
         adjustment -= allocatedValue
         allocatedEventValues[event.id, default: 0] += allocatedValue
+        allocatedEventQuantities[event.id, default: 0] += matchedQuantityOnEventDateBasis
       case .dividend(let amount, let value):
-        let quantityRatio = matchedQuantityOnEventDateBasis / amount
         let remainingEventValue = max(
           0,
           value - previouslyAllocatedEventValues[event.id, default: 0] - allocatedEventValues[event.id, default: 0])
-        let allocatedValue = min(value * quantityRatio, remainingEventValue)
+        let proportionalValue = EventAllocationMath.proportionalValue(
+          eventValue: value,
+          destinationQuantity: matchedQuantityOnEventDateBasis,
+          eligibleQuantity: amount)
+        let cumulativeQuantity = previouslyAllocatedEventQuantities[event.id, default: 0] +
+          allocatedEventQuantities[event.id, default: 0] + matchedQuantityOnEventDateBasis
+        let allocatedValue = cumulativeQuantity >= amount ? remainingEventValue : min(
+          proportionalValue,
+          remainingEventValue)
         attributableCost += allocatedValue
         adjustment += allocatedValue
         allocatedEventValues[event.id, default: 0] += allocatedValue
+        allocatedEventQuantities[event.id, default: 0] += matchedQuantityOnEventDateBasis
       case .split, .unsplit, .restruct:
         continue
       }
     }
-    return (adjustment, allocatedEventValues)
+    return (adjustment, allocatedEventValues, allocatedEventQuantities)
   }
 
   /// Filters restructure events between two dates for quantity-basis adjustment.
@@ -307,10 +333,12 @@ enum BedAndBreakfastMatcher {
     sellDate: Date,
     sortedEvents: [AssetEvent],
     allOutbounds: [Transaction],
-    previouslyAllocatedEventValues: [UUID: Decimal]) throws -> (
+    previouslyAllocatedEventValues: [UUID: Decimal],
+    previouslyAllocatedEventQuantities: [UUID: Decimal]) throws -> (
     matches: [BedAndBreakfastMatch],
     quantityMatched: Decimal,
-    allocatedEventValues: [UUID: Decimal])
+    allocatedEventValues: [UUID: Decimal],
+    allocatedEventQuantities: [UUID: Decimal])
   {
     struct AvailableBuy {
       let buy: Transaction
@@ -347,11 +375,12 @@ enum BedAndBreakfastMatcher {
 
     let totalAdjustedQuantity = availableBuys.reduce(Decimal(0)) { $0 + $1.adjustedRemainingQuantity }
     guard totalAdjustedQuantity > 0 else {
-      return ([], 0, [:])
+      return ([], 0, [:], [:])
     }
 
     let actualMatchQty = min(remainingToMatch, totalAdjustedQuantity)
     var allocatedEventValues: [UUID: Decimal] = [:]
+    var allocatedEventQuantities: [UUID: Decimal] = [:]
     let matches = try availableBuys.compactMap { availableBuy -> BedAndBreakfastMatch? in
       let matchQuantity = actualMatchQty * availableBuy.adjustedRemainingQuantity / totalAdjustedQuantity
       guard matchQuantity > 0 else { return nil }
@@ -369,8 +398,11 @@ enum BedAndBreakfastMatcher {
         through: nextOutboundDate,
         sortedEvents: sortedEvents,
         matchedBuyQuantity: buyDateMatchQty,
-        previouslyAllocatedEventValues: previouslyAllocatedEventValues.merging(allocatedEventValues) { $0 + $1 })
+        previouslyAllocatedEventValues: previouslyAllocatedEventValues.merging(allocatedEventValues) { $0 + $1 },
+        previouslyAllocatedEventQuantities: previouslyAllocatedEventQuantities
+          .merging(allocatedEventQuantities) { $0 + $1 })
       self.merge(eventAllocation.allocatedEventValues, into: &allocatedEventValues)
+      self.merge(eventAllocation.allocatedEventQuantities, into: &allocatedEventQuantities)
       let eventAdjustment = eventAllocation.adjustment
       let actualCost = (availableBuy.buy.totalCost / availableBuy.adjustedTotalQuantity * matchQuantity) +
         eventAdjustment
@@ -383,7 +415,7 @@ enum BedAndBreakfastMatcher {
         cost: actualCost)
     }
 
-    return (matches, actualMatchQty, allocatedEventValues)
+    return (matches, actualMatchQty, allocatedEventValues, allocatedEventQuantities)
   }
 
   private static func merge(_ values: [UUID: Decimal], into totals: inout [UUID: Decimal]) {
