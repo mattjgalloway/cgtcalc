@@ -83,7 +83,7 @@ import XCTest
     func testPDFDetailedCalculationLineIncludesCostComponents() throws {
       let result = ReportFormatterFixtureFactory.makeResult()
       let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
-      let line = PDFReportFormatter().detailedCalculationLine(for: disposal)
+      let line = PDFReportFormatter().detailedCalculationLine(for: DisposalReportEntry(disposal: disposal))
       XCTAssertEqual(line, "Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395")
     }
 
@@ -115,7 +115,7 @@ import XCTest
         section104Matches: [],
         bedAndBreakfastMatches: [match])
 
-      let line = PDFReportFormatter().detailedCalculationLine(for: disposal)
+      let line = PDFReportFormatter().detailedCalculationLine(for: DisposalReportEntry(disposal: disposal))
       XCTAssertEqual(line, "Calculation: (10 * 20 - 1) - ( (8 * 12.34567 + 0.8 + -1.25) ) = 100")
     }
 

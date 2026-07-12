@@ -9,18 +9,19 @@ public struct TextReportFormatter {
   /// - Parameter result: The engine output to render.
   /// - Returns: A human-readable report string.
   public func format(_ result: CalculationResult) -> String {
+    let document = ReportDocument(result: result)
     var output = ""
 
     // Summary section
-    output += self.formatSummary(result.taxYearSummaries)
+    output += self.formatSummary(document.taxYears.map(\.summary))
 
     // Tax year details
     output += "\n\n# TAX YEAR DETAILS\n\n"
-    output += self.formatTaxYearDetails(result.taxYearSummaries)
+    output += self.formatTaxYearDetails(document.taxYears)
 
     // Tax return information
     output += "\n# TAX RETURN INFORMATION\n\n"
-    output += self.formatTaxReturnInfo(result.taxYearSummaries)
+    output += self.formatTaxReturnInfo(document.taxYears.map(\.summary))
 
     // Holdings
     output += "\n\n# HOLDINGS\n\n"
@@ -113,25 +114,22 @@ public struct TextReportFormatter {
   /// Builds the per-tax-year disposal breakdown.
   /// - Parameter summaries: Tax-year summaries to render.
   /// - Returns: The rendered tax-year details section body.
-  private func formatTaxYearDetails(_ summaries: [TaxYearSummary]) -> String {
-    guard !summaries.isEmpty else {
+  private func formatTaxYearDetails(_ sections: [TaxYearReportSection]) -> String {
+    guard !sections.isEmpty else {
       return ""
     }
 
     var output = ""
 
-    for summary in summaries.sorted(by: { $0.taxYear < $1.taxYear }) {
+    for section in sections {
+      let summary = section.summary
       output += "## TAX YEAR \(summary.taxYear.label)\n\n"
 
-      let gainsCount = summary.disposals.filter { $0.gain >= 0 }.count
-      let lossesCount = summary.disposals.filter { $0.gain < 0 }.count
-      let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
-      let totalLosses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
+      output += "\(section.gainsCount) gains with total of \(self.formatDecimal(section.totalGains)).\n"
+      output += "\(section.lossesCount) losses with total of \(self.formatDecimal(section.totalLosses)).\n\n"
 
-      output += "\(gainsCount) gains with total of \(self.formatDecimal(totalGains)).\n"
-      output += "\(lossesCount) losses with total of \(self.formatDecimal(totalLosses)).\n\n"
-
-      for (index, disposal) in summary.disposals.enumerated() {
+      for (index, entry) in section.disposals.enumerated() {
+        let disposal = entry.disposal
         let gainStr = self.formatDecimal(abs(disposal.gain))
         let gainLabel = disposal.gain >= 0 ? "GAIN" : "LOSS"
 
@@ -139,10 +137,9 @@ public struct TextReportFormatter {
 
         output += "Matches with:\n"
 
-        if !disposal.bedAndBreakfastMatches.isEmpty {
-          for match in disposal.bedAndBreakfastMatches {
-            let matchDate = DateParser.format(match.buyTransaction.date)
-            let buyQuantity = match.buyDateQuantity
+        if !entry.acquisitionMatches.isEmpty {
+          for match in entry.acquisitionMatches {
+            let matchDate = DateParser.format(match.date)
             let restructureMultiplier = match.restructureMultiplier
             let hasRestructure = restructureMultiplier != 1
             let restructureSuffix = hasRestructure ?
@@ -150,50 +147,35 @@ public struct TextReportFormatter {
             let eventOffsetSuffix = match
               .eventAdjustment != 0 ? " with offset of £\(abs(match.eventAdjustment).rounded(to: 2).string)" : ""
             let suffix = restructureSuffix + eventOffsetSuffix
-            if UTC.calendar.isDate(match.buyTransaction.date, inSameDayAs: disposal.sellTransaction.date) {
-              output += "  - SAME DAY: \(self.formatDecimal(buyQuantity)) bought on \(matchDate) at £\(self.formatDecimal(match.buyTransaction.price))\(suffix)\n"
-            } else {
-              output += "  - BED & BREAKFAST: \(self.formatDecimal(buyQuantity)) bought on \(matchDate) at £\(self.formatDecimal(match.buyTransaction.price))\(suffix)\n"
-            }
+            let label = match.kind == .sameDay ? "SAME DAY" : "BED & BREAKFAST"
+            output += "  - \(label): \(self.formatDecimal(match.quantity)) bought on \(matchDate) at £\(self.formatDecimal(match.purchasePrice))\(suffix)\n"
           }
         }
 
-        if !disposal.section104Matches.isEmpty {
-          // poolQty is for display - total shares in the pool at time of disposal
-          let poolQty = disposal.section104Matches[0].poolQuantity
-          let poolCost = disposal.section104Matches[0].poolCost
-          let poolAvgCost = poolQty > 0 ? poolCost / poolQty : 0
-          output += "  - SECTION 104: \(self.formatDecimal(poolQty)) at cost basis of £\(poolAvgCost.rounded(to: 5).string)\n"
+        if let section104 = entry.section104 {
+          output += "  - SECTION 104: \(self.formatDecimal(section104.poolQuantity)) at cost basis of £\(section104.averageCost.rounded(to: 5).string)\n"
         }
 
         let saleExpenses = disposal.sellTransaction.expenses
 
         var costStr = "( "
 
-        if !disposal.bedAndBreakfastMatches.isEmpty {
-          // For B&B: show as (quantity * purchasePrice + purchaseExpenses)
-          for (index, match) in disposal.bedAndBreakfastMatches.enumerated() {
-            let purchasePrice = match.buyTransaction.price
-            let purchaseExpenses = match.buyTransaction.expenses * match.buyDateQuantity / match.buyTransaction.quantity
+        if !entry.acquisitionMatches.isEmpty {
+          for (index, match) in entry.acquisitionMatches.enumerated() {
             if index > 0 {
               costStr += " + "
             }
             let eventAdjustmentComponent = match
               .eventAdjustment != 0 ? " + \(match.eventAdjustment.rounded(to: 2).string)" : ""
-            costStr += "(\(match.buyDateQuantity) * \(purchasePrice.rounded(to: 5).string) + \(purchaseExpenses.rounded(to: 2).string)\(eventAdjustmentComponent))"
+            costStr += "(\(match.quantity) * \(match.purchasePrice.rounded(to: 5).string) + \(match.purchaseExpenses.rounded(to: 2).string)\(eventAdjustmentComponent))"
           }
         }
 
-        if !disposal.section104Matches.isEmpty {
-          // Use pool average cost for calculation line
-          let poolQty = disposal.section104Matches[0].poolQuantity
-          let poolCost = disposal.section104Matches[0].poolCost
-          let poolAvgCost = poolQty > 0 ? poolCost / poolQty : 0
-          let section104MatchedQuantity = disposal.section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
-          if !disposal.bedAndBreakfastMatches.isEmpty {
+        if let section104 = entry.section104 {
+          if !entry.acquisitionMatches.isEmpty {
             costStr += " + "
           }
-          costStr += "(\(section104MatchedQuantity) * \(poolAvgCost.rounded(to: 5).string))"
+          costStr += "(\(section104.matchedQuantity) * \(section104.averageCost.rounded(to: 5).string))"
         }
 
         costStr += " )"

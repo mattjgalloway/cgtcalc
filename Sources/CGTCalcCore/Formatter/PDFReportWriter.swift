@@ -41,17 +41,12 @@
     private let smallFont = CTFontCreateWithName("Helvetica" as CFString, 9, nil)
     private let monoFont = CTFontCreateWithName("Menlo-Regular" as CFString, 9.5, nil)
     private let generatedAt: Date
-    private let utcCalendar: Calendar = {
-      var calendar = Calendar(identifier: .gregorian)
-      calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .gmt
-      return calendar
-    }()
-
     public init(generatedAt: Date = Date()) {
       self.generatedAt = generatedAt
     }
 
     public func render(_ result: CalculationResult) throws -> FormattedReport {
+      let document = ReportDocument(result: result)
       guard let data = CFDataCreateMutable(nil, 0),
             let consumer = CGDataConsumer(data: data)
       else {
@@ -71,9 +66,9 @@
       layout.beginPage()
 
       self.drawTitle(&layout)
-      self.drawSummary(result.taxYearSummaries, layout: &layout)
-      self.drawTaxYearDetails(result.taxYearSummaries, layout: &layout)
-      self.drawTaxReturnInformation(result.taxYearSummaries, layout: &layout)
+      self.drawSummary(document.taxYears.map(\.summary), layout: &layout)
+      self.drawTaxYearDetails(document.taxYears, layout: &layout)
+      self.drawTaxReturnInformation(document.taxYears.map(\.summary), layout: &layout)
       self.drawHoldings(result.holdings, layout: &layout)
       self.drawSpouseTransfersOut(result.spouseTransfersOut, layout: &layout)
       self.drawTransactions(result.transactions, layout: &layout)
@@ -121,16 +116,16 @@
       self.drawTable(header: header, rows: rows, widthRatios: widths, layout: &layout)
     }
 
-    private func drawTaxYearDetails(_ summaries: [TaxYearSummary], layout: inout PDFLayout) {
+    private func drawTaxYearDetails(_ sections: [TaxYearReportSection], layout: inout PDFLayout) {
       self.drawSectionHeader("Tax Year Details", layout: &layout)
-      let ordered = summaries.sorted { $0.taxYear < $1.taxYear }
-      if ordered.isEmpty {
+      if sections.isEmpty {
         layout.drawText("No disposals.", x: self.margin, y: layout.y, font: self.bodyFont, color: self.colorMuted)
         layout.y += self.sectionSpacing
         return
       }
 
-      for summary in ordered {
+      for section in sections {
+        let summary = section.summary
         layout.ensureSpace(56)
         layout.drawText(
           "Tax Year \(summary.taxYear.label)",
@@ -140,12 +135,8 @@
           color: self.colorPrimary)
         layout.y += 15
 
-        let gainsCount = summary.disposals.filter { $0.gain >= 0 }.count
-        let lossesCount = summary.disposals.filter { $0.gain < 0 }.count
-        let totalGains = summary.disposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
-        let totalLosses = summary.disposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
         let summaryHeight = layout.drawWrappedText(
-          "\(gainsCount) gains with total \(self.currency(totalGains)); \(lossesCount) losses with total \(self.currency(totalLosses)).",
+          "\(section.gainsCount) gains with total \(self.currency(section.totalGains)); \(section.lossesCount) losses with total \(self.currency(section.totalLosses)).",
           x: self.margin,
           y: layout.y,
           width: self.contentWidth,
@@ -154,31 +145,28 @@
           color: self.colorText)
         layout.y += summaryHeight + 6
 
-        for (index, disposal) in summary.disposals.enumerated() {
+        for (index, entry) in section.disposals.enumerated() {
+          let disposal = entry.disposal
           let prefix = disposal.gain >= 0 ? "GAIN" : "LOSS"
           let title = "\(index + 1). SOLD \(disposal.sellTransaction.quantity) \(disposal.sellTransaction.asset) on \(DateParser.format(disposal.sellTransaction.date)) - \(prefix) \(self.currency(abs(disposal.gain)))"
           var detailLines: [String] = []
-          for match in disposal.bedAndBreakfastMatches {
-            let label = self.utcCalendar
-              .isDate(match.buyTransaction.date, inSameDayAs: disposal.sellTransaction.date) ? "Same day" : "Bed & breakfast"
+          for match in entry.acquisitionMatches {
+            let label = match.kind == .sameDay ? "Same day" : "Bed & breakfast"
             let restructureSuffix = match.restructureMultiplier != 1 ?
               " with restructure multiplier \(self.decimalString(self.rounded(match.restructureMultiplier, scale: 5)))" :
               ""
             let offsetSuffix = match.eventAdjustment != 0 ?
               " with offset of \(self.currency(abs(match.eventAdjustment)))" : ""
             detailLines.append(
-              "\(label): \(match.buyDateQuantity) at \(self.currency(match.buyTransaction.price)) on \(DateParser.format(match.buyTransaction.date))\(restructureSuffix)\(offsetSuffix)")
+              "\(label): \(match.quantity) at \(self.currency(match.purchasePrice)) on \(DateParser.format(match.date))\(restructureSuffix)\(offsetSuffix)")
           }
 
-          if !disposal.section104Matches.isEmpty {
-            let poolQty = disposal.section104Matches[0].poolQuantity
-            let poolCost = disposal.section104Matches[0].poolCost
-            let avgCost = poolQty > 0 ? poolCost / poolQty : 0
+          if let section104 = entry.section104 {
             detailLines.append(
-              "Section 104: \(poolQty) units at average cost \(self.currency(self.rounded(avgCost, scale: 5)))")
+              "Section 104: \(section104.poolQuantity) units at average cost \(self.currency(self.rounded(section104.averageCost, scale: 5)))")
           }
 
-          let calculationLine = self.detailedCalculationLine(for: disposal)
+          let calculationLine = self.detailedCalculationLine(for: entry)
           let measuredCardHeight = self.measureDisposalCardHeight(
             title: title,
             detailLines: detailLines,
@@ -541,28 +529,24 @@
         ])
     }
 
-    func detailedCalculationLine(for disposal: Disposal) -> String {
+    func detailedCalculationLine(for entry: DisposalReportEntry) -> String {
+      let disposal = entry.disposal
       let saleExpenses = disposal.sellTransaction.expenses
       var costParts: [String] = []
 
-      if !disposal.bedAndBreakfastMatches.isEmpty {
-        for match in disposal.bedAndBreakfastMatches {
-          let purchasePrice = self.rounded(match.buyTransaction.price, scale: 5)
-          let purchaseExpenses = match.buyTransaction.expenses * match.buyDateQuantity / match.buyTransaction.quantity
-          let roundedExpenses = self.rounded(purchaseExpenses, scale: 2)
+      if !entry.acquisitionMatches.isEmpty {
+        for match in entry.acquisitionMatches {
+          let purchasePrice = self.rounded(match.purchasePrice, scale: 5)
+          let roundedExpenses = self.rounded(match.purchaseExpenses, scale: 2)
           let eventAdjustmentPart = match
             .eventAdjustment != 0 ? " + \(self.decimalString(self.rounded(match.eventAdjustment, scale: 2)))" : ""
-          let part = "(\(self.decimalString(match.buyDateQuantity)) * \(self.decimalString(purchasePrice)) + \(self.decimalString(roundedExpenses))\(eventAdjustmentPart))"
+          let part = "(\(self.decimalString(match.quantity)) * \(self.decimalString(purchasePrice)) + \(self.decimalString(roundedExpenses))\(eventAdjustmentPart))"
           costParts.append(part)
         }
       }
 
-      if !disposal.section104Matches.isEmpty {
-        let poolQty = disposal.section104Matches[0].poolQuantity
-        let poolCost = disposal.section104Matches[0].poolCost
-        let poolAvgCost = poolQty > 0 ? poolCost / poolQty : 0
-        let section104MatchedQuantity = disposal.section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
-        let part = "(\(self.decimalString(section104MatchedQuantity)) * \(self.decimalString(self.rounded(poolAvgCost, scale: 5))))"
+      if let section104 = entry.section104 {
+        let part = "(\(self.decimalString(section104.matchedQuantity)) * \(self.decimalString(self.rounded(section104.averageCost, scale: 5))))"
         costParts.append(part)
       }
 
