@@ -780,7 +780,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = result.taxYearSummaries[0]
     let disposal = summary.disposals[0]
-    XCTAssertEqual(disposal.gain, 125, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 125)
   }
 
   func testSameDaySellsAreMergedBeforeRounding() throws {
@@ -800,7 +800,7 @@ final class CalculatorTests: XCTestCase {
     XCTAssertEqual(disposal.sellTransaction.quantity, 20)
     XCTAssertEqual(disposal.sellTransaction.price, 8, accuracy: 0.00001)
     XCTAssertEqual(disposal.sellTransaction.expenses, 14.5, accuracy: 0.00001)
-    XCTAssertEqual(disposal.gain, -19, accuracy: 1)
+    XCTAssertEqual(disposal.gain, -19)
   }
 
   func testBedAndBreakfast30DayRule() throws {
@@ -827,7 +827,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     let disposal = try XCTUnwrap(summary.disposals.first)
-    XCTAssertEqual(disposal.gain, 250, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 250)
   }
 
   func testDividendIncreasesSection104CostBasis() throws {
@@ -842,7 +842,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     let disposal = try XCTUnwrap(summary.disposals.first)
-    XCTAssertEqual(disposal.gain, 150, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 150)
   }
 
   func testInvalidAssetEventAmountThrows() {
@@ -968,7 +968,7 @@ final class CalculatorTests: XCTestCase {
 
     XCTAssertEqual(result.taxYearSummaries.count, 1)
     let summary = result.taxYearSummaries[0]
-    XCTAssertEqual(summary.totalGain, 1140, accuracy: 1)
+    XCTAssertEqual(summary.totalGain, 1140)
     XCTAssertEqual(summary.taxableGain, 0)
     XCTAssertFalse(summary.disposals[0].bedAndBreakfastMatches.isEmpty)
   }
@@ -983,8 +983,8 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     XCTAssertEqual(summary.disposals.count, 2)
-    XCTAssertEqual(summary.disposals[0].gain, -174, accuracy: 1)
-    XCTAssertEqual(summary.disposals[1].gain, 1240, accuracy: 1)
+    XCTAssertEqual(summary.disposals[0].gain, -174)
+    XCTAssertEqual(summary.disposals[1].gain, 1240)
   }
 
   func testSameDayAcquisitionUsesAggregatedCostForPartialDisposal() throws {
@@ -996,7 +996,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     let disposal = try XCTUnwrap(summary.disposals.first)
-    XCTAssertEqual(disposal.gain, 445, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 445)
 
     let holding = try XCTUnwrap(result.holdings["TEST"])
     XCTAssertEqual(holding.quantity, 10, accuracy: 0.00001)
@@ -1054,7 +1054,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     let disposal = try XCTUnwrap(summary.disposals.first)
-    XCTAssertEqual(disposal.gain, 60, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 60)
 
     let holding = try XCTUnwrap(result.holdings["TEST"])
     XCTAssertEqual(holding.quantity, 50, accuracy: 0.00001)
@@ -1107,7 +1107,7 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     let disposal = try XCTUnwrap(summary.disposals.first)
-    XCTAssertEqual(disposal.gain, 75, accuracy: 1)
+    XCTAssertEqual(disposal.gain, 75)
     XCTAssertEqual(disposal.bedAndBreakfastMatches.count, 1)
     XCTAssertEqual(disposal.bedAndBreakfastMatches[0].buyDateQuantity, 50, accuracy: 0.00001)
 
@@ -1165,8 +1165,8 @@ final class CalculatorTests: XCTestCase {
 
     let summary = try XCTUnwrap(result.taxYearSummaries.first)
     XCTAssertEqual(summary.disposals.count, 2)
-    XCTAssertEqual(summary.disposals[0].gain, 400, accuracy: 1)
-    XCTAssertEqual(summary.disposals[1].gain, 750, accuracy: 1)
+    XCTAssertEqual(summary.disposals[0].gain, 400)
+    XCTAssertEqual(summary.disposals[1].gain, 750)
 
     let holding = try XCTUnwrap(result.holdings["TEST"])
     XCTAssertEqual(holding.quantity, 50, accuracy: 0.00001)
