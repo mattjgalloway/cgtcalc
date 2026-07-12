@@ -1,0 +1,1 @@
+Error calculating CGT: Unsupported same-date combination for TEST on 01/01/2020: BUY, DIVIDEND. Date-only input cannot establish the event entitlement or restructure quantity basis.

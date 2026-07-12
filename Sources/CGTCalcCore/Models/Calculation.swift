@@ -14,6 +14,7 @@ public enum CalculationError: Error, LocalizedError {
     firstLaterAcquisitionDate: Date)
   case invalidAssetEventAmount(asset: String, date: Date, type: AssetEventType, expected: Decimal, actual: Decimal)
   case unsupportedCapitalReturn(asset: String, date: Date, value: Decimal, availableCost: Decimal)
+  case unsupportedSameDateCombination(asset: String, date: Date, rowTypes: [String])
 
   /// Human-readable explanation for a calculation failure.
   public var errorDescription: String? {
@@ -35,6 +36,8 @@ public enum CalculationError: Error, LocalizedError {
       "Invalid \(type.rawValue) amount for \(asset) on \(DateParser.format(date)): expected \(expected), got \(actual)"
     case .unsupportedCapitalReturn(let asset, let date, let value, let availableCost):
       "Unsupported CAPRETURN for \(asset) on \(DateParser.format(date)): value £\(value) exceeds the £\(availableCost) remaining allowable cost attributable to the event. CAPRETURN supports fund equalisation cost reductions and cannot reduce allowable cost below zero."
+    case .unsupportedSameDateCombination(let asset, let date, let rowTypes):
+      "Unsupported same-date combination for \(asset) on \(DateParser.format(date)): \(rowTypes.joined(separator: ", ")). Date-only input cannot establish the event entitlement or restructure quantity basis."
     }
   }
 }

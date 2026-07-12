@@ -136,6 +136,21 @@ public struct AssetEvent {
 }
 
 extension AssetEvent {
+  var type: AssetEventType {
+    switch self.kind {
+    case .capitalReturn:
+      .capitalReturn
+    case .dividend:
+      .dividend
+    case .split:
+      .split
+    case .unsplit:
+      .unsplit
+    case .restruct:
+      .restruct
+    }
+  }
+
   var calculationOrder: Int {
     switch self.kind {
     case .dividend:

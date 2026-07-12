@@ -114,6 +114,14 @@ final class ModelCoverageTests: XCTestCase {
     XCTAssertEqual(
       invalidAmount.errorDescription,
       "Invalid DIVIDEND amount for ABC on 02/01/2020: expected 100, got 99")
+
+    let unsupportedSameDate = CalculationError.unsupportedSameDateCombination(
+      asset: "ABC",
+      date: TestSupport.date("02/01/2020"),
+      rowTypes: ["BUY", "DIVIDEND"])
+    XCTAssertEqual(
+      unsupportedSameDate.errorDescription,
+      "Unsupported same-date combination for ABC on 02/01/2020: BUY, DIVIDEND. Date-only input cannot establish the event entitlement or restructure quantity basis.")
   }
 
   func testTaxYearSpecialRateChangeMetadata() throws {

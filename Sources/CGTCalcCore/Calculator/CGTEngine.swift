@@ -27,6 +27,7 @@ public enum CGTEngine {
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
     try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
+    try SameDateInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
 
     let normalizedTransactions = try self.normalizingSourceOrder(transactions)
     let normalizedEvents = try self.normalizingSourceOrder(assetEvents)
@@ -385,23 +386,49 @@ public enum CGTEngine {
     }
 
     var allocations = Dictionary(uniqueKeysWithValues: outbounds.map { ($0.id, MatchAllocation()) })
+    var cumulativeOutboundQuantity: Decimal = 0
 
-    for outbound in outbounds {
-      let quantityRatio = outbound.quantity / totalQuantity
+    for outbound in outbounds.sorted(by: self.outboundAllocationSortsBefore) {
+      let previousCumulativeQuantity = cumulativeOutboundQuantity
+      cumulativeOutboundQuantity += outbound.quantity
       let allocatedBnbMatches = bnbMatches.map { match in
         BedAndBreakfastMatch(
           buyTransaction: match.buyTransaction,
-          quantity: match.quantity * quantityRatio,
-          buyDateQuantity: match.buyDateQuantity * quantityRatio,
-          eventAdjustment: match.eventAdjustment * quantityRatio,
-          cost: match.cost * quantityRatio)
+          quantity: self.cumulativeAllocation(
+            of: match.quantity,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity),
+          buyDateQuantity: self.cumulativeAllocation(
+            of: match.buyDateQuantity,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity),
+          eventAdjustment: self.cumulativeAllocation(
+            of: match.eventAdjustment,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity),
+          cost: self.cumulativeAllocation(
+            of: match.cost,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity))
       }
       let allocatedSection104Matches = section104Matches.map { match in
         Section104Match(
           transactionId: match.transactionId,
           sourceOrder: match.sourceOrder,
-          quantity: match.quantity * quantityRatio,
-          cost: match.cost * quantityRatio,
+          quantity: self.cumulativeAllocation(
+            of: match.quantity,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity),
+          cost: self.cumulativeAllocation(
+            of: match.cost,
+            from: previousCumulativeQuantity,
+            through: cumulativeOutboundQuantity,
+            totalQuantity: totalQuantity),
           date: match.date,
           poolQuantity: match.poolQuantity,
           poolCost: match.poolCost)
@@ -412,5 +439,28 @@ public enum CGTEngine {
     }
 
     return allocations
+  }
+
+  private static func cumulativeAllocation(
+    of value: Decimal,
+    from previousQuantity: Decimal,
+    through cumulativeQuantity: Decimal,
+    totalQuantity: Decimal) -> Decimal
+  {
+    EventAllocationMath.cumulativeValue(
+      totalValue: value,
+      allocatedQuantity: cumulativeQuantity,
+      totalQuantity: totalQuantity) - EventAllocationMath.cumulativeValue(
+      totalValue: value,
+      allocatedQuantity: previousQuantity,
+      totalQuantity: totalQuantity)
+  }
+
+  private static func outboundAllocationSortsBefore(_ lhs: Transaction, _ rhs: Transaction) -> Bool {
+    if lhs.type != rhs.type { return lhs.type == .sell }
+    if lhs.quantity != rhs.quantity { return lhs.quantity < rhs.quantity }
+    if lhs.totalValue != rhs.totalValue { return lhs.totalValue < rhs.totalValue }
+    if lhs.expenses != rhs.expenses { return lhs.expenses < rhs.expenses }
+    return lhs.asset < rhs.asset
   }
 }

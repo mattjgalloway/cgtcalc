@@ -13,7 +13,13 @@ enum EventAllocationMath {
   }
 
   static func cumulativeValue(totalValue: Decimal, allocatedQuantity: Decimal, totalQuantity: Decimal) -> Decimal {
-    guard totalValue > 0, allocatedQuantity > 0, totalQuantity > 0 else { return 0 }
+    guard totalValue != 0, allocatedQuantity > 0, totalQuantity > 0 else { return 0 }
+    if totalValue < 0 {
+      return -self.cumulativeValue(
+        totalValue: abs(totalValue),
+        allocatedQuantity: allocatedQuantity,
+        totalQuantity: totalQuantity)
+    }
     guard allocatedQuantity < totalQuantity else { return totalValue }
     return self.proportionalValue(
       eventValue: totalValue,

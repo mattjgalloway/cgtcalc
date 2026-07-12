@@ -23,6 +23,139 @@ final class CalculatorTests: XCTestCase {
     }
   }
 
+  func testSameDateDividendUpliftPrecedesCapitalReturnForMatchedRebuyRegardlessOfInputOrder() throws {
+    let prefix = """
+    BUY 01/01/2020 TEST 100 10 0
+    SELL 01/06/2020 TEST 100 20 0
+    BUY 10/06/2020 TEST 100 1 0
+    """
+    let eventRows = [
+      "DIVIDEND 31/12/2020 TEST 100 100",
+      "CAPRETURN 31/12/2020 TEST 100 150"
+    ]
+
+    for rows in [eventRows, Array(eventRows.reversed())] {
+      let input = try InputParser.parse(content: prefix + "\n" + rows.joined(separator: "\n"))
+      let result = try CGTEngine.calculate(inputData: input)
+      let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+      XCTAssertEqual(disposal.rawAllowableCosts, 50)
+      XCTAssertEqual(disposal.rawGain, 1950)
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 100)
+      XCTAssertEqual(result.holdings["TEST"]?.costBasis, 1000)
+    }
+  }
+
+  func testSameDateTransactionPermutationsProduceIdenticalEconomics() throws {
+    let rows = [
+      "BUY 01/06/2020 TEST 30 2 3",
+      "BUY 01/06/2020 TEST 70 4 7",
+      "SELL 01/06/2020 TEST 50 10 0",
+      "SPOUSEOUT 01/06/2020 TEST 10"
+    ]
+
+    for permutation in self.permutations(of: rows) {
+      let input = try InputParser.parse(content: permutation.joined(separator: "\n"))
+      let result = try CGTEngine.calculate(inputData: input)
+      let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+      let spouseTransfer = try XCTUnwrap(result.spouseTransfersOut.first)
+
+      XCTAssertEqual(disposal.rawProceeds, 500)
+      XCTAssertEqual(disposal.rawAllowableCosts, 175)
+      XCTAssertEqual(disposal.rawGain, 325)
+      XCTAssertEqual(spouseTransfer.costBasis, 35)
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 40)
+      XCTAssertEqual(result.holdings["TEST"]?.costBasis, 140)
+      XCTAssertEqual(disposal.bedAndBreakfastMatches.reduce(0) { $0 + $1.quantity }, 50)
+      XCTAssertEqual(disposal.bedAndBreakfastMatches.reduce(0) { $0 + $1.cost }, 175)
+    }
+  }
+
+  func testSameDateSpouseInAndSellAreOrderIndependentWithoutSourceOrder() throws {
+    for transactions in [
+      [TestSupport.spouseIn("01/06/2020", "TEST", 10, 3), TestSupport.sell("01/06/2020", "TEST", 10, 5, 0)],
+      [TestSupport.sell("01/06/2020", "TEST", 10, 5, 0), TestSupport.spouseIn("01/06/2020", "TEST", 10, 3)]
+    ] {
+      let result = try CGTEngine.calculate(transactions: transactions, assetEvents: [])
+      let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+      XCTAssertEqual(disposal.rawAllowableCosts, 30)
+      XCTAssertEqual(disposal.rawGain, 20)
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 0)
+    }
+  }
+
+  func testSameDateDistributionOrderIsIndependentOfPublicAPIArrayOrderAndUUIDs() throws {
+    let transactions = [
+      TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
+      TestSupport.buy("01/07/2020", "TEST", 100, 1, 0)
+    ]
+
+    for capitalReturnFirst in [false, true] {
+      let dividend = TestSupport.dividend("31/12/2020", "TEST", 200, 100)
+      let capitalReturn = TestSupport.capReturn("31/12/2020", "TEST", 100, 150)
+      let reset = TestSupport.dividend("30/06/2020", "TEST", 100, 0)
+      let events = capitalReturnFirst ? [capitalReturn, reset, dividend] : [reset, dividend, capitalReturn]
+      let result = try CGTEngine.calculate(transactions: transactions, assetEvents: events)
+
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 200)
+      XCTAssertEqual(result.holdings["TEST"]?.costBasis, 1050)
+    }
+  }
+
+  func testSameDateRestructureAndOutboundUsePostRestructureBasisRegardlessOfInputOrder() throws {
+    let rows = [
+      "UNSPLIT 01/06/2020 TEST 2",
+      "SELL 01/06/2020 TEST 20 30 0"
+    ]
+
+    for sameDateRows in [rows, Array(rows.reversed())] {
+      let content = (["BUY 01/01/2020 TEST 100 10 0"] + sameDateRows).joined(separator: "\n")
+      let result = try CGTEngine.calculate(inputData: InputParser.parse(content: content))
+      let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+      XCTAssertEqual(disposal.rawAllowableCosts, 400)
+      XCTAssertEqual(disposal.rawGain, 200)
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 30)
+      XCTAssertEqual(result.holdings["TEST"]?.costBasis, 600)
+    }
+  }
+
+  func testSplitDistributionRowsHaveSameEconomicsAsAggregatedRows() throws {
+    let transactions = [
+      TestSupport.buy("01/01/2020", "TEST", 100, 10, 0),
+      TestSupport.buy("01/07/2020", "TEST", 100, 1, 0)
+    ]
+    let reset = TestSupport.dividend("30/06/2020", "TEST", 100, 0)
+    let splitEvents = [
+      reset,
+      TestSupport.dividend("31/12/2020", "TEST", 50, 25),
+      TestSupport.capReturn("31/12/2020", "TEST", 40, 60),
+      TestSupport.dividend("31/12/2020", "TEST", 150, 75),
+      TestSupport.capReturn("31/12/2020", "TEST", 60, 90)
+    ]
+    let aggregatedEvents = [
+      reset,
+      TestSupport.capReturn("31/12/2020", "TEST", 100, 150),
+      TestSupport.dividend("31/12/2020", "TEST", 200, 100)
+    ]
+
+    let splitResult = try CGTEngine.calculate(transactions: transactions, assetEvents: splitEvents)
+    let aggregatedResult = try CGTEngine.calculate(transactions: transactions, assetEvents: aggregatedEvents)
+
+    XCTAssertEqual(splitResult.holdings["TEST"]?.quantity, aggregatedResult.holdings["TEST"]?.quantity)
+    XCTAssertEqual(splitResult.holdings["TEST"]?.costBasis, aggregatedResult.holdings["TEST"]?.costBasis)
+  }
+
+  private func permutations<T>(of values: [T]) -> [[T]] {
+    guard values.count > 1 else { return [values] }
+    return values.indices.flatMap { index in
+      var remainder = values
+      let value = remainder.remove(at: index)
+      return self.permutations(of: remainder).map { [value] + $0 }
+    }
+  }
+
   func testSharedRebuyCostIncludingExpensesIsConservedAcrossDisposals() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 3 1 0
