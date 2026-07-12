@@ -58,7 +58,8 @@ enum SameDayDisposalMerger {
           asset: firstSell.asset,
           quantity: quantity,
           price: weightedPrice,
-          expenses: expenses)
+          expenses: expenses,
+          explicitTotalValue: proceeds)
       }
   }
 }

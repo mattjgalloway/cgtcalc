@@ -11,4 +11,13 @@ enum EventAllocationMath {
     guard eventValue > 0, destinationQuantity > 0, eligibleQuantity > 0 else { return 0 }
     return (eventValue * destinationQuantity / eligibleQuantity).rounded(to: self.monetaryScale)
   }
+
+  static func cumulativeValue(totalValue: Decimal, allocatedQuantity: Decimal, totalQuantity: Decimal) -> Decimal {
+    guard totalValue > 0, allocatedQuantity > 0, totalQuantity > 0 else { return 0 }
+    guard allocatedQuantity < totalQuantity else { return totalValue }
+    return self.proportionalValue(
+      eventValue: totalValue,
+      destinationQuantity: allocatedQuantity,
+      eligibleQuantity: totalQuantity)
+  }
 }

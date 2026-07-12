@@ -2,6 +2,17 @@
 import XCTest
 
 final class SameDayDisposalMergerTests: XCTestCase {
+  func testMergedWeightedPriceReconstructsExactOriginalProceeds() {
+    let sells = [
+      TestSupport.sell("01/06/2020", "TEST", 1, 10, 0),
+      TestSupport.sell("01/06/2020", "TEST", 2, 45, 0)
+    ]
+
+    let merged = SameDayDisposalMerger.merge(sells)
+
+    XCTAssertEqual(merged.first?.proceeds, 100)
+  }
+
   func testMergesSameAssetSameDaySells() {
     let merged = SameDayDisposalMerger.merge([
       TestSupport.sell("28/10/2018", "TEST", 10, 7, 12.5),

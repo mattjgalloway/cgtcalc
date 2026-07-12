@@ -3,6 +3,24 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testSharedRebuyCostIncludingExpensesIsConservedAcrossDisposals() throws {
+    let input = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 3 1 0
+    SELL 01/06/2020 TEST 1 100 0
+    SELL 02/06/2020 TEST 1 100 0
+    SELL 03/06/2020 TEST 1 100 0
+    BUY 10/06/2020 TEST 3 30 10
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+    let matchedCosts = result.taxYearSummaries
+      .flatMap(\.disposals)
+      .flatMap(\.bedAndBreakfastMatches)
+      .reduce(Decimal(0)) { $0 + $1.cost }
+
+    XCTAssertEqual(matchedCosts, 100)
+  }
+
   func testExactTotalCostSpouseHandoffPreservesRecipientBasis() throws {
     let transferorInput = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 100000000 0.123456789 0

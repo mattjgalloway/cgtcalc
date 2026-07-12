@@ -344,7 +344,6 @@ enum BedAndBreakfastMatcher {
       let buy: Transaction
       let buyDateQuantityRemaining: Decimal
       let adjustedRemainingQuantity: Decimal
-      let adjustedTotalQuantity: Decimal
     }
 
     let availableBuys = buys.compactMap { buy -> AvailableBuy? in
@@ -360,17 +359,10 @@ enum BedAndBreakfastMatcher {
         sortedEvents: sortedEvents)
       guard adjustedRemainingQuantity > 0 else { return nil }
 
-      let adjustedTotalQuantity = self.adjustedQuantity(
-        for: buy,
-        relativeTo: sellDate,
-        sortedEvents: sortedEvents)
-      guard adjustedTotalQuantity > 0 else { return nil }
-
       return AvailableBuy(
         buy: buy,
         buyDateQuantityRemaining: buyDateQuantityRemaining,
-        adjustedRemainingQuantity: adjustedRemainingQuantity,
-        adjustedTotalQuantity: adjustedTotalQuantity)
+        adjustedRemainingQuantity: adjustedRemainingQuantity)
     }
 
     let totalAdjustedQuantity = availableBuys.reduce(Decimal(0)) { $0 + $1.adjustedRemainingQuantity }
@@ -387,6 +379,14 @@ enum BedAndBreakfastMatcher {
 
       let buyDateMatchQty = availableBuy.buyDateQuantityRemaining * matchQuantity / availableBuy
         .adjustedRemainingQuantity
+      let previouslyUsedQuantity = usedBuyQuantities[availableBuy.buy.id, default: 0]
+      let acquisitionCost = EventAllocationMath.cumulativeValue(
+        totalValue: availableBuy.buy.totalCost,
+        allocatedQuantity: previouslyUsedQuantity + buyDateMatchQty,
+        totalQuantity: availableBuy.buy.quantity) - EventAllocationMath.cumulativeValue(
+        totalValue: availableBuy.buy.totalCost,
+        allocatedQuantity: previouslyUsedQuantity,
+        totalQuantity: availableBuy.buy.quantity)
       let nextOutboundDate = allOutbounds
         .filter { outbound in
           outbound.asset == availableBuy.buy.asset && outbound.date > availableBuy.buy.date
@@ -404,8 +404,7 @@ enum BedAndBreakfastMatcher {
       self.merge(eventAllocation.allocatedEventValues, into: &allocatedEventValues)
       self.merge(eventAllocation.allocatedEventQuantities, into: &allocatedEventQuantities)
       let eventAdjustment = eventAllocation.adjustment
-      let actualCost = (availableBuy.buy.totalCost / availableBuy.adjustedTotalQuantity * matchQuantity) +
-        eventAdjustment
+      let actualCost = acquisitionCost + eventAdjustment
 
       return BedAndBreakfastMatch(
         buyTransaction: availableBuy.buy,

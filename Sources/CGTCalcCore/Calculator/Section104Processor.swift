@@ -112,23 +112,35 @@ enum Section104Processor {
 
     let poolQuantity = holding.quantity
     let poolCostBasis = holding.costBasis
-    let averageCost = poolQuantity > 0 ? poolCostBasis / poolQuantity : Decimal(0)
+    let targetQuantity = min(quantityNeeded, poolQuantity)
+    let targetCost = targetQuantity >= poolQuantity
+      ? poolCostBasis
+      : poolCostBasis * targetQuantity / poolQuantity
     var remainingQuantity = quantityNeeded
+    var remainingCost = targetCost
+    var cumulativeMatchedQuantity: Decimal = 0
     var matches: [Section104Match] = []
 
     for match in holding.pool.sorted(by: self.matchSortsBefore) {
       guard remainingQuantity > 0, match.quantity > 0 else { continue }
 
       let matchQty = min(remainingQuantity, match.quantity)
+      cumulativeMatchedQuantity += matchQty
+      let matchCost: Decimal = if cumulativeMatchedQuantity >= targetQuantity {
+        remainingCost
+      } else {
+        poolCostBasis * matchQty / poolQuantity
+      }
       matches.append(Section104Match(
         transactionId: match.transactionId,
         sourceOrder: match.sourceOrder,
         quantity: matchQty,
-        cost: matchQty * averageCost,
+        cost: matchCost,
         date: match.date,
         poolQuantity: poolQuantity,
         poolCost: poolCostBasis))
       remainingQuantity -= matchQty
+      remainingCost -= matchCost
     }
 
     return matches

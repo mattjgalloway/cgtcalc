@@ -2,6 +2,23 @@
 import XCTest
 
 final class Section104ProcessorTests: XCTestCase {
+  func testSellingEntireRepeatingAveragePoolConsumesExactCost() throws {
+    let buys = [
+      TestSupport.buy("01/01/2020", "TEST", 1, 10, 0),
+      TestSupport.buy("02/01/2020", "TEST", 2, 45, 0)
+    ]
+    let holding = try Section104Processor.processActions(
+      Section104Processor.actions(buys: buys, events: [], after: .distantPast, through: nil),
+      into: Section104Holding(),
+      usedBuyQuantities: [:])
+
+    let matches = Section104Processor.makeMatches(quantityNeeded: 3, holding: holding)
+    let remaining = Section104Processor.applyMatches(matches, to: holding)
+
+    XCTAssertEqual(matches.reduce(Decimal(0)) { $0 + $1.cost }, 100)
+    XCTAssertEqual(remaining.costBasis, 0)
+  }
+
   func testActionsSortBuysBeforeEventsOnSameDate() {
     let buy = TestSupport.buy("01/03/2019", "TEST", 100, 10, 0, sourceOrder: 1)
     let event = TestSupport.capReturn("01/03/2019", "TEST", 100, 50, sourceOrder: 0)
