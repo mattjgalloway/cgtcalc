@@ -37,6 +37,8 @@ public struct Transaction: Identifiable {
   public let quantity: Decimal
   public let price: Decimal
   public let expenses: Decimal
+  /// Exact acquisition cost supplied independently of a per-unit price, used by lossless spouse handoffs.
+  public let explicitTotalCost: Decimal?
 
   /// Creates a buy or sell transaction row.
   /// - Parameters:
@@ -56,7 +58,8 @@ public struct Transaction: Identifiable {
     asset: String,
     quantity: Decimal,
     price: Decimal,
-    expenses: Decimal)
+    expenses: Decimal,
+    explicitTotalCost: Decimal? = nil)
   {
     self.id = id
     self.sourceOrder = sourceOrder
@@ -66,6 +69,7 @@ public struct Transaction: Identifiable {
     self.quantity = quantity
     self.price = price
     self.expenses = expenses
+    self.explicitTotalCost = explicitTotalCost
   }
 
   public var totalValue: Decimal {
@@ -73,7 +77,7 @@ public struct Transaction: Identifiable {
   }
 
   public var totalCost: Decimal {
-    self.totalValue + self.expenses
+    self.explicitTotalCost ?? (self.totalValue + self.expenses)
   }
 
   public var proceeds: Decimal {

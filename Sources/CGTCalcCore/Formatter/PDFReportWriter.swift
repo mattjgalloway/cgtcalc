@@ -354,9 +354,13 @@
       guard !spouseTransfersOut.isEmpty else { return }
       self.drawSectionHeader("Spouse Transfers Out", layout: &layout)
 
-      let lines = spouseTransfersOut.map { transfer in
+      let lines = spouseTransfersOut.flatMap { transfer in
         let tx = transfer.transaction
-        return "\(DateParser.format(tx.date)) SPOUSEOUT \(self.decimalString(tx.quantity)) of \(tx.asset) at transferred cost basis \(self.currency(self.rounded(transfer.costBasis, scale: 2))) (\(self.currency(self.rounded(transfer.averageCost, scale: 5))) per unit)"
+        let date = DateParser.format(tx.date)
+        return [
+          "\(date) SPOUSEOUT \(self.decimalString(tx.quantity)) of \(tx.asset) at transferred cost basis \(self.currency(self.rounded(transfer.costBasis, scale: 2))) (\(self.currency(self.rounded(transfer.averageCost, scale: 5))) per unit, informational)",
+          "Recipient input: SPOUSEIN \(date) \(tx.asset) \(self.decimalString(tx.quantity)) TOTALCOST \(self.decimalString(transfer.costBasis))"
+        ]
       }
       self.drawMonospaceLines(lines, sectionTitle: "Spouse Transfers Out", layout: &layout)
     }
@@ -376,7 +380,11 @@
         case .sell:
           "\(DateParser.format(tx.date)) SOLD \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price)) with \(self.currency(tx.expenses)) expenses"
         case .spouseIn:
-          "\(DateParser.format(tx.date)) SPOUSEIN \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price))"
+          if let totalCost = tx.explicitTotalCost {
+            "\(DateParser.format(tx.date)) SPOUSEIN \(self.decimalString(tx.quantity)) of \(tx.asset) with exact total cost \(self.currency(totalCost))"
+          } else {
+            "\(DateParser.format(tx.date)) SPOUSEIN \(self.decimalString(tx.quantity)) of \(tx.asset) at \(self.currency(tx.price)) per unit"
+          }
         case .spouseOut:
           "\(DateParser.format(tx.date)) SPOUSEOUT \(self.decimalString(tx.quantity)) of \(tx.asset)"
         }

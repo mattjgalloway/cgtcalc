@@ -260,8 +260,10 @@ final class TextReportFormatterTests: XCTestCase {
 
     XCTAssertTrue(output.contains("# SPOUSE TRANSFERS OUT"))
     XCTAssertTrue(output.contains(
-      "01/02/2024 SPOUSEOUT 40 of FUND at transferred cost basis £420.25 (£10.50625 per unit)"))
+      "01/02/2024 SPOUSEOUT 40 of FUND at transferred cost basis £420.25 (£10.50625 per unit, informational)"))
+    XCTAssertTrue(output.contains(
+      "Recipient input: SPOUSEIN 01/02/2024 FUND 40 TOTALCOST 420.25"))
     XCTAssertTrue(output.contains("01/02/2024 SPOUSEOUT 40 of FUND"))
-    XCTAssertTrue(output.contains("03/02/2024 SPOUSEIN 10 of FUND at £10.5"))
+    XCTAssertTrue(output.contains("03/02/2024 SPOUSEIN 10 of FUND at £10.5 per unit"))
   }
 }

@@ -99,7 +99,7 @@ The full list of kinds of data are as follows:
 |-------------|--------------|-----------------|------------|
 | `BUY`       | Transaction  | Buy transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
 | `SELL`      | Transaction  | Sell transaction | `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>` |
-| `SPOUSEIN`  | Transaction  | No-gain/no-loss transfer in from spouse/civil partner (manual cost basis input) | `<DATE> <ASSET> <AMOUNT> <PRICE>` |
+| `SPOUSEIN`  | Transaction  | No-gain/no-loss transfer in from spouse/civil partner | `<DATE> <ASSET> <AMOUNT> TOTALCOST <EXACT_TOTAL_COST>` |
 | `SPOUSEOUT` | Transaction  | No-gain/no-loss transfer out to spouse/civil partner (costed using normal share-identification ordering) | `<DATE> <ASSET> <AMOUNT>` |
 | `CAPRETURN` | Asset event  | Capital return / equalisation event which reduces allowable cost | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
 | `DIVIDEND`  | Asset event  | Accumulation distribution which increases allowable cost | `<DATE> <ASSET> <AMOUNT> <VALUE>` |
@@ -113,7 +113,8 @@ Numeric tokens accept standard decimal numbers with optional `£` and valid thou
 Notes for spouse transfers:
 
 - `SPOUSEOUT` does not take price or expenses. The calculator derives transferred allowable cost using normal share-identification ordering (same day, then following 30 days, then Section 104 fallback) and reports it in a dedicated `SPOUSE TRANSFERS OUT` section.
-- `SPOUSEIN` should use the per-unit cost basis manually transcribed from the transfer-out calculation run for the other person.
+- The `SPOUSEOUT` report emits a machine-copyable `SPOUSEIN ... TOTALCOST ...` row. This exact total transferred cost is the authoritative handoff to the recipient's calculation.
+- Legacy `SPOUSEIN <DATE> <ASSET> <AMOUNT> <PRICE>` rows remain supported as user-supplied per-unit basis. The displayed rounded average cost is informational and should not be transcribed when an exact `TOTALCOST` handoff is available.
 - This tool calculates one person at a time; use separate input files/runs for each spouse/civil partner.
 
 ## Example

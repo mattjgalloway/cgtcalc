@@ -297,7 +297,8 @@ public enum CGTEngine {
         asset: transaction.asset,
         quantity: transaction.quantity,
         price: transaction.price,
-        expenses: transaction.expenses)
+        expenses: transaction.expenses,
+        explicitTotalCost: transaction.explicitTotalCost)
     }
   }
 

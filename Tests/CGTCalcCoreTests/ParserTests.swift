@@ -75,6 +75,29 @@ final class ParserTests: XCTestCase {
     }
   }
 
+  func testParseSpouseInWithExactTotalCost() throws {
+    let data = try InputParser.parse(content: "SPOUSEIN 01/06/2020 TEST 100000000 TOTALCOST 12345678.9")
+
+    guard case .transaction(let transaction) = data.first else {
+      return XCTFail("Expected transaction")
+    }
+    XCTAssertEqual(transaction.type, .spouseIn)
+    XCTAssertEqual(transaction.quantity, 100000000)
+    XCTAssertEqual(transaction.explicitTotalCost, Decimal.parse("12345678.9"))
+    XCTAssertEqual(transaction.totalCost, Decimal.parse("12345678.9"))
+  }
+
+  func testParseRejectsUnknownSpouseInBasisKeyword() {
+    XCTAssertThrowsError(try InputParser.parse(
+      content: "SPOUSEIN 01/06/2020 TEST 100 TOTAL 1234"))
+    { error in
+      guard case ParserError.invalidField(_, let field, _) = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+      XCTAssertEqual(field, "spouse transfer basis")
+    }
+  }
+
   func testParseAssetEvents() throws {
     let input = """
     CAPRETURN 01/01/2020 TEST 100 50.0

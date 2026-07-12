@@ -30,7 +30,8 @@ TEST: 40 units acquired at £1 cost basis
 
 # SPOUSE TRANSFERS OUT
 
-10/01/2020 SPOUSEOUT 70 of TEST at transferred cost basis £75 (£1.07143 per unit)
+10/01/2020 SPOUSEOUT 70 of TEST at transferred cost basis £75 (£1.07143 per unit, informational)
+Recipient input: SPOUSEIN 10/01/2020 TEST 70 TOTALCOST 75
 
 
 # TRANSACTIONS

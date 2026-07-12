@@ -245,7 +245,8 @@ import XCTest
       XCTAssertTrue(snapshot.contains("Spouse Transfers Out"))
       XCTAssertTrue(snapshot.contains("01/02/2024 SPOUSEOUT 40 of FUND"))
       XCTAssertTrue(snapshot.contains("transferred cost basis £420.25"))
-      XCTAssertTrue(snapshot.contains("per unit"))
+      XCTAssertTrue(snapshot.contains("informational"))
+      XCTAssertTrue(snapshot.contains("Recipient input: SPOUSEIN 01/02/2024 FUND 40 TOTALCOST 420.25"))
     }
 
     func testPDFSnapshotWithVeryLargeDisposalUsesUnboxedFallback() throws {

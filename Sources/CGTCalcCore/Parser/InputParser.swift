@@ -128,8 +128,14 @@ public enum InputParser {
       return .transaction(transaction)
 
     case "SPOUSEIN":
-      guard fields.count == 5 else {
+      guard fields.count == 5 || fields.count == 6 else {
         throw ParserError.insufficientFields(line: lineNumber, expected: 5, got: fields.count)
+      }
+      if fields.count == 6, fields[4] != "TOTALCOST" {
+        throw ParserError.invalidField(
+          line: lineNumber,
+          field: "spouse transfer basis",
+          reason: "expected TOTALCOST before the exact transferred cost")
       }
       let transaction = try parseTransaction(fields: fields, lineNumber: lineNumber, sourceOrder: sourceOrder)
       return .transaction(transaction)
@@ -164,6 +170,7 @@ public enum InputParser {
   /// Supported forms:
   /// - BUY/SELL: `<DATE> <ASSET> <AMOUNT> <PRICE> <EXPENSES>`
   /// - SPOUSEIN: `<DATE> <ASSET> <AMOUNT> <PRICE>`
+  /// - SPOUSEIN exact handoff: `<DATE> <ASSET> <AMOUNT> TOTALCOST <EXACT_TOTAL_COST>`
   /// - SPOUSEOUT: `<DATE> <ASSET> <AMOUNT>`
   /// - Parameters:
   ///   - fields: Tokenized input fields.
@@ -185,22 +192,33 @@ public enum InputParser {
     let date = try DateParser.parse(fields[1])
     let asset = fields[2]
     let quantity = try parseDecimal(fields[3], lineNumber: lineNumber)
+    try self.validatePositive(quantity, field: "quantity", lineNumber: lineNumber)
     let price: Decimal
     let expenses: Decimal
+    let explicitTotalCost: Decimal?
 
     switch transactionType {
     case .buy, .sell:
       price = try self.parseDecimal(fields[4], lineNumber: lineNumber)
       expenses = try self.parseDecimal(fields[5], lineNumber: lineNumber)
+      explicitTotalCost = nil
     case .spouseIn:
-      price = try self.parseDecimal(fields[4], lineNumber: lineNumber)
+      if fields.count == 6 {
+        let totalCost = try self.parseDecimal(fields[5], lineNumber: lineNumber)
+        try self.validateNonNegative(totalCost, field: "total cost", lineNumber: lineNumber)
+        explicitTotalCost = totalCost
+        price = totalCost / quantity
+      } else {
+        price = try self.parseDecimal(fields[4], lineNumber: lineNumber)
+        explicitTotalCost = nil
+      }
       expenses = 0
     case .spouseOut:
       price = 0
       expenses = 0
+      explicitTotalCost = nil
     }
 
-    try self.validatePositive(quantity, field: "quantity", lineNumber: lineNumber)
     try self.validateNonNegative(price, field: "price", lineNumber: lineNumber)
     try self.validateNonNegative(expenses, field: "expenses", lineNumber: lineNumber)
 
@@ -211,7 +229,8 @@ public enum InputParser {
       asset: asset,
       quantity: quantity,
       price: price,
-      expenses: expenses)
+      expenses: expenses,
+      explicitTotalCost: explicitTotalCost)
   }
 
   /// Parses a CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, or RESTRUCT row into an asset-event model.

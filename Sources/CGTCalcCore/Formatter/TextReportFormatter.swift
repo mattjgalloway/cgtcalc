@@ -265,7 +265,8 @@ public struct TextReportFormatter {
     for transfer in spouseTransfersOut {
       let tx = transfer.transaction
       let dateStr = DateParser.format(tx.date)
-      output += "\(dateStr) SPOUSEOUT \(self.formatDecimal(tx.quantity)) of \(tx.asset) at transferred cost basis £\(transfer.costBasis.rounded(to: 2).string) (£\(transfer.averageCost.rounded(to: 5).string) per unit)\n"
+      output += "\(dateStr) SPOUSEOUT \(self.formatDecimal(tx.quantity)) of \(tx.asset) at transferred cost basis £\(transfer.costBasis.rounded(to: 2).string) (£\(transfer.averageCost.rounded(to: 5).string) per unit, informational)\n"
+      output += "Recipient input: SPOUSEIN \(dateStr) \(tx.asset) \(self.formatDecimal(tx.quantity)) TOTALCOST \(self.formatDecimal(transfer.costBasis))\n"
     }
     return output
   }
@@ -290,7 +291,11 @@ public struct TextReportFormatter {
       case .sell:
         "\(dateStr) SOLD \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price)) with £\(self.formatDecimal(transaction.expenses)) expenses"
       case .spouseIn:
-        "\(dateStr) SPOUSEIN \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price))"
+        if let totalCost = transaction.explicitTotalCost {
+          "\(dateStr) SPOUSEIN \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) with exact total cost £\(self.formatDecimal(totalCost))"
+        } else {
+          "\(dateStr) SPOUSEIN \(self.formatDecimal(transaction.quantity)) of \(transaction.asset) at £\(self.formatDecimal(transaction.price)) per unit"
+        }
       case .spouseOut:
         "\(dateStr) SPOUSEOUT \(self.formatDecimal(transaction.quantity)) of \(transaction.asset)"
       }

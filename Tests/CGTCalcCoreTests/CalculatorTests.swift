@@ -3,6 +3,42 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testExactTotalCostSpouseHandoffPreservesRecipientBasis() throws {
+    let transferorInput = try InputParser.parse(content: """
+    BUY 01/01/2020 TEST 100000000 0.123456789 0
+    SPOUSEOUT 01/06/2020 TEST 100000000
+    """)
+    let transferorResult = try CGTEngine.calculate(inputData: transferorInput)
+    let transfer = try XCTUnwrap(transferorResult.spouseTransfersOut.first)
+
+    XCTAssertEqual(transfer.costBasis, Decimal.parse("12345678.9"))
+    XCTAssertTrue(TextReportFormatter().format(transferorResult).contains(
+      "Recipient input: SPOUSEIN 01/06/2020 TEST 100000000 TOTALCOST 12345678.9"))
+
+    let recipientInput = try InputParser.parse(content: """
+    SPOUSEIN 01/06/2020 TEST 100000000 TOTALCOST 12345678.9
+    SELL 01/07/2020 TEST 100000000 0.2 0
+    """)
+    let recipientResult = try CGTEngine.calculate(inputData: recipientInput)
+    let disposal = try XCTUnwrap(recipientResult.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(disposal.rawAllowableCosts, transfer.costBasis)
+    XCTAssertEqual(disposal.rawGain, Decimal.parse("7654321.1"))
+    XCTAssertEqual(disposal.gain, 7654321)
+  }
+
+  func testMultipleExactTotalCostSpouseInsEnterSection104WithoutRateConversion() throws {
+    let input = try InputParser.parse(content: """
+    SPOUSEIN 01/01/2020 TEST 3 TOTALCOST 10
+    SPOUSEIN 01/02/2020 TEST 7 TOTALCOST 20
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+
+    XCTAssertEqual(result.holdings["TEST"]?.quantity, 10)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 30)
+  }
+
   func testCapitalReturnUsesHighCostGroupIITrancheInsteadOfPoolAverage() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 100 1 0

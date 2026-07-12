@@ -1,0 +1,39 @@
+# SUMMARY
+
+Tax year    Gain       Proceeds    Exemption   Loss carry   Taxable gain
+========================================================================
+2020/2021   £7654321   £20000000   £12300      £0           £7642021    
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2020/2021
+
+1 gains with total of 7654321.
+0 losses with total of 0.
+
+1) SOLD 100000000 of TEST on 01/07/2020 for GAIN of £7654321
+Matches with:
+  - SECTION 104: 100000000 at cost basis of £0.12346
+Calculation: (100000000 * 0.2 - 0) - ( (100000000 * 0.12346) ) = 7654321
+
+
+# TAX RETURN INFORMATION
+
+2020/2021: Disposals = 1, proceeds = 20000000, allowable costs = 12345678, total gains = 7654321, total losses = 0
+
+
+# HOLDINGS
+
+NONE
+
+
+# TRANSACTIONS
+
+01/06/2020 SPOUSEIN 100000000 of TEST with exact total cost £12345678.9
+01/07/2020 SOLD 100000000 of TEST at £0.2 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

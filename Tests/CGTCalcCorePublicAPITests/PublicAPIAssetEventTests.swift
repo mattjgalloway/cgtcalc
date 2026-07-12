@@ -73,6 +73,20 @@ final class PublicAPIAssetEventTests: XCTestCase {
     }
   }
 
+  func testPublicTransactionPreservesExplicitSpouseTransferTotalCost() throws {
+    let transaction = try Transaction(
+      type: .spouseIn,
+      date: self.date("01/06/2020"),
+      asset: "TEST",
+      quantity: 3,
+      price: 0,
+      expenses: 0,
+      explicitTotalCost: 10)
+
+    XCTAssertEqual(transaction.explicitTotalCost, 10)
+    XCTAssertEqual(transaction.totalCost, 10)
+  }
+
   func testConvenienceInitializersThrowForMismatchedType() throws {
     XCTAssertThrowsError(try AssetEvent(
       type: .dividend,
