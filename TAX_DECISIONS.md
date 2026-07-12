@@ -69,6 +69,55 @@ This is not legal advice. It is a project decision log.
   - `Sources/CGTCalcCore/Calculator/BedAndBreakfastMatcher.swift`
   - `Sources/CGTCalcCore/Calculator/Section104Processor.swift`
 
+### Same-date ordering architecture
+
+- Decision: input row order must not change a tax result unless the input model explicitly defines the rows as sequential and documents that sequence as tax-significant.
+- Why: input rows contain calendar dates rather than reliable legal intraday timestamps. Source order, dictionary order, and generated UUID order are not tax facts.
+- Status: project-wide architecture for all same-date processing.
+
+General rules:
+
+1. Rows on different dates are processed chronologically.
+2. Same-date rows are grouped, aggregated, or processed in a canonical tax order where the supported tax treatment determines one.
+3. If date-only input cannot establish a legally necessary sequence and no safe canonical treatment exists, every permutation must fail with the same explicit unsupported-case error rather than produce different answers.
+4. Stable semantic keys may be used for deterministic arithmetic residual placement, but residual assignment must not create a meaningful tax difference.
+5. Public API inputs without `sourceOrder` must produce the same tax result as equivalent parsed input; random UUIDs must not decide tax outcomes.
+
+Supported same-date behavior:
+
+- same-class acquisitions are treated together for same-day identification and their aggregate cost is conserved
+- same-asset taxable sells are one effective disposal
+- mixed `SELL` and `SPOUSEOUT` rows share one identification pool and receive pro-rata allocations
+- `SPOUSEIN` participates as a same-day acquisition
+- same-asset/date/type `DIVIDEND` rows form one logical event
+- same-asset/date/type `CAPRETURN` rows form one logical event
+- when `DIVIDEND` and `CAPRETURN` are components on the same asset/date, the Group II share of the accumulation `DIVIDEND` uplift is reflected before the `CAPRETURN` cost-floor validation, regardless of input row order
+- one `SPLIT`, `UNSPLIT`, or `RESTRUCT` may share a date with `SELL` and/or `SPOUSEOUT`; the restructure is effective before the outbounds and outbound quantities must use the post-restructure basis
+
+Unsupported same-date behavior:
+
+- `DIVIDEND` or `CAPRETURN` with any transaction or restructure for the same asset, because date-only input cannot determine event entitlement
+- `SPLIT`, `UNSPLIT`, or `RESTRUCT` with `BUY` or `SPOUSEIN`, because date-only input cannot determine the acquisition's quantity basis
+- more than one restructure for the same asset/date, because the input does not define a reliable sequence or intermediate basis
+
+These combinations raise `unsupportedSameDateCombination` for every input permutation. Different assets remain independent.
+
+Regression standard:
+
+- For each supported same-date combination, permutation tests must assert identical raw disposals, rounded gains/losses, match allocations, spouse transfer cost, event allocation, and final holdings.
+- For an unsupported ambiguous combination, permutation tests must assert the same explicit error.
+- Adding a new row type or same-date interaction requires an ordering decision and permutation coverage.
+- Code:
+  - `Sources/CGTCalcCore/Calculator/SameDateInputValidator.swift`
+  - `Sources/CGTCalcCore/Calculator/AssetEventGrouper.swift`
+- Tests:
+  - `Tests/CGTCalcCoreTests/SameDateInputValidatorTests.swift`
+  - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateTransactionPermutationsProduceIdenticalEconomics`
+  - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateDistributionOrderIsIndependentOfPublicAPIArrayOrderAndUUIDs`
+  - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateRestructureAndOutboundUsePostRestructureBasisRegardlessOfInputOrder`
+  - `Tests/CGTCalcCoreTests/TestData/Examples/Inputs/SameDateDividendAndCapitalReturn.txt`
+  - `Tests/CGTCalcCoreTests/TestData/InvalidExamples/Inputs/UnsupportedSameDateEntitlement.txt`
+
 ### Same-day taxable sells are treated as one effective disposal
 
 - Decision: same-asset same-day `SELL` rows are merged before matching and rounding.
@@ -233,6 +282,7 @@ The stages are deliberately separate:
    - Division-generated event and shared-acquisition allocations use nearest rounding at 10 decimal places.
    - Allocated destinations and the final residual must reconcile exactly to the original event or acquisition value.
    - Any arithmetic residual is assigned once and deterministically; processing or input order must not create a meaningful difference.
+   - Pro-rata allocation from a combined same-day outbound group uses cumulative 10-decimal allocation in canonical economic order, with exact reconciliation to the combined matches.
    - A partial Section 104 disposal uses the full `Decimal` proportional pooled cost. Full pool consumption uses the exact remaining pooled cost.
    - Same-day merged sells retain exact aggregate proceeds separately from the weighted per-unit price used for display.
 4. **Tax reporting precision**
@@ -257,13 +307,14 @@ Implementation guidance:
 - Avoid adding direct calls to generic fixed-scale rounding in calculator code unless the applicable policy is clear at the call site.
 - Tests should cover exact boundaries, values immediately above and below boundaries, conservation, and order independence.
 
-The retrospective precision audit confirmed the reporting boundary and corrected three conservation paths: shared bed-and-breakfast acquisition cost including expenses, exact proceeds from merged same-day sells, and exact cost depletion when a Section 104 pool is fully consumed. Text and PDF reports use the same calculation model, and spouse handoff uses exact total cost rather than display-rounded values.
+The retrospective precision audit confirmed the reporting boundary and corrected four conservation paths: shared bed-and-breakfast acquisition cost including expenses, exact proceeds from merged same-day sells, exact cost depletion when a Section 104 pool is fully consumed, and exact reconciliation when shared matches are allocated across mixed same-day outbounds. Text and PDF reports use the same calculation model, and spouse handoff uses exact total cost rather than display-rounded values.
 
 Tests:
 
 - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSharedRebuyCostIncludingExpensesIsConservedAcrossDisposals`
 - `Tests/CGTCalcCoreTests/SameDayDisposalMergerTests.swift` `testMergedWeightedPriceReconstructsExactOriginalProceeds`
 - `Tests/CGTCalcCoreTests/Section104ProcessorTests.swift` `testSellingEntireRepeatingAveragePoolConsumesExactCost`
+- `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateTransactionPermutationsProduceIdenticalEconomics`
 
 ### Gain/loss rounding happens per disposal before annual aggregation
 

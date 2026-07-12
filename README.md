@@ -42,6 +42,16 @@ Currently there is no support for:
 3. The additional HMRC identification fallback where, if same-day + 30-day + Section 104 still do not fully identify a disposal, the remainder is matched with later acquisitions beyond the 30-day window.
 4. Anything not represented by the supported input row types documented below.
 
+### Unsupported Same-Date Combinations
+
+Input rows carry dates, not legally meaningful intraday timestamps. To avoid making tax results depend on file order, the calculator rejects these same-asset combinations on one date:
+
+- `DIVIDEND` or `CAPRETURN` with any transaction or restructure
+- `SPLIT`, `UNSPLIT`, or `RESTRUCT` with `BUY` or `SPOUSEIN`
+- more than one `SPLIT`, `UNSPLIT`, or `RESTRUCT`
+
+One restructure may share a date with `SELL` and/or `SPOUSEOUT`. The restructure is treated as effective first, so outbound quantities must be entered on the post-restructure basis. Ambiguous combinations raise `unsupportedSameDateCombination`; move a row to its correct legal effective/entitlement date rather than using file order to imply timing.
+
 ### Unsupported Identification Cases
 
 If an input requires share identification beyond:
@@ -179,6 +189,8 @@ Important semantics:
 - `CAPRETURN` and `DIVIDEND` should be dated using the effective / entitlement date for the holding, not merely the later cash reporting date.
 - `CAPRETURN` supports fund equalisation cost reductions, not general company capital distributions. A return exceeding the remaining allowable cost attributable to its units is rejected rather than treated as a part disposal.
 - Same-day rows for one asset/date/type form one logical event: both their amounts and values are summed before validation and cost-basis apportionment.
+- When both event types occur for one asset/date, `DIVIDEND` is applied before `CAPRETURN` cost-floor validation regardless of input row order.
+- A distribution cannot share its entitlement date with a transaction or restructure for the same asset; date-only input cannot determine which units participate.
 - The summed `DIVIDEND` amount must match the holding quantity on that date.
 - The summed `CAPRETURN` amount must match the Group II tranche for that distribution period, i.e. the units bought since the last distribution date and still held at the event date.
 - Asset-event amount validation allows a small tolerance for broker/fund rounding dust: the summed amount must match the expected units within `max(0.0001, expected units * 0.00001)`.
