@@ -322,8 +322,8 @@ public enum InputParser {
   ///   - field: Field name for diagnostics.
   ///   - lineNumber: Source line number for diagnostics.
   private static func validatePositive(_ value: Decimal, field: String, lineNumber: Int) throws {
-    guard value > 0 else {
-      throw ParserError.invalidField(line: lineNumber, field: field, reason: "must be greater than zero")
+    if let reason = CalculationInputValidator.validationReason(for: value, requirement: .positive) {
+      throw ParserError.invalidField(line: lineNumber, field: field, reason: reason)
     }
   }
 
@@ -333,8 +333,8 @@ public enum InputParser {
   ///   - field: Field name for diagnostics.
   ///   - lineNumber: Source line number for diagnostics.
   private static func validateNonNegative(_ value: Decimal, field: String, lineNumber: Int) throws {
-    guard value >= 0 else {
-      throw ParserError.invalidField(line: lineNumber, field: field, reason: "must not be negative")
+    if let reason = CalculationInputValidator.validationReason(for: value, requirement: .nonNegative) {
+      throw ParserError.invalidField(line: lineNumber, field: field, reason: reason)
     }
   }
 }

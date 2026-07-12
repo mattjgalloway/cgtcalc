@@ -26,6 +26,7 @@ public enum CGTEngine {
   ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, and RESTRUCT rows for all assets.
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
+    try CalculationInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
     try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
     try SameDateInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
 
