@@ -107,13 +107,18 @@ This is not legal advice. It is a project decision log.
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSpouseOutUsesSameDayAcquisitionPriorityBeforeSection104Pool`
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSpouseOutUsesThirtyDayAcquisitionPriorityBeforeSection104Pool`
 
-### `SPOUSEIN` is manual carry-over basis input
+### `SPOUSEIN` uses a lossless manual carry-over basis
 
-- Decision: `SPOUSEIN` takes a manually entered per-unit cost basis copied from the transferor's `SPOUSEOUT` run.
+- Decision: the canonical spouse handoff is the exact `TOTALCOST` input row emitted by the transferor's `SPOUSEOUT` report. The displayed per-unit average is informational only; legacy per-unit `SPOUSEIN` input remains supported.
 - Why: the calculator works one person at a time and does not join two taxpayers' histories automatically.
+- Why: copying a display-rounded per-unit average can change the recipient's allowable cost, especially for large or fractional quantities.
 - Status: explicit product choice.
 - User-facing wording:
   - `README.md`
+- Tests:
+  - `Tests/CGTCalcCoreTests/ParserTests.swift` `testParseSpouseInWithExactTotalCost`
+  - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testExactTotalCostSpouseHandoffPreservesRecipientBasis`
+  - `Tests/CGTCalcCoreTests/TestData/Examples/Inputs/SpouseInExactTotalCost.txt`
 
 ### Future-buy reservation applies to spouse transfers too
 
@@ -136,12 +141,21 @@ This is not legal advice. It is a project decision log.
 ### `CAPRETURN` means capital return / equalisation
 
 - Decision: `CAPRETURN` rows reduce allowable cost.
-- Supported scope: fund equalisation cost reductions only. A `CAPRETURN` cannot reduce the allowable cost attributable to its units below zero; excess values are rejected because general capital distributions require part-disposal rules outside the current model.
+- Supported scope: fund equalisation cost reductions only. A `CAPRETURN` cannot reduce the cost attributable to its eligible Group II units below zero; excess values are rejected because general capital distributions require part-disposal rules outside the current model.
+- Group II attributable cost includes the acquisition cost and expenses of the eligible Group II units, adjusted by same-period distributions. It is tracked separately from the legal Section 104 pool average.
+- Physical outbounds deplete Group II provenance even where ordinary share identification assigns their legal allowable cost elsewhere. `SPLIT`, `UNSPLIT`, and `RESTRUCT` rescale the eligible quantity without changing its cost, and a distribution starts a new Group II period for later acquisitions.
 - A monetary tolerance of £0.0001 permits harmless decimal dust at the zero-cost boundary.
 - Why: they model equalisation or other capital-return style adjustments relevant to pooled fund cost basis.
+- Why: the whole Section 104 average can contain older Group I cost and therefore is not the cost floor for a return attributable specifically to Group II units.
 - Status: explicit semantic choice.
 - User-facing wording:
   - `README.md`
+- Code:
+  - `Sources/CGTCalcCore/Calculator/Section104Processor.swift`
+- Tests:
+  - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testCapitalReturnUsesHighCostGroupIITrancheInsteadOfPoolAverage`
+  - `Tests/CGTCalcCoreTests/TestData/Examples/Inputs/GroupIICapitalReturnUsesAttributableCost.txt`
+  - `Tests/CGTCalcCoreTests/TestData/InvalidExamples/Inputs/GroupIICapitalReturnExceedsAttributableCost.txt`
 
 ### Asset events use effective / entitlement dates
 
@@ -160,8 +174,7 @@ This is not legal advice. It is a project decision log.
   - both validations allow a small broker/fund rounding tolerance of `max(0.0001, expected units * 0.00001)`
   - an amount accepted within that tolerance is normalized to the eligible quantity established by validation; event value is apportioned proportionately using eligible event-date quantities, independent of disposal processing order
   - proportional event values use nearest rounding at 10 decimal places before entering matched or Section 104 cost-basis calculations; this removes non-economic repeating-decimal residue without applying tax-report whole-pound rounding early
-- Why: multiple lines on one date are treated as one logical distribution event of that type.
-- Why: brokers and fund platforms can report harmless fractional-unit dust, but meaningful mismatches should still fail validation.
+- Why: multiple lines on one date are treated as one logical distribution event of that type, while the tolerance accepts harmless broker/platform fractional-unit dust without accepting meaningful mismatches.
 - Status: intended validation behavior.
 - Code:
   - `Sources/CGTCalcCore/Calculator/AssetEventValidator.swift`
@@ -202,6 +215,55 @@ This is not legal advice. It is a project decision log.
   - `Tests/CGTCalcCoreTests/TestData/Examples/Inputs/BBDividendAfterUnsplitScalesMatchedQuantity.txt`
 
 ## Rounding And Reporting
+
+### Precision and rounding architecture
+
+- Decision: economic values are preserved through calculation and taxpayer-to-taxpayer handoff; rounding is applied only at a named boundary for a named purpose.
+- Status: project-wide architecture. New calculation code and reviews should use these rules rather than introducing local rounding conventions.
+
+The stages are deliberately separate:
+
+1. **Input precision**
+   - Valid input prices, quantities, expenses, distribution values, and transferred costs are parsed as `Decimal` and retained as entered.
+   - Input values are not rounded merely to match report display precision.
+2. **Core calculation precision**
+   - Acquisition cost, proceeds, expenses, Section 104 cost, share matching, and raw gains retain full practical `Decimal` precision.
+   - Intermediate values are not rounded unless division has created non-economic representation residue covered by an explicit normalization policy.
+3. **Apportionment precision**
+   - Division-generated event and shared-acquisition allocations use nearest rounding at 10 decimal places.
+   - Allocated destinations and the final residual must reconcile exactly to the original event or acquisition value.
+   - Any arithmetic residual is assigned once and deterministically; processing or input order must not create a meaningful difference.
+   - A partial Section 104 disposal uses the full `Decimal` proportional pooled cost. Full pool consumption uses the exact remaining pooled cost.
+   - Same-day merged sells retain exact aggregate proceeds separately from the weighted per-unit price used for display.
+4. **Tax reporting precision**
+   - Whole-pound tax rounding is applied only at the agreed disposal/reporting boundary described below.
+   - Tax reporting rounding must not be reused as an intermediate calculation or allocation rule.
+5. **Display precision**
+   - Text and PDF rounding exists only to render values for a person.
+   - Display-rounded values must not feed later calculations or be presented as authoritative handoff data.
+6. **Lossless handoffs**
+   - When output from one taxpayer's calculation is input to another taxpayer's calculation, the canonical transferred value must preserve the exact calculation basis.
+   - In particular, a spouse/civil-partner transfer must hand over exact total transferred cost; a rounded explanatory per-unit average is not authoritative.
+7. **Tolerance policy**
+   - Approximate comparisons use named quantity or monetary tolerances with documented units and purpose.
+   - Tolerance accepts harmless source or arithmetic dust; it must not silently move a meaningful value across a tax boundary.
+   - `max(0, ...)` is not a substitute for validation when a negative value would indicate an unsupported or inconsistent tax state.
+   - Asset-event quantity validation uses `max(0.0001, expected units * 0.00001)`; the CAPRETURN zero-cost boundary uses a £0.0001 monetary tolerance.
+
+Implementation guidance:
+
+- Prefer purpose-specific helpers whose names expose the policy, for example `normalizedAllocation`, `roundedDisposalFigure`, `quantitiesMatch`, and `amountsMatch`.
+- Keep report formatting helpers separate from calculation helpers.
+- Avoid adding direct calls to generic fixed-scale rounding in calculator code unless the applicable policy is clear at the call site.
+- Tests should cover exact boundaries, values immediately above and below boundaries, conservation, and order independence.
+
+The retrospective precision audit confirmed the reporting boundary and corrected three conservation paths: shared bed-and-breakfast acquisition cost including expenses, exact proceeds from merged same-day sells, and exact cost depletion when a Section 104 pool is fully consumed. Text and PDF reports use the same calculation model, and spouse handoff uses exact total cost rather than display-rounded values.
+
+Tests:
+
+- `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSharedRebuyCostIncludingExpensesIsConservedAcrossDisposals`
+- `Tests/CGTCalcCoreTests/SameDayDisposalMergerTests.swift` `testMergedWeightedPriceReconstructsExactOriginalProceeds`
+- `Tests/CGTCalcCoreTests/Section104ProcessorTests.swift` `testSellingEntireRepeatingAveragePoolConsumesExactCost`
 
 ### Gain/loss rounding happens per disposal before annual aggregation
 
