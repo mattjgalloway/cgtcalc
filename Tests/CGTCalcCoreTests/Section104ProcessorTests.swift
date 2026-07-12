@@ -250,13 +250,17 @@ final class Section104ProcessorTests: XCTestCase {
 
   func testActionsUseUUIDTieBreakForSameDateEventsWithoutSourceOrder() throws {
     let sameDate = TestSupport.date("01/03/2019")
+    let firstID = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let secondID = try XCTUnwrap(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))
     let eventA = try AssetEvent(
-      type: .capitalReturn,
+      id: secondID,
+      type: .dividend,
       date: sameDate,
       asset: "TEST",
       distributionAmount: 100,
       distributionValue: 10)
     let eventB = try AssetEvent(
+      id: firstID,
       type: .dividend,
       date: sameDate,
       asset: "TEST",
@@ -271,8 +275,7 @@ final class Section104ProcessorTests: XCTestCase {
 
     XCTAssertEqual(actions.count, 2)
 
-    let expectedFirstID = min(eventA.id.uuidString, eventB.id.uuidString)
     guard case .event(let firstEvent) = actions[0] else { return XCTFail("Expected event first") }
-    XCTAssertEqual(firstEvent.id.uuidString, expectedFirstID)
+    XCTAssertEqual(firstEvent.id, firstID)
   }
 }
