@@ -28,12 +28,12 @@ public enum CGTEngine {
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
     try CalculationInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
     try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
-    try SameDateInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
+    try CalculationTimeline.validateSameDateCombinations(transactions: transactions, assetEvents: assetEvents)
 
     let normalizedTransactions = try self.normalizingSourceOrder(transactions)
     let normalizedEvents = try self.normalizingSourceOrder(assetEvents)
-    let sortedTransactions = normalizedTransactions.sorted(by: self.transactionSortsBefore)
-    let sortedEvents = normalizedEvents.sorted(by: self.assetEventSortsBefore)
+    let sortedTransactions = normalizedTransactions.sorted(by: CalculationTimeline.transactionSortsBefore)
+    let sortedEvents = normalizedEvents.sorted(by: CalculationTimeline.assetEventSortsBefore)
     let buys = sortedTransactions.filter(\.type.isAcquisition)
     let sells = SameDayDisposalMerger.merge(sortedTransactions.filter(\.type.isTaxableDisposal))
     let spouseOuts = sortedTransactions.filter(\.type.isSpouseTransferOut)
@@ -41,10 +41,10 @@ public enum CGTEngine {
     let sellsByAsset = Dictionary(grouping: sells, by: \.asset)
     let spouseOutsByAsset = Dictionary(grouping: spouseOuts, by: \.asset)
     let transactionsByAsset = Dictionary(grouping: normalizedTransactions, by: \.asset)
-    let allOutbounds = (sells + spouseOuts).sorted(by: self.transactionSortsBefore)
+    let allOutbounds = (sells + spouseOuts).sorted(by: CalculationTimeline.transactionSortsBefore)
     let outboundsByAsset = Dictionary(grouping: allOutbounds, by: \.asset)
 
-    let groupedEvents = AssetEventGrouper.groupDistributions(sortedEvents)
+    let groupedEvents = CalculationTimeline.groupDistributions(sortedEvents)
     let groupedEventsByAsset = Dictionary(grouping: groupedEvents, by: \.asset)
     var calculationEvents: [AssetEvent] = []
     for asset in Set(transactionsByAsset.keys).union(groupedEventsByAsset.keys) {
@@ -54,7 +54,9 @@ public enum CGTEngine {
       calculationEvents.append(contentsOf: normalizedAssetEvents)
     }
 
-    let eventsByAsset = Dictionary(grouping: calculationEvents.sorted(by: self.assetEventSortsBefore), by: \.asset)
+    let eventsByAsset = Dictionary(
+      grouping: calculationEvents.sorted(by: CalculationTimeline.assetEventSortsBefore),
+      by: \.asset)
 
     var section104Holdings: [String: Section104Holding] = [:]
     var usedBuyQuantities: [UUID: Decimal] = [:]
@@ -138,18 +140,8 @@ public enum CGTEngine {
       spouseTransfersOut: spouseTransfersOut.sorted(by: self.spouseTransferSortsBefore))
   }
 
-  private static func transactionSortsBefore(_ lhs: Transaction, _ rhs: Transaction) -> Bool {
-    if lhs.date != rhs.date {
-      return lhs.date < rhs.date
-    }
-    if lhs.sourceOrder != rhs.sourceOrder {
-      return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
-    }
-    return lhs.id.uuidString < rhs.id.uuidString
-  }
-
   private static func spouseTransferSortsBefore(_ lhs: SpouseTransferOut, _ rhs: SpouseTransferOut) -> Bool {
-    self.transactionSortsBefore(lhs.transaction, rhs.transaction)
+    CalculationTimeline.transactionSortsBefore(lhs.transaction, rhs.transaction)
   }
 
   private struct OutboundGroupKey: Hashable {
@@ -159,12 +151,12 @@ public enum CGTEngine {
 
   private static func groupedOutboundsByAssetAndDay(_ outbounds: [Transaction]) -> [[Transaction]] {
     let grouped = Dictionary(grouping: outbounds) { outbound in
-      OutboundGroupKey(asset: outbound.asset, day: UTC.calendar.startOfDay(for: outbound.date))
+      OutboundGroupKey(asset: outbound.asset, day: CalculationTimeline.day(for: outbound.date))
     }
     return grouped.values
-      .map { $0.sorted(by: self.transactionSortsBefore) }
+      .map { $0.sorted(by: CalculationTimeline.transactionSortsBefore) }
       .sorted { lhs, rhs in
-        self.transactionSortsBefore(lhs[0], rhs[0])
+        CalculationTimeline.transactionSortsBefore(lhs[0], rhs[0])
       }
   }
 
@@ -270,19 +262,6 @@ public enum CGTEngine {
     return OutboundGroupProcessResult(
       updatedHolding: updatedHolding,
       allocationByOutbound: allocationByOutbound)
-  }
-
-  private static func assetEventSortsBefore(_ lhs: AssetEvent, _ rhs: AssetEvent) -> Bool {
-    if lhs.date != rhs.date {
-      return lhs.date < rhs.date
-    }
-    if lhs.calculationOrder != rhs.calculationOrder {
-      return lhs.calculationOrder < rhs.calculationOrder
-    }
-    if lhs.sourceOrder != rhs.sourceOrder {
-      return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
-    }
-    return lhs.id.uuidString < rhs.id.uuidString
   }
 
   /// Ensures transactions without explicit source order still get a deterministic tie-breaker.

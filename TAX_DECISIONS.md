@@ -108,10 +108,10 @@ Regression standard:
 - For an unsupported ambiguous combination, permutation tests must assert the same explicit error.
 - Adding a new row type or same-date interaction requires an ordering decision and permutation coverage.
 - Code:
-  - `Sources/CGTCalcCore/Calculator/SameDateInputValidator.swift`
-  - `Sources/CGTCalcCore/Calculator/AssetEventGrouper.swift`
+  - `Sources/CGTCalcCore/Calculator/CalculationTimeline.swift`
 - Tests:
-  - `Tests/CGTCalcCoreTests/SameDateInputValidatorTests.swift`
+  - `Tests/CGTCalcCoreTests/CalculationTimelineGroupingTests.swift`
+  - `Tests/CGTCalcCoreTests/CalculationTimelineValidationTests.swift`
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateTransactionPermutationsProduceIdenticalEconomics`
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateDistributionOrderIsIndependentOfPublicAPIArrayOrderAndUUIDs`
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testSameDateRestructureAndOutboundUsePostRestructureBasisRegardlessOfInputOrder`

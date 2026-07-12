@@ -226,19 +226,15 @@ enum AssetEventValidator {
   }
 
   private static func actionSortsBefore(_ lhs: Action, _ rhs: Action) -> Bool {
-    if lhs.date != rhs.date {
-      return lhs.date < rhs.date
-    }
-
-    if lhs.sourceOrder != rhs.sourceOrder {
-      return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
-    }
-
-    if lhs.typeRank != rhs.typeRank {
-      return lhs.typeRank < rhs.typeRank
-    }
-
-    return lhs.id.uuidString < rhs.id.uuidString
+    CalculationTimeline.entrySortsBefore(
+      lhsDate: lhs.date,
+      lhsPriority: lhs.timelinePriority,
+      lhsSourceOrder: lhs.sourceOrder,
+      lhsID: lhs.id,
+      rhsDate: rhs.date,
+      rhsPriority: rhs.timelinePriority,
+      rhsSourceOrder: rhs.sourceOrder,
+      rhsID: rhs.id)
   }
 
   private static func poolSortsBefore(_ lhs: PoolEntry, _ rhs: PoolEntry) -> Bool {
@@ -295,17 +291,12 @@ enum AssetEventValidator {
       }
     }
 
-    var typeRank: Int {
+    var timelinePriority: Int {
       switch self {
       case .transaction(let transaction):
-        switch transaction.type {
-        case .buy, .spouseIn:
-          0
-        case .sell, .spouseOut:
-          1
-        }
-      case .event:
-        2
+        CalculationTimeline.priority(for: transaction)
+      case .event(let event):
+        CalculationTimeline.priority(for: event)
       }
     }
 

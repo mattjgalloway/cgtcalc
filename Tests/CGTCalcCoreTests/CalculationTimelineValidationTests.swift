@@ -1,7 +1,7 @@
 @testable import CGTCalcCore
 import XCTest
 
-final class SameDateInputValidatorTests: XCTestCase {
+final class CalculationTimelineValidationTests: XCTestCase {
   func testRejectsTransactionAndDistributionCombinationsConsistently() {
     let transactions = [
       TestSupport.buy("01/01/2020", "TEST", 100, 1, 0),
@@ -54,20 +54,24 @@ final class SameDateInputValidatorTests: XCTestCase {
       TestSupport.spouseOut("01/01/2020", "TEST", 5)
     ]
 
-    XCTAssertNoThrow(try SameDateInputValidator.validate(transactions: outbounds, assetEvents: [restructure]))
+    XCTAssertNoThrow(try CalculationTimeline.validateSameDateCombinations(
+      transactions: outbounds,
+      assetEvents: [restructure]))
   }
 
   func testAmbiguousRowsForDifferentAssetsRemainIndependent() throws {
     let transaction = TestSupport.buy("01/01/2020", "AAA", 100, 1, 0)
     let event = TestSupport.dividend("01/01/2020", "BBB", 100, 10)
 
-    XCTAssertNoThrow(try SameDateInputValidator.validate(transactions: [transaction], assetEvents: [event]))
+    XCTAssertNoThrow(try CalculationTimeline.validateSameDateCombinations(
+      transactions: [transaction],
+      assetEvents: [event]))
   }
 
   private func assertUnsupported(transactions: [Transaction], events: [AssetEvent]) {
     for transactionRows in [transactions, Array(transactions.reversed())] {
       for eventRows in [events, Array(events.reversed())] {
-        XCTAssertThrowsError(try SameDateInputValidator.validate(
+        XCTAssertThrowsError(try CalculationTimeline.validateSameDateCombinations(
           transactions: Array(transactionRows),
           assetEvents: Array(eventRows)))
         { error in

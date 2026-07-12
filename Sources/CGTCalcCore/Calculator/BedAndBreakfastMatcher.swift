@@ -81,11 +81,11 @@ enum BedAndBreakfastMatcher {
         !UTC.calendar.isDate(buy.date, inSameDayAs: sellDate)
     }.sorted { $0.date < $1.date }
 
-    let outboundsByDay = Dictionary(grouping: allOutbounds, by: { UTC.calendar.startOfDay(for: $0.date) })
+    let outboundsByDay = Dictionary(grouping: allOutbounds, by: { CalculationTimeline.day(for: $0.date) })
 
     for buyGroup in self.groupedBuysByDay(windowBuys) {
       guard remainingToMatch > 0 else { break }
-      let buyDay = UTC.calendar.startOfDay(for: buyGroup[0].date)
+      let buyDay = CalculationTimeline.day(for: buyGroup[0].date)
       let sameDaySellQuantity = outboundsByDay[buyDay, default: []]
         .reduce(Decimal(0)) { total, sameDaySell in
           total + sameDaySell.quantity
@@ -310,19 +310,9 @@ enum BedAndBreakfastMatcher {
   }
 
   private static func groupedBuysByDay(_ buys: [Transaction]) -> [[Transaction]] {
-    Dictionary(grouping: buys, by: { UTC.calendar.startOfDay(for: $0.date) })
+    Dictionary(grouping: buys, by: { CalculationTimeline.day(for: $0.date) })
       .sorted(by: { $0.key < $1.key })
-      .map { _, buysOnDay in
-        buysOnDay.sorted { lhs, rhs in
-          if lhs.date != rhs.date {
-            return lhs.date < rhs.date
-          }
-          if lhs.sourceOrder != rhs.sourceOrder {
-            return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
-          }
-          return lhs.id.uuidString < rhs.id.uuidString
-        }
-      }
+      .map { _, buysOnDay in buysOnDay.sorted(by: CalculationTimeline.transactionSortsBefore) }
   }
 
   private static func matchGroup(

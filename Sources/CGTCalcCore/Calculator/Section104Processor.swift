@@ -305,32 +305,39 @@ enum Section104Processor {
       guard case .event(let event) = self else { return false }
       return event.distributionType != nil
     }
+
+    var id: UUID {
+      switch self {
+      case .buy(let buy): buy.id
+      case .event(let event): event.id
+      }
+    }
+
+    var sourceOrder: Int? {
+      switch self {
+      case .buy(let buy): buy.sourceOrder
+      case .event(let event): event.sourceOrder
+      }
+    }
+
+    var priority: Int {
+      switch self {
+      case .buy: 0
+      case .event(let event): CalculationTimeline.priority(for: event)
+      }
+    }
   }
 
   private static func actionSortsBefore(_ lhs: Action, _ rhs: Action) -> Bool {
-    if lhs.date != rhs.date {
-      return lhs.date < rhs.date
-    }
-
-    switch (lhs, rhs) {
-    case (.buy, .event):
-      return true
-    case (.event, .buy):
-      return false
-    case (.buy(let lhsBuy), .buy(let rhsBuy)):
-      if lhsBuy.sourceOrder != rhsBuy.sourceOrder {
-        return (lhsBuy.sourceOrder ?? .max) < (rhsBuy.sourceOrder ?? .max)
-      }
-      return lhsBuy.id.uuidString < rhsBuy.id.uuidString
-    case (.event(let lhsEvent), .event(let rhsEvent)):
-      if lhsEvent.calculationOrder != rhsEvent.calculationOrder {
-        return lhsEvent.calculationOrder < rhsEvent.calculationOrder
-      }
-      if lhsEvent.sourceOrder != rhsEvent.sourceOrder {
-        return (lhsEvent.sourceOrder ?? .max) < (rhsEvent.sourceOrder ?? .max)
-      }
-      return lhsEvent.id.uuidString < rhsEvent.id.uuidString
-    }
+    CalculationTimeline.entrySortsBefore(
+      lhsDate: lhs.date,
+      lhsPriority: lhs.priority,
+      lhsSourceOrder: lhs.sourceOrder,
+      lhsID: lhs.id,
+      rhsDate: rhs.date,
+      rhsPriority: rhs.priority,
+      rhsSourceOrder: rhs.sourceOrder,
+      rhsID: rhs.id)
   }
 
   private static func matchSortsBefore(_ lhs: Section104Match, _ rhs: Section104Match) -> Bool {

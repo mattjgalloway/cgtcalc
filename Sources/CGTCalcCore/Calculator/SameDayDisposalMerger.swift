@@ -17,13 +17,12 @@ enum SameDayDisposalMerger {
       var sells: [Transaction]
     }
 
-    let calendar = UTC.calendar
     var groupedSells: [SellGroupKey: SellGroup] = [:]
 
     for (index, transaction) in transactions.enumerated() where transaction.type == .sell {
       let key = SellGroupKey(
         asset: transaction.asset,
-        day: calendar.startOfDay(for: transaction.date))
+        day: CalculationTimeline.day(for: transaction.date))
 
       if var existingGroup = groupedSells[key] {
         existingGroup.sells.append(transaction)
