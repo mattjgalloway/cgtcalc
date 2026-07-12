@@ -1,0 +1,28 @@
+# SUMMARY
+
+Tax year   Gain   Proceeds   Exemption   Loss carry   Taxable gain
+==================================================================
+
+
+# TAX YEAR DETAILS
+
+
+# TAX RETURN INFORMATION
+
+
+
+# HOLDINGS
+
+TEST: 200 units acquired at £20.5 cost basis
+
+
+# TRANSACTIONS
+
+01/01/2020 BOUGHT 100 of TEST at £1 with £0 expenses
+01/07/2020 BOUGHT 100 of TEST at £100 with £0 expenses
+
+
+# ASSET EVENTS
+
+30/06/2020 TEST DIVIDEND on 100 for £0
+31/12/2020 TEST CAPITAL RETURN on 100 for £6000

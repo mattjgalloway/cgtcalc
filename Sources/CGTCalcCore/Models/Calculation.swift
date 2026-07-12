@@ -43,6 +43,7 @@ public struct Section104Holding {
   public var quantity: Decimal
   public var costBasis: Decimal
   public var pool: [Section104Match]
+  var groupIIEntries: [GroupIICostEntry]
 
   /// Creates a Section 104 holding state.
   /// - Parameters:
@@ -57,12 +58,21 @@ public struct Section104Holding {
     self.quantity = quantity
     self.costBasis = costBasis
     self.pool = pool
+    self.groupIIEntries = []
   }
 
   public var averageCost: Decimal {
     guard self.quantity > 0 else { return 0 }
     return self.costBasis / self.quantity
   }
+}
+
+struct GroupIICostEntry {
+  let transactionId: UUID
+  let sourceOrder: Int?
+  let date: Date
+  var quantity: Decimal
+  var cost: Decimal
 }
 
 public struct Section104Match: Identifiable {

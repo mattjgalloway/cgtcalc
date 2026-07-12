@@ -48,33 +48,54 @@ enum Section104Processor {
     _ actions: [Action],
     into holding: Section104Holding,
     usedBuyQuantities: [UUID: Decimal],
-    allocatedEventValues: [UUID: Decimal] = [:]) throws -> Section104Holding
+    allocatedEventValues: [UUID: Decimal] = [:],
+    allocatedEventQuantities: [UUID: Decimal] = [:]) throws -> Section104Holding
   {
     var updatedHolding = holding
 
-    for action in actions {
-      switch action {
-      case .buy(let buy):
-        if updatedHolding.pool.contains(where: { $0.transactionId == buy.id }) { continue }
-        let remainingQuantity = max(0, buy.quantity - usedBuyQuantities[buy.id, default: 0])
-        guard remainingQuantity > 0 else { continue }
-        let remainingCost = buy.totalCost * remainingQuantity / buy.quantity
+    for actionsOnDate in Dictionary(grouping: actions, by: \.date)
+      .sorted(by: { $0.key < $1.key })
+      .map({ $0.value.sorted(by: self.actionSortsBefore) })
+    {
+      for action in actionsOnDate {
+        switch action {
+        case .buy(let buy):
+          if updatedHolding.pool.contains(where: { $0.transactionId == buy.id }) { continue }
+          let remainingQuantity = max(0, buy.quantity - usedBuyQuantities[buy.id, default: 0])
+          guard remainingQuantity > 0 else { continue }
+          let remainingCost = buy.totalCost * remainingQuantity / buy.quantity
 
-        let match = Section104Match(
-          transactionId: buy.id,
-          sourceOrder: buy.sourceOrder,
-          quantity: remainingQuantity,
-          cost: remainingCost,
-          date: buy.date,
-          poolQuantity: updatedHolding.quantity,
-          poolCost: updatedHolding.costBasis)
-        updatedHolding.quantity += remainingQuantity
-        updatedHolding.costBasis += remainingCost
-        updatedHolding.pool.append(match)
+          let match = Section104Match(
+            transactionId: buy.id,
+            sourceOrder: buy.sourceOrder,
+            quantity: remainingQuantity,
+            cost: remainingCost,
+            date: buy.date,
+            poolQuantity: updatedHolding.quantity,
+            poolCost: updatedHolding.costBasis)
+          updatedHolding.quantity += remainingQuantity
+          updatedHolding.costBasis += remainingCost
+          updatedHolding.pool.append(match)
+          updatedHolding.groupIIEntries.append(GroupIICostEntry(
+            transactionId: buy.id,
+            sourceOrder: buy.sourceOrder,
+            date: buy.date,
+            quantity: remainingQuantity,
+            cost: remainingCost))
 
-      case .event(let event):
-        let residualValue = max(0, event.distributionValue - allocatedEventValues[event.id, default: 0])
-        updatedHolding = try self.applyAssetEvent(event, value: residualValue, to: updatedHolding)
+        case .event(let event):
+          let residualValue = max(0, event.distributionValue - allocatedEventValues[event.id, default: 0])
+          let residualQuantity = max(0, event.distributionAmount - allocatedEventQuantities[event.id, default: 0])
+          updatedHolding = try self.applyAssetEvent(
+            event,
+            value: residualValue,
+            eligibleQuantity: residualQuantity,
+            to: updatedHolding)
+        }
+      }
+
+      if actionsOnDate.contains(where: \.isDistributionEvent) {
+        updatedHolding.groupIIEntries = []
       }
     }
 
@@ -130,18 +151,37 @@ enum Section104Processor {
     return updatedHolding
   }
 
+  /// Removes physically outbound units from Group II provenance without changing the legal Section 104 pool.
+  static func applyOutboundToGroupII(
+    quantity: Decimal,
+    holdingQuantity: Decimal,
+    to holding: Section104Holding) -> Section104Holding
+  {
+    var updatedHolding = holding
+    updatedHolding.groupIIEntries = self.depletingGroupIIEntries(
+      holding.groupIIEntries,
+      holdingQuantity: holdingQuantity,
+      disposedQuantity: quantity)
+    return updatedHolding
+  }
+
   /// Applies a single asset event to a Section 104 holding.
   /// - Parameters:
   ///   - event: The event to apply.
   ///   - holding: The holding to update.
   /// - Returns: The adjusted holding.
   static func applyAssetEvent(_ event: AssetEvent, to holding: Section104Holding) throws -> Section104Holding {
-    try self.applyAssetEvent(event, value: event.distributionValue, to: holding)
+    try self.applyAssetEvent(
+      event,
+      value: event.distributionValue,
+      eligibleQuantity: event.distributionAmount,
+      to: holding)
   }
 
   private static func applyAssetEvent(
     _ event: AssetEvent,
     value: Decimal,
+    eligibleQuantity: Decimal,
     to holding: Section104Holding) throws -> Section104Holding
   {
     switch event.kind {
@@ -149,20 +189,26 @@ enum Section104Processor {
       return self.applyRestructureEvents([event], to: holding)
     case .capitalReturn:
       var adjustedHolding = holding
-      let residualAmount = event.distributionValue > 0
-        ? event.distributionAmount * value / event.distributionValue
-        : 0
-      let availableCost = holding.averageCost * residualAmount
+      let availableCost = holding.groupIIEntries.reduce(Decimal(0)) { $0 + $1.cost }
       try CapitalReturnValidator.validate(
         asset: event.asset,
         date: event.date,
         value: value,
         availableCost: availableCost)
       adjustedHolding.costBasis = max(0, adjustedHolding.costBasis - value)
+      adjustedHolding.groupIIEntries = self.applyingGroupIIAdjustment(-value, to: holding.groupIIEntries)
       return adjustedHolding
     case .dividend:
       var adjustedHolding = holding
       adjustedHolding.costBasis += value
+      let groupIIQuantity = holding.groupIIEntries.reduce(Decimal(0)) { $0 + $1.quantity }
+      let groupIIAdjustment = EventAllocationMath.proportionalValue(
+        eventValue: value,
+        destinationQuantity: groupIIQuantity,
+        eligibleQuantity: eligibleQuantity)
+      adjustedHolding.groupIIEntries = self.applyingGroupIIAdjustment(
+        groupIIAdjustment,
+        to: holding.groupIIEntries)
       return adjustedHolding
     }
   }
@@ -180,6 +226,7 @@ enum Section104Processor {
       case .split(let multiplier):
         let ratio = (oldUnits: Decimal(1), newUnits: multiplier)
         adjustedHolding.quantity = adjustedHolding.quantity * ratio.newUnits / ratio.oldUnits
+        self.rescaleGroupIIEntries(&adjustedHolding.groupIIEntries, by: ratio)
         for i in 0 ..< adjustedHolding.pool.count {
           let match = adjustedHolding.pool[i]
           adjustedHolding.pool[i] = Section104Match(
@@ -194,6 +241,7 @@ enum Section104Processor {
       case .unsplit(let multiplier):
         let ratio = (oldUnits: multiplier, newUnits: Decimal(1))
         adjustedHolding.quantity = adjustedHolding.quantity * ratio.newUnits / ratio.oldUnits
+        self.rescaleGroupIIEntries(&adjustedHolding.groupIIEntries, by: ratio)
         for i in 0 ..< adjustedHolding.pool.count {
           let match = adjustedHolding.pool[i]
           adjustedHolding.pool[i] = Section104Match(
@@ -208,6 +256,7 @@ enum Section104Processor {
       case .restruct(let oldUnits, let newUnits):
         let ratio = (oldUnits: oldUnits, newUnits: newUnits)
         adjustedHolding.quantity = adjustedHolding.quantity * ratio.newUnits / ratio.oldUnits
+        self.rescaleGroupIIEntries(&adjustedHolding.groupIIEntries, by: ratio)
         for i in 0 ..< adjustedHolding.pool.count {
           let match = adjustedHolding.pool[i]
           adjustedHolding.pool[i] = Section104Match(
@@ -238,6 +287,11 @@ enum Section104Processor {
       case .event(let event):
         event.date
       }
+    }
+
+    var isDistributionEvent: Bool {
+      guard case .event(let event) = self else { return false }
+      return event.distributionType != nil
     }
   }
 
@@ -292,5 +346,62 @@ enum Section104Processor {
         poolQuantity: poolMatch.poolQuantity,
         poolCost: poolMatch.poolCost)
     }
+  }
+
+  private static func depletingGroupIIEntries(
+    _ entries: [GroupIICostEntry],
+    holdingQuantity: Decimal,
+    disposedQuantity: Decimal) -> [GroupIICostEntry]
+  {
+    let groupIIQuantity = entries.reduce(Decimal(0)) { $0 + $1.quantity }
+    var remainingToDeplete = max(0, disposedQuantity - max(0, holdingQuantity - groupIIQuantity))
+    var updatedEntries = entries.sorted(by: self.groupIIEntrySortsBefore)
+
+    for index in updatedEntries.indices where remainingToDeplete > 0 {
+      let quantityUsed = min(remainingToDeplete, updatedEntries[index].quantity)
+      let costUsed = updatedEntries[index].quantity > 0
+        ? updatedEntries[index].cost * quantityUsed / updatedEntries[index].quantity
+        : 0
+      updatedEntries[index].quantity -= quantityUsed
+      updatedEntries[index].cost -= costUsed
+      remainingToDeplete -= quantityUsed
+    }
+    return updatedEntries.filter { $0.quantity > 0 }
+  }
+
+  private static func applyingGroupIIAdjustment(
+    _ adjustment: Decimal,
+    to entries: [GroupIICostEntry]) -> [GroupIICostEntry]
+  {
+    let totalQuantity = entries.reduce(Decimal(0)) { $0 + $1.quantity }
+    guard totalQuantity > 0 else { return entries }
+    var remainingAdjustment = adjustment
+    var adjustedEntries = entries
+    for index in adjustedEntries.indices {
+      let entryAdjustment = index == adjustedEntries.index(before: adjustedEntries.endIndex)
+        ? remainingAdjustment
+        : EventAllocationMath.proportionalValue(
+          eventValue: abs(adjustment),
+          destinationQuantity: adjustedEntries[index].quantity,
+          eligibleQuantity: totalQuantity) * (adjustment < 0 ? -1 : 1)
+      adjustedEntries[index].cost += entryAdjustment
+      remainingAdjustment -= entryAdjustment
+    }
+    return adjustedEntries
+  }
+
+  private static func rescaleGroupIIEntries(
+    _ entries: inout [GroupIICostEntry],
+    by ratio: (oldUnits: Decimal, newUnits: Decimal))
+  {
+    for index in entries.indices {
+      entries[index].quantity = entries[index].quantity * ratio.newUnits / ratio.oldUnits
+    }
+  }
+
+  private static func groupIIEntrySortsBefore(_ lhs: GroupIICostEntry, _ rhs: GroupIICostEntry) -> Bool {
+    if lhs.date != rhs.date { return lhs.date < rhs.date }
+    if lhs.sourceOrder != rhs.sourceOrder { return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max) }
+    return lhs.transactionId.uuidString < rhs.transactionId.uuidString
   }
 }

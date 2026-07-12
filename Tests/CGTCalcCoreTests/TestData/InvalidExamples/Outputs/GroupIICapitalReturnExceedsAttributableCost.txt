@@ -1,0 +1,1 @@
+Error calculating CGT: Unsupported CAPRETURN for TEST on 31/12/2020: value £200 exceeds the £100 remaining allowable cost attributable to the event. CAPRETURN supports fund equalisation cost reductions and cannot reduce allowable cost below zero.

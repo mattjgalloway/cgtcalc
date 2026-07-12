@@ -122,7 +122,8 @@ public enum CGTEngine {
         actions,
         into: section104Holdings[asset, default: Section104Holding()],
         usedBuyQuantities: usedBuyQuantities,
-        allocatedEventValues: allocatedEventValues)
+        allocatedEventValues: allocatedEventValues,
+        allocatedEventQuantities: allocatedEventQuantities)
       return (asset, holding)
     })
 
@@ -225,7 +226,8 @@ public enum CGTEngine {
       actions,
       into: currentHolding,
       usedBuyQuantities: usedBuyQuantities,
-      allocatedEventValues: allocatedEventValues)
+      allocatedEventValues: allocatedEventValues,
+      allocatedEventQuantities: allocatedEventQuantities)
     let s104QuantityNeeded = groupedQuantity - bnbQuantityUsed
     var section104Matches: [Section104Match] = []
 
@@ -257,7 +259,11 @@ public enum CGTEngine {
       outbounds: outboundGroup,
       bnbMatches: bnbMatches,
       section104Matches: section104Matches)
-    let updatedHolding = Section104Processor.applyMatches(section104Matches, to: processedHolding)
+    let poolAdjustedHolding = Section104Processor.applyMatches(section104Matches, to: processedHolding)
+    let updatedHolding = Section104Processor.applyOutboundToGroupII(
+      quantity: groupedQuantity,
+      holdingQuantity: processedHolding.quantity,
+      to: poolAdjustedHolding)
 
     return OutboundGroupProcessResult(
       updatedHolding: updatedHolding,
