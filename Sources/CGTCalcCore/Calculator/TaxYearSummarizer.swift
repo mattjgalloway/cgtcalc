@@ -11,7 +11,10 @@ enum TaxYearSummarizer {
   /// Groups disposals by tax year and applies exemption and carried-loss rules.
   /// - Parameter disposals: Completed disposal records from the engine.
   /// - Returns: Per-year summaries plus the remaining carried loss after the last year.
-  static func summarize(disposals: [Disposal]) throws -> TaxYearSummaryResult {
+  static func summarize(
+    disposals: [Disposal],
+    taxRateProvider: any TaxRateProvider = BuiltInTaxRateProvider()) throws -> TaxYearSummaryResult
+  {
     let disposalsByYear = Dictionary(grouping: disposals) { $0.taxYear }
     var summaries: [TaxYearSummary] = []
     var lossCarryForward: Decimal = 0
@@ -20,7 +23,12 @@ enum TaxYearSummarizer {
       let totalGain = yearDisposals.filter { $0.gain > 0 }.reduce(Decimal(0)) { $0 + $1.gain }
       let totalLoss = yearDisposals.filter { $0.gain < 0 }.reduce(Decimal(0)) { $0 + abs($1.gain) }
       let rawNetGain = totalGain - totalLoss
-      let exemption = try TaxRateLookup.rates(for: taxYear).exemption
+      guard let rates = taxRateProvider.rates(for: taxYear) else {
+        throw TaxRateProviderError.missingTaxRates(
+          startYear: taxYear.startYear,
+          providerIdentifier: taxRateProvider.identifier)
+      }
+      let exemption = rates.exemption
 
       let netGain = rawNetGain
       var lossAppliedThisYear: Decimal = 0

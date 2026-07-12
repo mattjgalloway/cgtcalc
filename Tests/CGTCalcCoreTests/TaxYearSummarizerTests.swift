@@ -50,10 +50,11 @@ final class TaxYearSummarizerTests: XCTestCase {
       try TaxYearSummarizer.summarize(disposals: [
         TestSupport.disposal(date: "01/06/2012", gain: 100)
       ])) { error in
-        guard case TaxRateLookup.LookupError.missingTaxRates(let startYear) = error else {
+        guard case TaxRateProviderError.missingTaxRates(let startYear, let providerIdentifier) = error else {
           return XCTFail("Unexpected error: \(error)")
         }
         XCTAssertEqual(startYear, 2012)
+        XCTAssertEqual(providerIdentifier, "built-in HMRC rates")
       }
   }
 }

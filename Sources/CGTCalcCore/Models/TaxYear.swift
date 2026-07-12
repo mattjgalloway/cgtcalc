@@ -92,6 +92,50 @@ public struct TaxRates: Sendable {
   }
 }
 
+public protocol TaxRateProvider: Sendable {
+  var identifier: String { get }
+  func rates(for year: TaxYear) -> TaxRates?
+}
+
+public enum TaxRateProviderError: Error, LocalizedError, Equatable {
+  case missingTaxRates(startYear: Int, providerIdentifier: String)
+
+  public var errorDescription: String? {
+    switch self {
+    case .missingTaxRates(let startYear, let providerIdentifier):
+      "Missing tax rates for year \(startYear) from provider \(providerIdentifier)."
+    }
+  }
+}
+
+public struct BuiltInTaxRateProvider: TaxRateProvider {
+  public let identifier = "built-in HMRC rates"
+
+  public init() {}
+
+  public func rates(for year: TaxYear) -> TaxRates? {
+    Self.rates[year.startYear]
+  }
+
+  // Source: HMRC rates and allowances for Capital Gains Tax.
+  private static let rates: [Int: TaxRates] = [
+    2026: TaxRates(exemption: 3000),
+    2025: TaxRates(exemption: 3000),
+    2024: TaxRates(exemption: 3000),
+    2023: TaxRates(exemption: 6000),
+    2022: TaxRates(exemption: 12300),
+    2021: TaxRates(exemption: 12300),
+    2020: TaxRates(exemption: 12300),
+    2019: TaxRates(exemption: 12000),
+    2018: TaxRates(exemption: 11700),
+    2017: TaxRates(exemption: 11300),
+    2016: TaxRates(exemption: 11100),
+    2015: TaxRates(exemption: 11100),
+    2014: TaxRates(exemption: 11000),
+    2013: TaxRates(exemption: 10900)
+  ]
+}
+
 // MARK: - Tax Rates Lookup
 
 public enum TaxRateLookup {
@@ -106,30 +150,11 @@ public enum TaxRateLookup {
     }
   }
 
-  // UK CGT rates by tax year
-  // Source: HMRC https://www.gov.uk/government/publications/rates-and-allowances-for-capital-gains-tax/rates-and-allowances-for-capital-gains-tax
-  private static let rates: [Int: TaxRates] = [
-    2026: TaxRates(exemption: 3000), // 2026/2027
-    2025: TaxRates(exemption: 3000), // 2025/2026
-    2024: TaxRates(exemption: 3000), // 2024/2025
-    2023: TaxRates(exemption: 6000), // 2023/2024
-    2022: TaxRates(exemption: 12300), // 2022/2023
-    2021: TaxRates(exemption: 12300), // 2021/2022
-    2020: TaxRates(exemption: 12300), // 2020/2021
-    2019: TaxRates(exemption: 12000), // 2019/2020
-    2018: TaxRates(exemption: 11700), // 2018/2019
-    2017: TaxRates(exemption: 11300), // 2017/2018
-    2016: TaxRates(exemption: 11100), // 2016/2017
-    2015: TaxRates(exemption: 11100), // 2015/2016
-    2014: TaxRates(exemption: 11000), // 2014/2015
-    2013: TaxRates(exemption: 10900) // 2013/2014
-  ]
-
   /// Returns the configured CGT rates for a tax year.
   /// - Parameter year: The tax year to look up.
   /// - Returns: The exemption and rate bundle for that year.
   public static func rates(for year: TaxYear) throws -> TaxRates {
-    guard let rates = rates[year.startYear] else {
+    guard let rates = BuiltInTaxRateProvider().rates(for: year) else {
       throw LookupError.missingTaxRates(startYear: year.startYear)
     }
     return rates

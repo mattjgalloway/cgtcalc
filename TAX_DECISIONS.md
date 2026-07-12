@@ -24,15 +24,16 @@ This is not legal advice. It is a project decision log.
   - `Tests/CGTCalcCoreTests/CalculatorTests.swift` `testPre2008InputDateThrowsUnsupportedScopeError`
   - `Tests/CGTCalcCoreTests/TestData/InvalidExamples/Inputs/UnsupportedPre2008Date.txt`
 
-### Disposal tax years supported from 2013/2014 onwards
+### Built-in disposal tax years are supported from 2013/2014 onwards
 
-- Decision: annual exempt amount data is currently configured only for disposal tax years `2013/2014` onwards.
+- Decision: the built-in HMRC provider contains annual exempt amount data for disposal tax years `2013/2014` onwards. Direct library callers may inject a `TaxRateProvider` for other years; missing provider data remains an explicit error.
 - Why: tax-year lookup data has only been populated from that point.
 - Status: explicit scope boundary.
 - User-facing wording:
   - `README.md`
 - Code:
   - `Sources/CGTCalcCore/Models/TaxYear.swift`
+  - `Sources/CGTCalcCore/Calculator/TaxYearSummarizer.swift`
 
 ### UK-resident assumption for 30-day matching
 

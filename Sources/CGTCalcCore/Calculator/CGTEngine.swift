@@ -7,6 +7,13 @@ public enum CGTEngine {
   /// - Parameter inputData: Mixed transaction and asset-event rows from the parser.
   /// - Returns: The full calculation result used by the formatter and tests.
   public static func calculate(inputData: [InputData]) throws -> CalculationResult {
+    try self.calculate(inputData: inputData, taxRateProvider: BuiltInTaxRateProvider())
+  }
+
+  public static func calculate(
+    inputData: [InputData],
+    taxRateProvider: any TaxRateProvider) throws -> CalculationResult
+  {
     let transactions = inputData.compactMap { data -> Transaction? in
       if case .transaction(let t) = data { return t }
       return nil
@@ -17,7 +24,10 @@ public enum CGTEngine {
       return nil
     }
 
-    return try self.calculate(transactions: transactions, assetEvents: assetEvents)
+    return try self.calculate(
+      transactions: transactions,
+      assetEvents: assetEvents,
+      taxRateProvider: taxRateProvider)
   }
 
   /// Runs the CGT engine on transactions and asset events.
@@ -26,6 +36,17 @@ public enum CGTEngine {
   ///   - assetEvents: CAPRETURN, DIVIDEND, SPLIT, UNSPLIT, and RESTRUCT rows for all assets.
   /// - Returns: Disposals, tax-year summaries, and final holdings.
   public static func calculate(transactions: [Transaction], assetEvents: [AssetEvent]) throws -> CalculationResult {
+    try self.calculate(
+      transactions: transactions,
+      assetEvents: assetEvents,
+      taxRateProvider: BuiltInTaxRateProvider())
+  }
+
+  public static func calculate(
+    transactions: [Transaction],
+    assetEvents: [AssetEvent],
+    taxRateProvider: any TaxRateProvider) throws -> CalculationResult
+  {
     try CalculationInputValidator.validate(transactions: transactions, assetEvents: assetEvents)
     try self.validateSupportedDateScope(transactions: transactions, assetEvents: assetEvents)
     try CalculationTimeline.validateSameDateCombinations(transactions: transactions, assetEvents: assetEvents)
@@ -108,7 +129,9 @@ public enum CGTEngine {
       previousOutboundDateByAsset[asset] = outboundDate
     }
 
-    let summaryResult = try TaxYearSummarizer.summarize(disposals: disposals)
+    let summaryResult = try TaxYearSummarizer.summarize(
+      disposals: disposals,
+      taxRateProvider: taxRateProvider)
     let summaries = summaryResult.summaries
 
     let assets = Set(buysByAsset.keys)
