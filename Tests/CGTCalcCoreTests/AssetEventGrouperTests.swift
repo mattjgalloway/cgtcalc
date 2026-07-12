@@ -34,6 +34,17 @@ final class AssetEventGrouperTests: XCTestCase {
     XCTAssertEqual(grouped[1].distributionValue, 7)
   }
 
+  func testEmitsDividendBeforeCapitalReturnRegardlessOfInputOrder() {
+    let capitalReturn = TestSupport.capReturn("15/06/2020", "TEST", 100, 3, sourceOrder: 0)
+    let dividend = TestSupport.dividend("15/06/2020", "TEST", 200, 5, sourceOrder: 1)
+
+    for events in [[capitalReturn, dividend], [dividend, capitalReturn]] {
+      let grouped = AssetEventGrouper.groupDistributions(events)
+
+      XCTAssertEqual(grouped.map(\.distributionType), [.dividend, .capitalReturn])
+    }
+  }
+
   func testKeepsDifferentAssetsAndDaysSeparate() {
     let events = [
       TestSupport.dividend("15/06/2020", "AAA", 100, 5),

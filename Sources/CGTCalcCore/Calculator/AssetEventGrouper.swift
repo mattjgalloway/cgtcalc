@@ -38,6 +38,11 @@ enum AssetEventGrouper {
         date: event.date,
         asset: event.asset,
         kind: kind)
+    }.sorted { lhs, rhs in
+      if lhs.date != rhs.date { return lhs.date < rhs.date }
+      if lhs.asset != rhs.asset { return lhs.asset < rhs.asset }
+      if lhs.calculationOrder != rhs.calculationOrder { return lhs.calculationOrder < rhs.calculationOrder }
+      return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
     }
   }
 }

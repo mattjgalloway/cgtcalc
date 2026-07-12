@@ -3,6 +3,26 @@ import XCTest
 
 /// Engine-level smoke tests. Detailed rule behavior lives in focused unit-test files.
 final class CalculatorTests: XCTestCase {
+  func testSameDateDividendUpliftPrecedesCapitalReturnRegardlessOfInputOrder() throws {
+    let prefix = """
+    BUY 01/01/2020 TEST 100 10 0
+    DIVIDEND 30/06/2020 TEST 100 0
+    BUY 01/07/2020 TEST 100 1 0
+    """
+    let eventRows = [
+      "DIVIDEND 31/12/2020 TEST 200 100",
+      "CAPRETURN 31/12/2020 TEST 100 150"
+    ]
+
+    for rows in [eventRows, Array(eventRows.reversed())] {
+      let input = try InputParser.parse(content: prefix + "\n" + rows.joined(separator: "\n"))
+      let result = try CGTEngine.calculate(inputData: input)
+
+      XCTAssertEqual(result.holdings["TEST"]?.quantity, 200)
+      XCTAssertEqual(result.holdings["TEST"]?.costBasis, 1050)
+    }
+  }
+
   func testSharedRebuyCostIncludingExpensesIsConservedAcrossDisposals() throws {
     let input = try InputParser.parse(content: """
     BUY 01/01/2020 TEST 3 1 0

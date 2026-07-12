@@ -34,7 +34,7 @@ final class Section104ProcessorTests: XCTestCase {
     guard case .event = actions[1] else { return XCTFail("Expected event second") }
   }
 
-  func testActionsUseSourceOrderForSameDateSameTypeRows() {
+  func testActionsUseCanonicalDistributionOrderBeforeSourceOrder() {
     let buy1 = TestSupport.buy("01/03/2019", "TEST", 100, 10, 0, sourceOrder: 2)
     let buy2 = TestSupport.buy("01/03/2019", "TEST", 100, 12, 0, sourceOrder: 1)
     let event1 = TestSupport.capReturn("01/03/2019", "TEST", 100, 50, sourceOrder: 4)
@@ -55,8 +55,8 @@ final class Section104ProcessorTests: XCTestCase {
 
     XCTAssertEqual(firstBuy.sourceOrder, 1)
     XCTAssertEqual(secondBuy.sourceOrder, 2)
-    XCTAssertEqual(firstEvent.sourceOrder, 3)
-    XCTAssertEqual(secondEvent.sourceOrder, 4)
+    XCTAssertEqual(firstEvent.distributionType, .dividend)
+    XCTAssertEqual(secondEvent.distributionType, .capitalReturn)
   }
 
   func testProcessActionsBuildsHoldingAndAppliesCapitalReturn() throws {

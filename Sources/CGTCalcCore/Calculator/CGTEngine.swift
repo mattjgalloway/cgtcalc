@@ -274,6 +274,9 @@ public enum CGTEngine {
     if lhs.date != rhs.date {
       return lhs.date < rhs.date
     }
+    if lhs.calculationOrder != rhs.calculationOrder {
+      return lhs.calculationOrder < rhs.calculationOrder
+    }
     if lhs.sourceOrder != rhs.sourceOrder {
       return (lhs.sourceOrder ?? .max) < (rhs.sourceOrder ?? .max)
     }

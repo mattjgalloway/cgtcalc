@@ -323,6 +323,9 @@ enum Section104Processor {
       }
       return lhsBuy.id.uuidString < rhsBuy.id.uuidString
     case (.event(let lhsEvent), .event(let rhsEvent)):
+      if lhsEvent.calculationOrder != rhsEvent.calculationOrder {
+        return lhsEvent.calculationOrder < rhsEvent.calculationOrder
+      }
       if lhsEvent.sourceOrder != rhsEvent.sourceOrder {
         return (lhsEvent.sourceOrder ?? .max) < (rhsEvent.sourceOrder ?? .max)
       }
