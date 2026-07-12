@@ -2,6 +2,8 @@
 import XCTest
 
 final class Section104ProcessorTests: XCTestCase {
+  private let tolerance = QuantityMaths.arithmeticDustTolerance
+
   func testSellingEntireRepeatingAveragePoolConsumesExactCost() throws {
     let buys = [
       TestSupport.buy("01/01/2020", "TEST", 1, 10, 0),
@@ -17,6 +19,95 @@ final class Section104ProcessorTests: XCTestCase {
 
     XCTAssertEqual(matches.reduce(Decimal(0)) { $0 + $1.cost }, 100)
     XCTAssertEqual(remaining.costBasis, 0)
+  }
+
+  func testMakeMatchesReconcilesDifferenceExactlyAtTolerance() throws {
+    let holding = try self.makeHolding(quantity: 10, price: 10)
+    let matches = Section104Processor.makeMatches(
+      quantityNeeded: 10 + self.tolerance,
+      holding: holding)
+
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.quantity }, 10 + self.tolerance)
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.cost }, holding.costBasis)
+  }
+
+  func testMakeMatchesDoesNotReconcileDifferenceBeyondTolerance() throws {
+    let beyondTolerance = try XCTUnwrap(Decimal.parse("0.0000000100000001"))
+    let holding = try self.makeHolding(quantity: 10, price: 10)
+    let matches = Section104Processor.makeMatches(
+      quantityNeeded: 10 + beyondTolerance,
+      holding: holding)
+
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.quantity }, 10)
+  }
+
+  func testMakeMatchesReconcilesPoolSlightlyBelowRequestedQuantity() throws {
+    let available = 10 - self.tolerance
+    let holding = try self.makeHolding(quantity: available, price: 10)
+    let matches = Section104Processor.makeMatches(quantityNeeded: 10, holding: holding)
+    let remaining = Section104Processor.applyMatches(matches, to: holding)
+
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.quantity }, 10)
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.cost }, holding.costBasis)
+    XCTAssertEqual(remaining.quantity, 0)
+    XCTAssertEqual(remaining.costBasis, 0)
+    XCTAssertTrue(remaining.pool.isEmpty)
+  }
+
+  func testMakeMatchesReconcilesPoolSlightlyAboveRequestedQuantity() throws {
+    let available = 10 + self.tolerance
+    let holding = try self.makeHolding(quantity: available, price: 10)
+    let matches = Section104Processor.makeMatches(quantityNeeded: 10, holding: holding)
+    let remaining = Section104Processor.applyMatches(matches, to: holding)
+
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.quantity }, 10)
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.cost }, holding.costBasis)
+    XCTAssertEqual(remaining.quantity, 0)
+    XCTAssertEqual(remaining.costBasis, 0)
+    XCTAssertTrue(remaining.pool.isEmpty)
+  }
+
+  func testMakeMatchesDoesNotMatchToleranceSizedRequestAgainstEmptyPool() {
+    let matches = Section104Processor.makeMatches(
+      quantityNeeded: self.tolerance,
+      holding: Section104Holding())
+
+    XCTAssertTrue(matches.isEmpty)
+  }
+
+  func testPartialDisposalDoesNotConsumeCompletePoolCostBasis() throws {
+    let holding = try self.makeHolding(quantity: 10, price: 10)
+    let matches = Section104Processor.makeMatches(quantityNeeded: 4, holding: holding)
+    let remaining = Section104Processor.applyMatches(matches, to: holding)
+
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.cost }, 40)
+    XCTAssertEqual(remaining.quantity, 6)
+    XCTAssertEqual(remaining.costBasis, 60)
+  }
+
+  func testFullPoolReconciliationAdjustsOnlyFinalProvenanceLot() throws {
+    let firstBuy = TestSupport.buy("01/01/2020", "TEST", 4, 10, 0, sourceOrder: 0)
+    let secondBuy = TestSupport.buy("02/01/2020", "TEST", 6, 10, 0, sourceOrder: 1)
+    let holding = try Section104Processor.processActions(
+      Section104Processor.actions(
+        buys: [firstBuy, secondBuy],
+        events: [],
+        after: .distantPast,
+        through: nil),
+      into: Section104Holding(),
+      usedBuyQuantities: [:])
+    let matches = Section104Processor.makeMatches(
+      quantityNeeded: 10 + self.tolerance,
+      holding: holding)
+    let remaining = Section104Processor.applyMatches(matches, to: holding)
+
+    XCTAssertEqual(matches.count, 2)
+    XCTAssertEqual(matches[0].quantity, 4)
+    XCTAssertEqual(matches[1].quantity, 6 + self.tolerance)
+    XCTAssertEqual(matches.reduce(0) { $0 + $1.cost }, 100)
+    XCTAssertEqual(remaining.quantity, 0)
+    XCTAssertEqual(remaining.costBasis, 0)
+    XCTAssertTrue(remaining.pool.isEmpty)
   }
 
   func testActionsSortBuysBeforeEventsOnSameDate() {
@@ -192,6 +283,14 @@ final class Section104ProcessorTests: XCTestCase {
     XCTAssertEqual(holding.costBasis, 96.28, accuracy: 0.00001)
     XCTAssertEqual(holding.pool.count, 1)
     XCTAssertEqual(holding.pool[0].quantity, 1)
+  }
+
+  private func makeHolding(quantity: Decimal, price: Decimal) throws -> Section104Holding {
+    let buy = TestSupport.buy("01/01/2020", "TEST", quantity, price, 0)
+    return try Section104Processor.processActions(
+      Section104Processor.actions(buys: [buy], events: [], after: .distantPast, through: nil),
+      into: Section104Holding(),
+      usedBuyQuantities: [:])
   }
 
   func testApplyRestructureEventsIgnoresNonRestructureEventTypes() {

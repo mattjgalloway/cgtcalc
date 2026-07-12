@@ -1,0 +1,49 @@
+# SUMMARY
+
+Tax year    Gain   Proceeds   Exemption   Loss carry   Taxable gain
+===================================================================
+2025/2026   £661   £1181      £3000       £0           £0          
+
+
+# TAX YEAR DETAILS
+
+## TAX YEAR 2025/2026
+
+2 gains with total of 661.
+0 losses with total of 0.
+
+1) SOLD 72 of GB00B41YBW71 on 10/02/2026 for GAIN of £429
+Matches with:
+  - BED & BREAKFAST: 20.0506329113924050632911392405063291136 bought on 18/02/2026 at £3.21
+  - BED & BREAKFAST: 51.949367088607594936708860759493670885 bought on 18/02/2026 at £3.74
+Calculation: (72 * 9.56 - 0) - ( (20.0506329113924050632911392405063291136 * 3.21 + 0) + (51.949367088607594936708860759493670885 * 3.74 + 0) ) = 429
+
+2) SOLD 79 of GB00B41YBW71 on 25/02/2026 for GAIN of £232
+Matches with:
+  - SECTION 104: 79 at cost basis of £3.30414
+Calculation: (79 * 6.25 - 0) - ( (79 * 3.30414) ) = 232
+
+
+# TAX RETURN INFORMATION
+
+2025/2026: Disposals = 2, proceeds = 1181, allowable costs = 519, total gains = 661, total losses = 0
+
+
+# HOLDINGS
+
+NONE
+
+
+# TRANSACTIONS
+
+09/02/2025 BOUGHT 20 of GB00B41YBW71 at £3.37 with £0 expenses
+09/02/2025 BOUGHT 52 of GB00B41YBW71 at £3.24 with £0 expenses
+10/02/2026 SOLD 72 of GB00B41YBW71 at £9.56 with £0 expenses
+18/02/2026 BOUGHT 22 of GB00B41YBW71 at £3.21 with £0 expenses
+18/02/2026 BOUGHT 57 of GB00B41YBW71 at £3.74 with £0 expenses
+25/02/2026 SOLD 79 of GB00B41YBW71 at £6.25 with £0 expenses
+
+
+# ASSET EVENTS
+
+NONE

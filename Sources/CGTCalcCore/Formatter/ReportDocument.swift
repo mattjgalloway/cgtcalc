@@ -71,18 +71,28 @@ struct DisposalReportEntry {
         date: match.buyTransaction.date,
         purchasePrice: match.buyTransaction.price,
         purchaseExpenses: purchaseExpenses,
-        restructureMultiplier: match.restructureMultiplier,
+        restructureMultiplier: QuantityMaths.isArithmeticDust(match.restructureMultiplier - 1)
+          ? 1
+          : match.restructureMultiplier,
         eventAdjustment: match.eventAdjustment,
         cost: match.cost)
     }
 
     if let firstMatch = disposal.section104Matches.first {
-      let averageCost = firstMatch.poolQuantity > 0 ? firstMatch.poolCost / firstMatch.poolQuantity : 0
+      let acquisitionQuantity = self.acquisitionMatches.reduce(Decimal(0)) { $0 + $1.quantity }
+      let rawMatchedQuantity = disposal.section104Matches.reduce(Decimal(0)) { $0 + $1.quantity }
+      let expectedMatchedQuantity = disposal.sellTransaction.quantity - acquisitionQuantity
+      let poolQuantity = QuantityMaths.isArithmeticDust(firstMatch.poolQuantity - expectedMatchedQuantity)
+        ? expectedMatchedQuantity
+        : firstMatch.poolQuantity
+      let averageCost = poolQuantity > 0 ? firstMatch.poolCost / poolQuantity : 0
       self.section104 = Section104Component(
-        poolQuantity: firstMatch.poolQuantity,
+        poolQuantity: poolQuantity,
         poolCost: firstMatch.poolCost,
         averageCost: averageCost,
-        matchedQuantity: disposal.section104Matches.reduce(0) { $0 + $1.quantity },
+        matchedQuantity: QuantityMaths.isArithmeticDust(rawMatchedQuantity - expectedMatchedQuantity)
+          ? expectedMatchedQuantity
+          : rawMatchedQuantity,
         matchedCost: disposal.section104Matches.reduce(0) { $0 + $1.cost })
     } else {
       self.section104 = nil

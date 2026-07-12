@@ -111,20 +111,27 @@ enum Section104Processor {
     guard quantityNeeded > 0 else { return [] }
 
     let poolQuantity = holding.quantity
+    guard poolQuantity > 0 else { return [] }
+
     let poolCostBasis = holding.costBasis
-    let targetQuantity = min(quantityNeeded, poolQuantity)
-    let targetCost = targetQuantity >= poolQuantity
+    let consumesEntirePool = QuantityMaths.isNearFullPoolConsumption(
+      requested: quantityNeeded,
+      available: poolQuantity)
+    let targetQuantity = consumesEntirePool ? quantityNeeded : min(quantityNeeded, poolQuantity)
+    let targetCost = consumesEntirePool
       ? poolCostBasis
       : poolCostBasis * targetQuantity / poolQuantity
-    var remainingQuantity = quantityNeeded
+    var remainingQuantity = targetQuantity
     var remainingCost = targetCost
     var cumulativeMatchedQuantity: Decimal = 0
     var matches: [Section104Match] = []
 
-    for match in holding.pool.sorted(by: self.matchSortsBefore) {
-      guard remainingQuantity > 0, match.quantity > 0 else { continue }
+    let poolMatches = holding.pool.filter { $0.quantity > 0 }.sorted(by: self.matchSortsBefore)
+    for (index, match) in poolMatches.enumerated() {
+      guard remainingQuantity > 0 else { continue }
 
-      let matchQty = min(remainingQuantity, match.quantity)
+      let isFinalFullPoolMatch = consumesEntirePool && index == poolMatches.index(before: poolMatches.endIndex)
+      let matchQty = isFinalFullPoolMatch ? remainingQuantity : min(remainingQuantity, match.quantity)
       cumulativeMatchedQuantity += matchQty
       let matchCost: Decimal = if cumulativeMatchedQuantity >= targetQuantity {
         remainingCost
@@ -159,7 +166,14 @@ enum Section104Processor {
     let matchedCost = matches.reduce(Decimal(0)) { $0 + $1.cost }
     updatedHolding.quantity -= totalUsed
     updatedHolding.costBasis -= matchedCost
+    updatedHolding.quantity = QuantityMaths.normalizingArithmeticZero(updatedHolding.quantity)
+    if updatedHolding.quantity == 0 {
+      updatedHolding.costBasis = 0
+    }
     updatedHolding.pool = self.applyingMatches(matches, to: updatedHolding.pool)
+    if updatedHolding.quantity == 0 {
+      updatedHolding.pool = []
+    }
     return updatedHolding
   }
 

@@ -181,7 +181,7 @@ struct CalculationSession {
       : []
 
     let matchedQuantity = bnbQuantityUsed + section104Matches.reduce(0) { $0 + $1.quantity }
-    guard matchedQuantity == groupedQuantity else {
+    guard QuantityMaths.isReconciledMatch(requested: groupedQuantity, matched: matchedQuantity) else {
       if let laterDate = self.firstLaterAcquisitionDate(
         outboundDate: outboundDate,
         buys: assetBuys)

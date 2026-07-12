@@ -56,4 +56,68 @@ final class CalculationSessionTests: XCTestCase {
     XCTAssertEqual(output.holdings["TEST"]?.quantity, 60)
     XCTAssertEqual(output.holdings["TEST"]?.costBasis, 600)
   }
+
+  func testReconcilesReciprocalRestructureDustWhenFullyConsumingPool() throws {
+    let result = try CGTEngine.calculate(
+      transactions: [
+        TestSupport.buy("01/01/2020", "TEST", 7, 10, 0),
+        TestSupport.sell("01/07/2020", "TEST", 7, 12, 0)
+      ],
+      assetEvents: [
+        AssetEvent(date: TestSupport.date("01/03/2020"), asset: "TEST", oldUnits: 3, newUnits: 10),
+        AssetEvent(date: TestSupport.date("01/05/2020"), asset: "TEST", oldUnits: 10, newUnits: 3)
+      ])
+
+    let disposal = try XCTUnwrap(result.taxYearSummaries.first?.disposals.first)
+
+    XCTAssertEqual(disposal.section104Matches.reduce(0) { $0 + $1.quantity }, 7)
+    XCTAssertEqual(disposal.rawAllowableCosts, 70)
+    XCTAssertEqual(disposal.gain, 14)
+    XCTAssertEqual(result.holdings["TEST"]?.quantity, 0)
+    XCTAssertEqual(result.holdings["TEST"]?.costBasis, 0)
+  }
+
+  func testDoesNotReconcileQuantityOutsideArithmeticDustTolerance() throws {
+    XCTAssertThrowsError(try CGTEngine.calculate(
+      transactions: [
+        TestSupport.buy("01/01/2020", "TEST", 7, 10, 0),
+        TestSupport.sell("01/07/2020", "TEST", XCTUnwrap(Decimal.parse("7.00000002")), 12, 0)
+      ],
+      assetEvents: []))
+    { error in
+      guard case CalculationError.insufficientShares = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+    }
+  }
+
+  func testToleranceSizedSaleFromEmptyPoolIsRejected() throws {
+    let quantity = try XCTUnwrap(Decimal.parse("0.00000001"))
+
+    XCTAssertThrowsError(try CGTEngine.calculate(
+      transactions: [TestSupport.sell("01/07/2020", "TEST", quantity, 12, 0)],
+      assetEvents: []))
+    { error in
+      guard case CalculationError.insufficientShares = error else {
+        return XCTFail("Unexpected error: \(error)")
+      }
+    }
+  }
+
+  func testReconcilesSplitAcquisitionRoundingFixture() throws {
+    let input = try InputParser.parse(content: """
+    BUY 09/02/2025 GB00B41YBW71 20 3.37 0
+    BUY 09/02/2025 GB00B41YBW71 52 3.24 0
+    SELL 10/02/2026 GB00B41YBW71 72 9.56 0
+    BUY 18/02/2026 GB00B41YBW71 22 3.21 0
+    BUY 18/02/2026 GB00B41YBW71 57 3.74 0
+    SELL 25/02/2026 GB00B41YBW71 79 6.25 0
+    """)
+
+    let result = try CGTEngine.calculate(inputData: input)
+
+    XCTAssertEqual(result.taxYearSummaries.first?.disposals.count, 2)
+    XCTAssertEqual(result.holdings["GB00B41YBW71"]?.quantity, 0)
+    XCTAssertEqual(result.holdings["GB00B41YBW71"]?.costBasis, 0)
+  }
 }

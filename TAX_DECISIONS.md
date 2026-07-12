@@ -300,6 +300,7 @@ The stages are deliberately separate:
    - Tolerance accepts harmless source or arithmetic dust; it must not silently move a meaningful value across a tax boundary.
    - `max(0, ...)` is not a substitute for validation when a negative value would indicate an unsupported or inconsistent tax state.
    - Asset-event quantity validation uses `max(0.0001, expected units * 0.00001)`; the CAPRETURN zero-cost boundary uses a £0.0001 monetary tolerance.
+   - Internal matching uses a fixed `0.00000001` unit tolerance only for arithmetic residue from proportional allocation or restructure ratios. Near-equal full-pool consumption receives the exact remaining pool cost and normalizes the residual holding to zero; larger shortfalls remain errors.
 
 Implementation guidance:
 
