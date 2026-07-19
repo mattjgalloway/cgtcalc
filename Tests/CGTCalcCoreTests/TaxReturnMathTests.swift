@@ -29,7 +29,8 @@ final class TaxReturnMathTests: XCTestCase {
     XCTAssertEqual(summary.taxReturnMath.proceeds, 2)
     XCTAssertEqual(summary.taxReturnMath.allowableCosts, 2)
     XCTAssertEqual(summary.taxReturnMath.totalGains, 0)
-    XCTAssertEqual(summary.taxReturnMath.totalLosses, 0)
+    // Two 99p losses each floor to -£1 per disposal, so losses total £2.
+    XCTAssertEqual(summary.taxReturnMath.totalLosses, 2)
   }
 
   func testTaxReturnUsesPerDisposalRoundedValuesForMixedPenceGainAndLoss() throws {
@@ -44,7 +45,8 @@ final class TaxReturnMathTests: XCTestCase {
     XCTAssertEqual(summary.taxReturnMath.proceeds, 1)
     XCTAssertEqual(summary.taxReturnMath.allowableCosts, 2)
     XCTAssertEqual(summary.taxReturnMath.totalGains, 0)
-    XCTAssertEqual(summary.taxReturnMath.totalLosses, 0)
+    // The 99p loss floors to -£1 per disposal (the 99p gain floors to £0), so losses total £1.
+    XCTAssertEqual(summary.taxReturnMath.totalLosses, 1)
   }
 
   func testTaxReturnUsesPerDisposalRoundedValuesForMixedSection104AndThirtyDayMatch() throws {
