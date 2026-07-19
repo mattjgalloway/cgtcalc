@@ -183,7 +183,8 @@ final class ModelCoverageTests: XCTestCase {
     XCTAssertEqual(taxReturn.proceeds, 25)
     XCTAssertEqual(taxReturn.allowableCosts, 20)
     XCTAssertEqual(taxReturn.totalGains, 7)
-    XCTAssertEqual(taxReturn.totalLosses, 1)
+    // rawGain -1.25 floors to -£2 per disposal, so losses total £2.
+    XCTAssertEqual(taxReturn.totalLosses, 2)
 
     let split = try XCTUnwrap(taxReturn.specialRateSplit)
     XCTAssertEqual(split.label, "29th October")

@@ -36,7 +36,7 @@ extension TaxYearSummary {
       .reduce(Decimal(0)) { $0 + TaxMethods.roundedGain($1.rawGain) }
     let totalLosses = self.disposals
       .filter { $0.rawGain < 0 }
-      .reduce(Decimal(0)) { $0 + TaxMethods.roundedGain(abs($1.rawGain)) }
+      .reduce(Decimal(0)) { $0 + abs(TaxMethods.roundedGain($1.rawGain)) }
 
     let specialRateSplit: TaxReturnMath.SpecialRateSplit?
     if let cutoff = self.taxYear.specialCapitalGainsRateChangeLastOldRateDate,
