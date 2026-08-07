@@ -344,9 +344,12 @@ Tests:
   - `proceeds` are the sum of rounded per-disposal proceeds
   - `allowable costs` are the sum of rounded per-disposal allowable costs
   - `total gains` are the sum of rounded positive per-disposal gains
-  - `total losses` are the sum of rounded positive per-disposal losses
+  - `total losses` are the sum of the absolute values of signed, rounded per-disposal losses
+  - for losses, apply `TaxMethods.roundedGain(rawGain)` before `abs`; for example, `-£5.79` rounds to `-£6` and contributes `£6` to `total losses`
 - Why:
-  - the project keeps the disposal workings, top summary, and tax-return section on one coherent rounding basis
+  - the project keeps the disposal workings, top summary, and tax-return section on one coherent per-disposal rounding basis
+  - signed-first rounding is intentional because rounding down is not symmetric: `abs(roundDown(-5.79))` is `6`, whereas `roundDown(abs(-5.79))` is `5`
+  - this ensures `total losses` agrees with the individual disposal `LOSS` figures shown in the report
   - this avoids introducing a separate raw-total box-rounding regime that would create broader visible output changes and make the report harder to follow
 - Status: explicit project reporting policy.
 - Code:
