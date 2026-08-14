@@ -27,7 +27,7 @@ struct CalculationSession {
 
   init(transactions: [Transaction], calculationEvents: [AssetEvent]) {
     let sortedTransactions = transactions.sorted(by: CalculationTimeline.transactionSortsBefore)
-    let buys = sortedTransactions.filter(\.type.isAcquisition)
+    let buys = SameDayAcquisitionMerger.merge(sortedTransactions.filter(\.type.isAcquisition))
     let sells = SameDayDisposalMerger.merge(sortedTransactions.filter(\.type.isTaxableDisposal))
     let spouseOuts = sortedTransactions.filter(\.type.isSpouseTransferOut)
     let outbounds = (sells + spouseOuts).sorted(by: CalculationTimeline.transactionSortsBefore)
