@@ -9,6 +9,8 @@ Tax year   Gain   Proceeds   Exemption   Loss carry   Taxable gain
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 
 
 # HOLDINGS

@@ -24,6 +24,18 @@ struct CGTCalcCommand: ParsableCommand {
     #endif
   }
 
+  enum RoundingModeArgument: String, ExpressibleByArgument {
+    case aggregate
+    case perDisposal = "per-disposal"
+
+    var mode: RoundingMode {
+      switch self {
+      case .aggregate: .aggregate
+      case .perDisposal: .perDisposal
+      }
+    }
+  }
+
   static let VERSION = "0.2.0"
 
   static let configuration = CommandConfiguration(
@@ -39,6 +51,11 @@ struct CGTCalcCommand: ParsableCommand {
 
   @Option(name: .shortAndLong, help: "Output format")
   var format: OutputFormat = .text
+
+  @Option(
+    name: .long,
+    help: "Rounding mode: 'aggregate' (round only final totals so tax-return boxes reconcile) or 'per-disposal' (round each disposal, matching HMRC's HS284 worked examples)")
+  var rounding: RoundingModeArgument = .aggregate
 
   /// Parses input, runs the calculator, and writes the formatted report to stdout or a file.
   mutating func run() throws {
@@ -73,10 +90,10 @@ struct CGTCalcCommand: ParsableCommand {
     let formatter: any ReportFormatter
     switch self.format {
     case .text:
-      formatter = TextReportFormatter()
+      formatter = TextReportFormatter(rounding: self.rounding.mode)
     #if os(macOS)
       case .pdf:
-        formatter = PDFReportFormatter()
+        formatter = PDFReportFormatter(rounding: self.rounding.mode)
     #endif
     }
 

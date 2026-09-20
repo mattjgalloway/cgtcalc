@@ -3,7 +3,11 @@ import Foundation
 // MARK: - Output Formatter
 
 public struct TextReportFormatter {
-  public init() {}
+  private let rounding: RoundingMode
+
+  public init(rounding: RoundingMode = .perDisposal) {
+    self.rounding = rounding
+  }
 
   /// Renders a full text report for a calculation result.
   /// - Parameter result: The engine output to render.
@@ -21,6 +25,7 @@ public struct TextReportFormatter {
 
     // Tax return information
     output += "\n# TAX RETURN INFORMATION\n\n"
+    output += "Rounding mode: \(self.rounding.reportLabel)\n\n"
     output += self.formatTaxReturnInfo(document.taxYears.map(\.summary))
 
     // Holdings
@@ -54,11 +59,11 @@ public struct TextReportFormatter {
 
     let rows = summaries
       .reduce(into: [[String]]()) { output, summary in
-        let gain = self.formatCurrency(summary.netGain)
+        let gain = self.formatCurrency(summary.reportedNetGain(rounding: self.rounding))
         let proceeds = self.formatProceeds(summary)
         let exemption = self.formatCurrency(summary.exemption)
         let lossCarry = self.formatCurrency(summary.lossCarryForward)
-        let taxable = self.formatCurrency(summary.taxableGain)
+        let taxable = self.formatCurrency(summary.reportedTaxableGain(rounding: self.rounding))
         let row = [
           summary.taxYear.label,
           gain,
@@ -106,7 +111,7 @@ public struct TextReportFormatter {
   /// - Parameter summary: The tax-year summary to inspect.
   /// - Returns: Rounded proceeds as a currency string.
   private func formatProceeds(_ summary: TaxYearSummary) -> String {
-    "\(self.formatCurrency(summary.summaryReportedProceeds))"
+    "\(self.formatCurrency(summary.summaryReportedProceeds(rounding: self.rounding)))"
   }
 
   // MARK: - Tax Year Details
@@ -198,8 +203,8 @@ public struct TextReportFormatter {
     var output = ""
 
     for summary in summaries.sorted(by: { $0.taxYear < $1.taxYear }) {
-      let taxReturn = summary.taxReturnMath
-      output += "\(summary.taxYear.label): Disposals = \(taxReturn.disposalsCount), proceeds = \(self.formatDecimal(taxReturn.proceeds)), allowable costs = \(self.formatDecimal(TaxMethods.roundedGain(taxReturn.allowableCosts))), total gains = \(self.formatDecimal(taxReturn.totalGains)), total losses = \(self.formatDecimal(taxReturn.totalLosses))\n"
+      let taxReturn = summary.taxReturnMath(rounding: self.rounding)
+      output += "\(summary.taxYear.label): Disposals = \(taxReturn.disposalsCount), proceeds = \(self.formatDecimal(taxReturn.proceeds)), allowable costs = \(self.formatDecimal(taxReturn.allowableCosts)), total gains = \(self.formatDecimal(taxReturn.totalGains)), total losses = \(self.formatDecimal(taxReturn.totalLosses))\n"
 
       if let split = taxReturn.specialRateSplit {
         output += "    > Gains to (and inc.) \(split.label) = \(self.formatDecimal(split.gainsToAndIncludingLabelDate)), gains after \(split.label) = \(self.formatDecimal(split.gainsAfterLabelDate))\n"

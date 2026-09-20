@@ -31,6 +31,8 @@ Calculation: (5 * 100 - 0) - ( (5 * 87.2) ) = 64
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2019/2020: Disposals = 1, proceeds = 525, allowable costs = 500, total gains = 25, total losses = 0
 2020/2021: Disposals = 1, proceeds = 500, allowable costs = 436, total gains = 64, total losses = 0
 

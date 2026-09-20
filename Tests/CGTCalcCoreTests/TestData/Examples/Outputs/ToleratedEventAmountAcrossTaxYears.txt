@@ -31,6 +31,8 @@ Calculation: (0.0001 * 2000000 - 0) - ( (0.0001 * 500000 + 0 + 50) ) = 100
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2024/2025: Disposals = 1, proceeds = 200, allowable costs = 100, total gains = 100, total losses = 0
     > Gains to (and inc.) 29th October = 0, gains after 29th October = 100
 2025/2026: Disposals = 1, proceeds = 200, allowable costs = 100, total gains = 100, total losses = 0

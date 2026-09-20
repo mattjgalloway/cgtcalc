@@ -82,7 +82,7 @@ For PDF output, use `--format pdf --output-file report.pdf` (available on macOS 
 
 Full usage can be found by running with `-h`:
 ```
-USAGE: cgtcalc <filename> [--output-file <output-file>] [--format <format>]
+USAGE: cgtcalc <filename> [--output-file <output-file>] [--format <format>] [--rounding <rounding>]
 
 ARGUMENTS:
   <filename>              The input data filename (use '-' for stdin)
@@ -91,9 +91,21 @@ OPTIONS:
   -o, --output-file <output-file>
                           Output file
   -f, --format <format>   Output format (text or pdf on macOS, text only on Linux)
+  --rounding <rounding>   Rounding mode: 'aggregate' (default) or 'per-disposal'
   --version               Show the version.
   -h, --help              Show help information.
 ```
+
+### Rounding modes
+
+The tax-return figures (proceeds, allowable costs, total gains, total losses) can be rounded to whole pounds in two ways, selected with `--rounding`:
+
+- `aggregate` (default): every disposal is kept at full decimal precision and only the four final totals are rounded, each in HMRC's Self Assessment direction — income (proceeds and gains) is rounded **down** and costs/reliefs (allowable costs and losses) are rounded **up**. This follows HMRC's Capital Gains Manual (CG14200), which says the computation should retain full precision and only the entered figures are rounded, and the Self Assessment rounding convention (SAM121370), which rounds income down and expenses/reliefs up — always in the taxpayer's favour. Because each of the four totals is rounded independently in its own direction, an unavoidable rounding artefact of at most **£1** (in the taxpayer's favour) can remain, so `proceeds − allowable costs` may be £1 more than `gains − losses`. Where HMRC's online form flags this it can safely be accepted, since each figure is rounded exactly as HMRC's own convention directs.
+- `per-disposal`: each disposal is rounded to whole pounds (downwards) and the rounded values are summed. This matches the presentation in HMRC's HS284 worked examples, but because each figure is rounded independently the four totals accumulate rounding differences and may be several pounds out of step, so they need not reconcile.
+
+If in doubt, use the default `aggregate` mode: it keeps full precision until the return figures and rounds them the way HMRC does.
+
+Both the `# SUMMARY` table and the `# TAX RETURN INFORMATION` section use the selected rounding mode, so the summary's `Gain` and `Taxable gain` columns are consistent with the reported `total gains − total losses`. The `# TAX RETURN INFORMATION` section states which rounding mode produced its figures (both text and PDF output), so a saved report is self-documenting. The figures to transcribe onto a Self Assessment return are those in the `# TAX RETURN INFORMATION` section (disposal proceeds, allowable costs, total gains, total losses); the summary is a per-year overview of the same rounded figures.
 
 ### Input data
 

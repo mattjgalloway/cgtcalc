@@ -25,6 +25,8 @@ Calculation: (400 * 5.2 - 105) - ( (400 * 4.18667) ) = 300
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2018/2019: Disposals = 2, proceeds = 5440, allowable costs = 4809, total gains = 629, total losses = 0
 
 

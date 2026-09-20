@@ -20,6 +20,8 @@ Calculation: (10 * 10 - 0) - ( (10 * 4) ) = 60
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2019/2020: Disposals = 1, proceeds = 100, allowable costs = 40, total gains = 60, total losses = 0
 
 

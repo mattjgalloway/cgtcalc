@@ -20,6 +20,8 @@ Calculation: (100 * 20 - 0) - ( (100 * 10 + 0 + 100) ) = 900
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2020/2021: Disposals = 1, proceeds = 2000, allowable costs = 1100, total gains = 900, total losses = 0
 
 

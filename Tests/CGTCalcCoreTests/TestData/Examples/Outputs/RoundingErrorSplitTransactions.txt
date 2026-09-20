@@ -26,6 +26,8 @@ Calculation: (79 * 6.25 - 0) - ( (79 * 3.30414) ) = 232
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2025/2026: Disposals = 2, proceeds = 1181, allowable costs = 519, total gains = 661, total losses = 0
 
 

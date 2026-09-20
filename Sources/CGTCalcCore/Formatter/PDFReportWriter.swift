@@ -41,8 +41,10 @@
     private let smallFont = CTFontCreateWithName("Helvetica" as CFString, 9, nil)
     private let monoFont = CTFontCreateWithName("Menlo-Regular" as CFString, 9.5, nil)
     private let generatedAt: Date
-    public init(generatedAt: Date = Date()) {
+    private let rounding: RoundingMode
+    public init(generatedAt: Date = Date(), rounding: RoundingMode = .perDisposal) {
       self.generatedAt = generatedAt
+      self.rounding = rounding
     }
 
     public func render(_ result: CalculationResult) throws -> FormattedReport {
@@ -103,11 +105,11 @@
       for summary in summaries {
         rows.append([
           summary.taxYear.label,
-          self.currency(summary.netGain),
-          self.currency(summary.summaryReportedProceeds),
+          self.currency(summary.reportedNetGain(rounding: self.rounding)),
+          self.currency(summary.summaryReportedProceeds(rounding: self.rounding)),
           self.currency(summary.exemption),
           self.currency(summary.lossCarryForward),
-          self.currency(summary.taxableGain)
+          self.currency(summary.reportedTaxableGain(rounding: self.rounding))
         ])
       }
       if rows.isEmpty {
@@ -239,7 +241,7 @@
       }
 
       let introHeight = layout.drawWrappedText(
-        "Values below are laid out for HMRC Self Assessment entry.",
+        "Values below are laid out for HMRC Self Assessment entry. Rounding mode: \(self.rounding.reportLabel).",
         x: self.margin,
         y: layout.y,
         width: self.contentWidth,
@@ -555,7 +557,7 @@
     }
 
     func taxReturnEntry(for summary: TaxYearSummary, disposalsCount: Int? = nil) -> TaxReturnEntry {
-      let taxReturn = summary.taxReturnMath
+      let taxReturn = summary.taxReturnMath(rounding: self.rounding)
       let count = disposalsCount ?? taxReturn.disposalsCount
 
       let rows: [(label: String, value: String)] = [

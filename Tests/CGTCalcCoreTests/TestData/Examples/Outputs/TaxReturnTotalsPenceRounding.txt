@@ -25,6 +25,8 @@ Calculation: (1 * 1.99 - 0) - ( (1 * 1) ) = 0
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2020/2021: Disposals = 2, proceeds = 2, allowable costs = 2, total gains = 0, total losses = 0
 
 

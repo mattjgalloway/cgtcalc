@@ -26,6 +26,8 @@ Calculation: (50 * 3 - 0) - ( (50 * 1.5 + 0) ) = 75
 
 # TAX RETURN INFORMATION
 
+Rounding mode: per-disposal (each disposal rounded to whole pounds, then summed; HS284 style)
+
 2019/2020: Disposals = 2, proceeds = 290, allowable costs = 150, total gains = 140, total losses = 0
 
 

@@ -11,7 +11,8 @@ Tax Year 2023/2024
 Section 104: 200 units at average cost £8
 Calculation: (100 * 12 - 3) - ( (100 * 8) ) = 395
 Tax Return Information
-Values below are laid out for HMRC Self Assessment entry.
+Values below are laid out for HMRC Self Assessment entry. Rounding mode: per-disposal (each
+disposal rounded to whole pounds, then summed; HS284 style).
 Tax Year 2023/2024
 Disposals 1
 Proceeds 1200
